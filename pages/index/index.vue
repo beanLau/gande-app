@@ -1,8 +1,41 @@
 <template>
-	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
-			<text class="title">{{title}}</text>
+	<view>
+		<home v-if="PageCur=='home'"></home>
+		<archives v-if="PageCur=='archives'"></archives>
+		<updown v-if="PageCur=='updown'"></updown>
+		<build v-if="PageCur=='build'"></build>
+		<my v-if="PageCur=='my'"></my>
+		<view class="cu-bar tabbar bg-white shadow foot">
+			<view class="action" @click="NavChange" data-cur="home">
+				<view class='cuIcon-cu-image'>
+					<image :src="'/static/tabbar/home' + [PageCur=='home'?'-cur':''] + '.png'"></image>
+				</view>
+				<view :class="PageCur=='home'?'text-red':'text-gray'">首页</view>
+			</view>
+			<view class="action" @click="NavChange" data-cur="archives">
+				<view class='cuIcon-cu-image'>
+					<image :src="'/static/tabbar/archives' + [PageCur == 'archives'?'-cur':''] + '.png'"></image>
+				</view>
+				<view :class="PageCur=='archives'?'text-red':'text-gray'">户档案</view>
+			</view>
+			<view class="action" @click="NavChange" data-cur="updown">
+				<view class='cuIcon-cu-image'>
+					<image :src="'/static/tabbar/updown' + [PageCur == 'updown'?'-cur':''] + '.png'"></image>
+				</view>
+				<view :class="PageCur=='updown'?'text-red':'text-gray'">上传下达</view>
+			</view>
+			<view class="action" @click="NavChange" data-cur="build">
+				<view class='cuIcon-cu-image'>
+					<image :src="'/static/tabbar/build' + [PageCur == 'build'?'-cur':''] + '.png'"></image>
+				</view>
+				<view :class="PageCur=='build'?'text-red':'text-gray'">党建</view>
+			</view>
+			<view class="action" @click="NavChange" data-cur="my">
+				<view class='cuIcon-cu-image'>
+					<image :src="'/static/tabbar/my' + [PageCur == 'my'?'-cur':''] + '.png'"></image>
+				</view>
+				<view :class="PageCur=='my'?'text-red':'text-gray'">我的</view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -10,43 +43,18 @@
 <script>
 	export default {
 		data() {
-			return {
-				title: 'Hello'
+		return {
+				PageCur: 'home'
 			}
 		},
-		onLoad() {
-
-		},
 		methods: {
-
+			NavChange: function(e) {
+				this.PageCur = e.currentTarget.dataset.cur
+			}
 		}
 	}
 </script>
 
 <style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
 
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin-top: 200rpx;
-		margin-left: auto;
-		margin-right: auto;
-		margin-bottom: 50rpx;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
 </style>
