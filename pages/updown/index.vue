@@ -1,53 +1,273 @@
 <template>
-	<view>
-		<cu-custom bgColor="bg-gradual-pink" :isBack="true"><block slot="backText">返回</block>
-			<block slot="content">轮播图</block>
-		</cu-custom>
-		<view class="cu-bar bg-white">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 全屏限高轮播
-			</view>
-			<view class="action">
-				<switch @change="DotStyle" :class="dotStyle?'checked':''" :checked="dotStyle?true:false"></switch>
-			</view>
-		</view>
-		<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500">
-			<swiper-item v-for="(item,index) in swiperList" :key="index">
-				<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-				<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-			</swiper-item>
-		</swiper>
-		<!-- #ifndef MP-ALIPAY -->
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 卡片式轮播
-			</view>
-		</view>
-		<swiper class="card-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500" @change="cardSwiper" indicator-color="#8799a3"
-		 indicator-active-color="#0081ff">
-			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-				</view>
-			</swiper-item>
-		</swiper>
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 堆叠式轮播 
-			</view>
-		</view>
-		<view class="tower-swiper" @touchmove="TowerMove" @touchstart="TowerStart" @touchend="TowerEnd">
-			<view class="tower-item" :class="item.zIndex==1?'none':''" v-for="(item,index) in swiperList" :key="index" :style="[{'--index': item.zIndex,'--left':item.mLeft}]" :data-direction="direction">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+	<view class="page-content">
+		<image src="../../static/top-bg.png" mode="scaleToFill" class="top-bg"></image>
+		<view class="bg-white padding">
+			<view>
+				<view class="gd-form-group">
+					<view class="title">日期</view>
+					<view class="picker-wrap">
+						<picker mode="date" :value="date" start="2015-09-01" end="2020-09-01" @change="DateChange">
+							<view class="picker">
+								{{date}}
+							</view>
+						</picker>
+						<text class="lg text-gray cuIcon-unfold"></text>
+					</view>
+					<text>至</text>
+					<view class="picker-wrap">
+						<picker mode="date" :value="date" start="2015-09-01" end="2020-09-01" @change="DateChange">
+							<view class="picker">
+								{{date}}
+							</view>
+						</picker>
+						<text class="lg text-gray cuIcon-unfold"></text>
+					</view>
 				</view>
 			</view>
+			<view>
+				<view class="gd-form-group">
+					<view class="title">紧急程度</view>
+					<view class="picker-wrap">
+						<picker @change="PickerChange" :range="picker">
+							<view class="picker">
+								紧急
+							</view>
+						</picker>
+						<text class="lg text-gray cuIcon-unfold"></text>
+					</view>
+				</view>
+			</view>
+			<view class="flex">
+				<view class="gd-form-group">
+					<view class="title">类型</view>
+					<view class="picker-wrap">
+						<picker @change="PickerChange" :range="picker2">
+							<view class="picker">
+								全部
+							</view>
+						</picker>
+						<text class="lg text-gray cuIcon-unfold"></text>
+					</view>
+				</view>
+				<view class="gd-form-group" style="margin-left: 20upx;">
+					<view class="title">状态</view>
+					<view class="picker-wrap">
+						<picker @change="PickerChange" :range="picker3">
+							<view class="picker">
+								全部
+							</view>
+						</picker>
+						<text class="lg text-gray cuIcon-unfold"></text>
+					</view>
+				</view>
+			</view>
 		</view>
-		<!-- #endif -->
+		<view class="list-title">
+			人员列表
+		</view>
+		<view class="people-list">
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			<view class="people-item flex">
+				<image class="people-pic" src="../../static/swiper3.jpg" mode="aspectFill"></image>
+				<view class="people-right">
+					<view class="people-top">
+						<text>刘德华</text>
+						<text>柯曲镇</text>
+						<text>达协村</text>
+						<text>户主</text>
+						<text>男</text>
+					</view>
+					<view class="people-middle">
+						<text>家庭成员 2</text>
+						<text>手机号码 18222882288</text>
+					</view>
+					<view class="people-bottom">
+						身份证号 130666990999099909
+					</view>
+				</view>
+				<text class="lg text-gray cuIcon-right"></text>
+			</view>
+			
+		</view>
 	</view>
 </template>
 
@@ -55,6 +275,10 @@
 	export default {
 		data() {
 			return {
+				date: '2018-12-25',
+				picker: ['特别紧急', '紧急', '一般', '不紧急'],
+				picker2: ['问题', '任务'],
+				picker3: ['进行中', '已完成'],
 				cardCur: 0,
 				swiperList: [{
 					id: 0,
@@ -95,6 +319,9 @@
 			// 初始化towerSwiper 传已有的数组名即可
 		},
 		methods: {
+			PickerChange(e) {
+				this.index = e.detail.value
+			},
 			DotStyle(e) {
 				this.dotStyle = e.detail.value
 			},
@@ -154,9 +381,116 @@
 </script>
 
 <style>
-	.tower-swiper .tower-item {
-		transform: scale(calc(0.5 + var(--index) / 10));
-		margin-left: calc(var(--left) * 100upx - 150upx);
-		z-index: var(--index);
+	.page-content{
+		padding-bottom: 120upx;
+	}
+	
+	.top-bg{
+		width: 100%;
+		height: 140upx;
+	}
+	.filter-list{
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+	}
+	.filter-item{
+		width: calc(25% - 10px);
+		text-align: center;
+		border: 1px solid #ccc;
+		border-radius: 2upx;
+	}
+	.filter-item > text{
+		height: 50upx;
+		line-height: 50upx;
+	}
+	.cu-form-group{
+		min-height: 30upx;
+		height: 50upx;
+		line-height: 50upx;
+		padding: 0.5upx 5upx;
+	}
+	.list-title{
+		position: relative;
+		height: 80upx;
+		font-size: 40upx;
+		line-height: 80upx;
+		padding-left: 40upx;
+		color: #666;
+		font-size: 32upx;
+	}
+	.list-title::after{
+		position: absolute;
+		content: "";
+		left: 20upx;
+		top: 22upx;
+		width: 6upx;
+		height: 30upx;
+		background: red;
+	}
+	.people-list{
+		padding: 0 32upx;
+		background: #fff;
+	}
+	.people-item{
+		border-bottom: 1upx solid #ccc;
+		background: #fff;
+		padding: 20upx 0;
+		display: flex;
+		align-items: center;
+	}
+	.people-item .text-gray{
+		width: 20upx;
+	}	.people-pic{
+		width: 80upx;
+		height: 80upx;
+		border-radius: 40upx;
+	}	.people-right{
+		width: calc(100% - 100upx);
+		padding-left: 20upx;
+	}	.people-top{
+		color: #333;
+		font-size: 28upx;
+	}
+	.people-top text{
+		margin-right: 20upx;
+	}	.people-middle{
+		color: #999;
+		font-size: 24upx;
+	}
+	.people-middle text{
+		margin-right: 20upx;
+	}	.people-bottom{
+		color: #999;
+		font-size: 24upx;
+	}
+	.people-bottom text{
+		margin-right: 20upx;
+	}
+	
+	.gd-form-group{
+		display: flex;
+		align-items: center;
+		margin-top: 10upx;
+	}
+	.gd-form-group .title{
+		margin-right: 20upx;
+	}
+	.gd-form-group text{
+		margin:0 20upx;
+	}
+	.gd-form-group .picker-wrap{
+		position: relative;
+		padding: 4upx 10upx;
+		border: 1px solid #ccc;
+		border-radius: 4upx;
+		padding-right: 40upx;
+	}
+	.gd-form-group .picker-wrap .text-gray{
+		position: absolute;
+		right: 4upx;
+		top: 0;
+		margin: 0;
+		line-height: 40upx;
 	}
 </style>

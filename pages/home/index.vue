@@ -1,5 +1,5 @@
 <template>
-	<view>
+	<view class="page-content">
 		<image src="../../static/top-bg.png" mode="scaleToFill" class="top-bg"></image>
 		<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
 		 :autoplay="true" interval="5000" duration="500">
@@ -8,6 +8,7 @@
 				<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
 			</swiper-item>
 		</swiper>
+		
 		<view class="qiun-columns">
 			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
 				<view class="qiun-title-dot-light">任务完成率</view>
@@ -17,12 +18,102 @@
 				<canvas canvas-id="canvasColumnStack" id="canvasColumnStack" class="charts"  @touchstart="touchColumn"></canvas>
 				<!--#endif-->
 			</view>
-			<view class="bg-white padding">
-				<view class="grid margin-bottom text-center col-4">
-					<view class="padding" :class="indexs%2==0?'bg-cyan':'bg-blue'" v-for="(item,indexs) in (index+1)*2" :key="indexs">{{indexs+1}}</view>
-				</view>
+		</view>
+		<view class="bg-white padding">
+			<view class="cu-list grid col-4">
+				<view class="cu-item bg-blue">乡镇</view>
+				<view class="cu-item bg-blue">已完成</view>
+				<view class="cu-item bg-red">未完成</view>
+				<view class="cu-item bg-blue">总数</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
 			</view>
 		</view>
+		
+		<view class="qiun-columns">
+			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
+				<view class="qiun-title-dot-light">问题解决率</view>
+			</view>
+			<view class="qiun-charts" >
+				<!--#ifndef MP-ALIPAY -->
+				<canvas canvas-id="canvasColumnStack2" id="canvasColumnStack2" class="charts"  @touchstart="touchColumn"></canvas>
+				<!--#endif-->
+			</view>
+		</view>
+		<view class="bg-white padding">
+			<view class="cu-list grid col-4">
+				<view class="cu-item bg-blue">乡镇</view>
+				<view class="cu-item bg-blue">已解决</view>
+				<view class="cu-item bg-red">未解决</view>
+				<view class="cu-item bg-blue">总数</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
+			</view>
+		</view>
+		<view class="qiun-columns">
+			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
+				<view class="qiun-title-dot-light">党建任务完成进度</view>
+			</view>
+		</view>
+		<view class="bg-white padding">
+			<view class="cu-list grid col-5">
+				<view class="cu-item bg-blue">乡镇</view>
+				<view class="cu-item bg-blue">支部会议</view>
+				<view class="cu-item bg-blue">党员会议</view>
+				<view class="cu-item bg-blue">党课</view>
+				<view class="cu-item bg-blue">完成情况</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item text-red">3</view>
+				<view class="cu-item text-blue">4</view>
+				<view class="cu-item">4</view>
+				<view class="cu-item text-red">未完成</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item">4</view>
+				<view class="cu-item text-red">4</view>
+				<view class="cu-item">未完成</view>
+			</view>
+		</view>
+		<view class="bg-white padding">
+			<view class="grid margin-bottom text-center col-5 border">
+				<view class="padding bg-blue">乡镇</view>
+				<view class="padding bg-blue">支部会议</view>
+				<view class="padding bg-blue">党员会议</view>
+				<view class="padding bg-blue">党课</view>
+				<view class="padding bg-blue">完成情况</view>
+				
+				<view class="padding">柯庄镇</view>
+				<view class="padding">3</view>
+				<view class="padding text-red">4</view>
+				<view class="padding">4</view>
+				<view class="padding text-red">未完成</view>
+				
+				<view class="padding">柯庄镇</view>
+				<view class="padding">3</view>
+				<view class="padding">4</view>
+				<view class="padding text-red">4</view>
+				<view class="padding">已未完成</view>
+			</view>
+		</view>
+		
 	</view>
 </template>
 
@@ -89,6 +180,7 @@
 						ColumnStack.series=res.data.data.ColumnStack.series;
 						_self.textarea = JSON.stringify(res.data.data.ColumnStack);
 						_self.showColumnStack("canvasColumnStack",ColumnStack);
+						_self.showColumnStack("canvasColumnStack2",ColumnStack);
 					},
 					fail: () => {
 						_self.tips="网络错误，小程序端请检查合法域名";
@@ -158,6 +250,9 @@
 </script>
 
 <style>
+	.page-content{
+		padding-bottom: 120upx;
+	}
 	/*样式的width和height一定要与定义的cWidth和cHeight相对应*/
 	.qiun-charts {
 		width: 750upx;
