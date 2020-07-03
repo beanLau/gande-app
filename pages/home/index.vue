@@ -10,9 +10,15 @@
 		</swiper>
 		
 		<view class="qiun-columns">
-			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
-				<view class="qiun-title-dot-light">任务完成率</view>
+			<view class="group-wrap">
+				<view class="group-title">任务完成率</view>
+				<view class="select-month" @click="show(3)">
+					<text>{{taskMonth}}</text>
+					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
+				</view>
 			</view>
+			<tui-datetime ref="dateTime" :type="type" :cancelColor="cancelColor" :color="color"
+			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="change"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
 				<canvas canvas-id="canvasColumnStack" id="canvasColumnStack" class="charts"  @touchstart="touchColumn"></canvas>
@@ -146,7 +152,15 @@
 				}],
 				dotStyle: false,
 				towerStart: 0,
-				direction: ''
+				direction: '',
+				taskMonth: "6月",
+				type: 3,
+				cancelColor: '#888',
+				color: '#5677fc',
+				setDateTime: '',
+				result: '',
+				unitTop: false,
+				radius: false
 			}
 		},
 		mounted() {
@@ -167,6 +181,13 @@
 			this.getServerData();
 		},
 		methods: {
+			show(){
+				this.$refs.dateTime.show();
+			},
+			change() {
+				console.log(e);
+				this.result = e.result;
+			},
 			getServerData(){
 				uni.request({
 					url: 'https://www.ucharts.cn/data.json',
@@ -268,5 +289,22 @@
 	.top-bg{
 		width: 100%;
 		height: 140upx;
+	}
+	.group-wrap{
+		padding: 40upx 30upx;
+		background: #fff;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.group-title{
+		padding-left: 22upx;
+		font-size: 32upx;
+		line-height: 1;
+		color: #2E2E2E;
+		border-left: 8upx solid #DE1727;
+	}
+	.select-month{
+		line-height: 1;
 	}
 </style>

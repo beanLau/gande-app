@@ -14,7 +14,12 @@
 			"style": {}
 		}
 	],
-	
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"tui-(.*)": "@/components/thorui/tui-$1/tui-$1.vue"
+		}
+	},
 	"globalStyle": {
 		"navigationBarBackgroundColor": "#0081ff",
 		"navigationBarTitleText": "ColorUi for UniApp",

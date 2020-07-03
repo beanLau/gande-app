@@ -15,6 +15,11 @@
 <style>
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
+	/*每个页面公共css uParse为优化版本*/
+	@import './common/app.css';
+	/* #ifndef APP-NVUE */
+	@import './components/uni/uParse/src/wxParse.css';
+	/* #endif */
 	@import './common/qiun.css';
 	.nav-list {
 		display: flex;

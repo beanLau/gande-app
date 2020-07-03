@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import App from './App'
+import store from './store'
+import tui from './common/httpRequest'
 
 import home from './pages/home/index.vue'
 Vue.component('home',home)
