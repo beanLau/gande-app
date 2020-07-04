@@ -25,12 +25,12 @@
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding">
+		<view class="bg-white padding bottom-border">
 			<view class="cu-list grid col-4">
-				<view class="cu-item bg-blue">乡镇</view>
-				<view class="cu-item bg-blue">已完成</view>
-				<view class="cu-item bg-red">未完成</view>
-				<view class="cu-item bg-blue">总数</view>
+				<view class="cu-item table-title">乡镇</view>
+				<view class="cu-item table-title">已完成</view>
+				<view class="cu-item table-title">未完成</view>
+				<view class="cu-item table-title">总数</view>
 				
 				<view class="cu-item">柯庄镇</view>
 				<view class="cu-item">3</view>
@@ -39,14 +39,28 @@
 				
 				<view class="cu-item">柯庄镇</view>
 				<view class="cu-item">3</view>
+				<view class="cu-item">-</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
 				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item">-</view>
 				<view class="cu-item">5</view>
 			</view>
 		</view>
 		
 		<view class="qiun-columns">
-			<view class="qiun-bg-white qiun-title-bar qiun-common-mt" >
-				<view class="qiun-title-dot-light">问题解决率</view>
+			<view class="group-wrap">
+				<view class="group-title">问题解决率</view>
+				<view class="select-month" @click="show(3)">
+					<text>{{taskMonth}}</text>
+					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
+				</view>
 			</view>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
@@ -54,12 +68,12 @@
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding">
+		<view class="bg-white padding bottom-border">
 			<view class="cu-list grid col-4">
-				<view class="cu-item bg-blue">乡镇</view>
-				<view class="cu-item bg-blue">已解决</view>
-				<view class="cu-item bg-red">未解决</view>
-				<view class="cu-item bg-blue">总数</view>
+				<view class="cu-item table-title">乡镇</view>
+				<view class="cu-item table-title">已完成</view>
+				<view class="cu-item table-title">未完成</view>
+				<view class="cu-item table-title">总数</view>
 				
 				<view class="cu-item">柯庄镇</view>
 				<view class="cu-item">3</view>
@@ -68,7 +82,17 @@
 				
 				<view class="cu-item">柯庄镇</view>
 				<view class="cu-item">3</view>
+				<view class="cu-item">-</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
 				<view class="cu-item text-red">2</view>
+				<view class="cu-item">5</view>
+				
+				<view class="cu-item">柯庄镇</view>
+				<view class="cu-item">3</view>
+				<view class="cu-item">-</view>
 				<view class="cu-item">5</view>
 			</view>
 		</view>
@@ -77,13 +101,13 @@
 				<view class="qiun-title-dot-light">党建任务完成进度</view>
 			</view>
 		</view>
-		<view class="bg-white padding">
+		<view class="bg-white padding bottom-border">
 			<view class="cu-list grid col-5">
-				<view class="cu-item bg-blue">乡镇</view>
-				<view class="cu-item bg-blue">支部会议</view>
-				<view class="cu-item bg-blue">党员会议</view>
-				<view class="cu-item bg-blue">党课</view>
-				<view class="cu-item bg-blue">完成情况</view>
+				<view class="cu-item table-title">乡镇</view>
+				<view class="cu-item table-title">支部会议</view>
+				<view class="cu-item table-title">党员会议</view>
+				<view class="cu-item table-title">党课</view>
+				<view class="cu-item table-title">完成情况</view>
 				
 				<view class="cu-item">柯庄镇</view>
 				<view class="cu-item text-red">3</view>
@@ -100,11 +124,11 @@
 		</view>
 		<view class="bg-white padding">
 			<view class="grid margin-bottom text-center col-5 border">
-				<view class="padding bg-blue">乡镇</view>
-				<view class="padding bg-blue">支部会议</view>
-				<view class="padding bg-blue">党员会议</view>
-				<view class="padding bg-blue">党课</view>
-				<view class="padding bg-blue">完成情况</view>
+				<view class="padding table-title">乡镇</view>
+				<view class="padding table-title">支部会议</view>
+				<view class="padding table-title">党员会议</view>
+				<view class="padding table-title">党课</view>
+				<view class="padding table-title">完成情况</view>
 				
 				<view class="padding">柯庄镇</view>
 				<view class="padding">3</view>
@@ -195,11 +219,21 @@
 					},
 					success: function(res) {
 						console.log(res.data.data)
-						let ColumnStack={categories:[],series:[]};
-						//这里我后台返回的是数组，所以用等于，如果您后台返回的是单条数据，需要push进去
-						ColumnStack.categories=res.data.data.ColumnStack.categories;
-						ColumnStack.series=res.data.data.ColumnStack.series;
-						_self.textarea = JSON.stringify(res.data.data.ColumnStack);
+						let ColumnStack={
+							"categories": ["任城镇", "新店镇", "邢湾镇"],
+							"series": [{
+								"name": "已完成",
+								"data": [50, 20, 70],
+								"color": "#EE9FA5",
+								format:(val)=>{return val.toFixed(0)+'%'}
+							}, {
+								"name": "未完成",
+								"data": [50, 80, 30],
+								"color": '#FAFAFA',
+								format:(val)=>{return val.toFixed(0)+'%'}
+							}]
+						}; 
+						_self.textarea = JSON.stringify(ColumnStack);
 						_self.showColumnStack("canvasColumnStack",ColumnStack);
 						_self.showColumnStack("canvasColumnStack2",ColumnStack);
 					},
@@ -230,6 +264,9 @@
 						disableGrid:true,
 					},
 					yAxis: {
+						min: 0,
+						max: 10,
+						format:(val)=>{return val.toFixed(0)+'%'}
 						//disabled:true
 					},
 					dataLabel: true,
@@ -305,6 +342,13 @@
 		border-left: 8upx solid #DE1727;
 	}
 	.select-month{
+		line-height: 1;
+	}
+	.table-title{
+		background-color: #F6F6F6;
+		color: #2E2E2E;
+	}
+	.cu-item{
 		line-height: 1;
 	}
 </style>
