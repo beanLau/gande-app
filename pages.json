@@ -13,7 +13,11 @@
 			"path": "pages/plugin/home",
 			"style": {}
 		}
-	],
+	    ,{
+            "path" : "pages/createTask/createTask",
+            "style" : {}
+        }
+    ],
 	"easycom": {
 		"autoscan": true,
 		"custom": {

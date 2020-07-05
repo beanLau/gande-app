@@ -44,7 +44,7 @@
 	export default {
 		data() {
 		return {
-				PageCur: 'home'
+				PageCur: 'updown'
 			}
 		},
 		methods: {
