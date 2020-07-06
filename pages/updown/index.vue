@@ -3,12 +3,7 @@
 		
 		<!--screen-->
 		<view class="tui-header-screen">
-			<view class="title-content">
-				<text class="top-title">上传下达</text>
-				<view class="send-btn" @tap="toCreateTask">
-					发布任务
-				</view>
-			</view>
+			<uni-nav-bar status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			<view class="tui-screen-top">
 				<view class="tui-top-item tui-icon-ml" @click="showFilterTime()">
 					<view>日期</view>
@@ -446,12 +441,12 @@ export default {
 		},
 		detail: function() {
 			uni.navigateTo({
-				url: '../productDetail/productDetail'
+				url: '../taskDetail/index'
 			});
 		},
 		toCreateTask(){
 			uni.navigateTo({
-				url: '../createTask/createTask'
+				url: '../createTask/index'
 			});
 		}
 	},
@@ -494,7 +489,7 @@ page {
 
 .title-content{
 	position: relative;
-	border-top: 50upx solid #DE1727;
+	border-top: 60upx solid #851A1C;
 	position: relative;
 	height: 150upx;
 	background: #DE1727;

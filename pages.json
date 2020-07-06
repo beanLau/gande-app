@@ -14,8 +14,24 @@
 			"style": {}
 		}
 	    ,{
-            "path" : "pages/createTask/createTask",
-            "style" : {}
+            "path" : "pages/createTask/index",
+            "style" : {
+				"app-plus": {
+					"background": "#851A1C",
+				     "titleNView": false //禁用原生导航栏
+				}
+				
+			}
+        }
+        ,{
+            "path" : "pages/taskDetail/index",
+            "style" : {
+				"app-plus": {
+					"background": "#851A1C",
+				     "titleNView": false //禁用原生导航栏
+				}
+				
+			}
         }
     ],
 	"easycom": {
@@ -30,4 +46,5 @@
 		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white"
 	}
+	
 }

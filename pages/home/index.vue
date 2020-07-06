@@ -1,13 +1,16 @@
 <template>
 	<view class="page-content">
-		<image src="../../static/top-bg.png" mode="scaleToFill" class="top-bg"></image>
-		<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500">
-			<swiper-item v-for="(item,index) in swiperList" :key="index">
-				<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-				<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-			</swiper-item>
-		</swiper>
+		<view class="status_bar"></view>
+		<view class="top-wrap">
+			<image src="../../static/home-top.png" mode="scaleToFill" class="top-bg"></image>
+			<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
+			 :autoplay="true" interval="5000" duration="500">
+				<swiper-item v-for="(item,index) in swiperList" :key="index">
+					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
+					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+				</swiper-item>
+			</swiper>
+		</view>
 		<view class="qiun-columns">
 			<view class="group-wrap">
 				<view class="group-title">任务完成率</view>
@@ -158,7 +161,7 @@
 			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBuildMonth"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
-				<canvas canvas-id="buildCanva" id="buildCanva" class="charts"  @touchstart="touchWorkCanva"></canvas>
+				<canvas canvas-id="buildCanva" id="buildCanva" class="charts"  @touchstart="touchBuildCanva"></canvas>
 				<!--#endif-->
 			</view>
 		</view>
@@ -567,8 +570,16 @@
 				});
 			},
 			touchProgressCanva(e){
-				workCanva.touchLegend(e);
-				workCanva.showToolTip(e, {
+				progressCanva.touchLegend(e);
+				progressCanva.showToolTip(e, {
+					format: function (item, category) {
+						return category + ' ' + item.name + ':' + item.data 
+					}
+				});
+			},
+			touchBuildCanva(e){
+				buildCanva.touchLegend(e);
+				buildCanva.showToolTip(e, {
 					format: function (item, category) {
 						return category + ' ' + item.name + ':' + item.data 
 					}
@@ -593,6 +604,11 @@
 </script>
 
 <style>
+	.status_bar {
+	      height: var(--status-bar-height);
+	      width: 100%;
+		  background: #DE1727;
+	  }
 	.page-content{
 		padding-bottom: 120upx;
 	}
@@ -608,9 +624,13 @@
 		height: 500upx;
 		background-color: #FFFFFF;
 	}
+	.top-wrap{
+		font-size: 0; 
+	}
 	.top-bg{
+		font-size: 0;
 		width: 100%;
-		height: 140upx;
+		height: 100upx;
 	}
 	.group-wrap{
 		padding: 40upx 30upx;

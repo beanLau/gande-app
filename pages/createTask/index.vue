@@ -1,19 +1,18 @@
 <template>
 	<view class="container">
-		<view class="navbar-wrap">
-			<uni-nav-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="发布任务"></uni-nav-bar>
-		</view>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="发布任务"></uni-nav-bar>
+		
 		<form @submit="formSubmit" @reset="formReset">
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">任务标题</view>
-					<input placeholder-class="tui-phcolor" class="tui-input" name="mobile" placeholder="请输入任务标题" maxlength="50" type="text" />
+					<input placeholder-class="tui-phcolor" class="tui-input" name="title" placeholder="请输入任务标题" maxlength="50" type="text" />
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">紧急程度</view>
-					<radio-group class="radio-group" name="sex">
+					<radio-group class="radio-group" name="chengdu">
 						<label class="tui-radio">
 							<radio value="1" color="#5677fc" />一般
 						</label>
@@ -44,14 +43,16 @@
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">选择分类</view>
+					<view class="tui-title">任务内容</view>
 				</view>
-				<textarea placeholder-style="color:#F76260" placeholder="占位符字体是红色的"/>
+				
 			</tui-list-cell>
-
-			<view class="tui-btn-box">
-				<button class="tui-button-primary" hover-class="tui-button-hover" formType="submit" type="primary">Submit</button>
-				<button class="tui-button-primary tui-button-gray" hover-class="tui-button-gray_hover" formType="reset">Reset</button>
+			<view class="textarea-wrap">
+				<textarea placeholder-style="color:#999" placeholder="占位符字体是红色的"/>
+			</view>
+			<view class="tui-btn-box flex">
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
 	</view>
@@ -186,22 +187,30 @@
 	}
 
 	.tui-radio {
-		display: inline-block;
-		padding-left: 28rpx;
-		font-size: 36rpx;
+		display: flex;
+		font-size: 19px;
 		vertical-align: middle;
+		align-items: center;
+		margin-right: 30upx;
 	}
-
+	uni-radio .wx-radio-input, uni-checkbox .wx-checkbox-input, uni-radio .uni-radio-input, uni-checkbox .uni-checkbox-input {
+		margin: 0;
+		width: 36upx;
+		height: 36upx;
+		margin-right: 8upx;
+	}
 
 	.tui-btn-box {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		padding: 40rpx 50rpx;
 		box-sizing: border-box;
+		margin-top: 60upx;
 	}
-
-	.tui-button-gray {
-		margin-top: 30rpx;
+	uni-button{
+		margin: 0 10px;
 	}
-
 	.tui-tips {
 		padding: 30rpx;
 		color: #999;
@@ -210,5 +219,31 @@
 	.form-right{
 		flex-grow: 1;
 		text-align: right;
+	}
+	.radio-group{
+		display: flex;
+		align-items: center;
+	}
+	.textarea-wrap{
+		background: #fff;
+		padding: 0 20upx;
+	}
+	.textarea-wrap textarea{
+		padding: 10upx 20upx;
+		width: 100%;
+		border: 1px solid #ccc;
+		color: #666;
+	}
+	.cancel-btn{
+		background: #eee;
+		color: #999;
+	}
+	.submit-btn{
+		background: #D4091C;
+		color: #fff;
+	}
+	.uni-radio-input-checked{
+		background-color: rgb(222, 23, 39) !important;
+		border-color: rgb(222, 23, 39) !important;
 	}
 </style>
