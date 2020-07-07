@@ -324,6 +324,8 @@ export default {
 		//显示紧急程度筛选相关事件begin
 		showFilterDegree(){
 			this.degreeH = 246;
+			this.typeH = 0;
+			this.statusH = 0;
 			this.tabIndex = 0;
 		},
 		selectDegree(e){
@@ -353,6 +355,8 @@ export default {
 		//显示类别筛选相关事件begin
 		showFilterType(){
 			this.typeH = 246;
+			this.degreeH = 0;
+			this.statusH = 0;
 			this.tabIndex = 1;
 		},
 		selectType(e){
@@ -381,6 +385,8 @@ export default {
 
 		//显示分类筛选相关事件begin
 		showFilterStatus(){
+			this.typeH = 0;
+			this.degreeH = 0;
 			this.statusH = 246;
 			this.tabIndex = 1;
 		},

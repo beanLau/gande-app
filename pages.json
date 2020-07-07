@@ -14,24 +14,13 @@
 			"style": {}
 		}
 	    ,{
-            "path" : "pages/createTask/index",
-            "style" : {
-				"app-plus": {
-					"background": "#851A1C",
-				     "titleNView": false //禁用原生导航栏
-				}
-				
-			}
+            "path" : "pages/createTask/index"
         }
         ,{
-            "path" : "pages/taskDetail/index",
-            "style" : {
-				"app-plus": {
-					"background": "#851A1C",
-				     "titleNView": false //禁用原生导航栏
-				}
-				
-			}
+            "path" : "pages/taskDetail/index"
+        }
+        ,{
+            "path" : "pages/taskDetail2/index"
         }
     ],
 	"easycom": {

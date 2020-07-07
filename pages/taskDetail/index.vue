@@ -3,7 +3,7 @@
 		<view class="navbar-wrap">
 			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务详情"></uni-nav-bar>
 		</view>
-		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150" @tap="detail">
+		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">
 				<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
 				<view>甘德县政府工作报告准时发布</view>
@@ -42,7 +42,7 @@
 				</view>
 				<view class="towns-bottom">
 					<text class="towns-time">汇报时间 2020-06-01</text>
-					<text class="towns-btn">查看详情</text>
+					<text class="towns-btn" @click="toDetail">查看详情</text>
 				</view>
 			</view>
 			<view class="towns-item">
@@ -98,6 +98,11 @@
 		methods: {
 			pageBack(){
 				uni.navigateBack()
+			},
+			toDetail(){
+				uni.navigateTo({
+					url: '../taskDetail2/index'
+				})
 			}
 		}
 	}
