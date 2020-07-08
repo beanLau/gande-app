@@ -29,22 +29,23 @@
 			</view>
 		</view>
 		<view class="report-content">
-			<view class="report-title">柯曲镇任务汇报</view>
+			<view class="report-title">培田古村任务汇报</view>
 			<view class="group">
 				<text class="group-label">汇报时间</text>
-				<text class="group-value">2020-06-01</text>
+				<text class="group-value">{{detail.time}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">汇报人</text>
-				<text class="group-value">张倩</text>
-			</view>
-			<view class="group">
-				<text class="group-label">完成状态</text>
-				<text class="group-value light-hight">已完结</text>
+				<text class="group-value">{{detail.person}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">汇报内容</text>
-				<text class="group-value">在县委、县政府及镇委的坚强领导下，践行发展理念，推动高质量发展，较好完成了镇三届人大四次会议确定的任务，取得重大进展。</text>
+				<view class="audio-list">
+					<view class="audio-item" v-for="(audio,index) in detail.audios" :data-index="index" @click="playDetailAudio">
+						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
+						<text class="audio-len">{{audio.len}}</text>
+					</view>
+				</view>
 			</view>
 		</view>
 		<view class="towns-list">
@@ -53,7 +54,7 @@
 			</view>
 			<view class="towns-item" v-for="(item,idx) in villageList" :key="item.name">
 				<view class="towns-top">
-					<text class="towns-name">{{item.name}}</text>
+					<text class="towns-name">联护员  {{item.name}}</text>
 					<text class="towns-btn" @click="toDetail">详情</text>
 				</view>
 				<view class="towns-audios">
@@ -78,8 +79,23 @@
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
+				detailIndex: -1,
+				detail: {
+					name: '',
+					person: '剑侠客',
+					time: '2020-07-08',
+					audios: [{
+						src: 'http://www.douxue.top/audio.mp3',
+						isPlay: false,
+						len: '00:50'
+					},{
+						src: 'http://www.douxue.top/audio.mp3',
+						isPlay: false,
+						len: '00:50'
+					}]
+				},
 				villageList: [{
-					name: "培田古村",
+					name: "李萌",
 					statusName: '进行中',
 					reportTime: "2020-06-01",
 					reportName: "张倩",
@@ -93,7 +109,7 @@
 						len: '00:50'
 					}]
 				},{
-					name: "培田古村2",
+					name: "李萌2",
 					statusName: '进行中',
 					reportTime: "2020-06-01",
 					reportName: "张倩",
@@ -103,7 +119,7 @@
 						len: '00:50'
 					}]
 				},{
-					name: "培田古村3",
+					name: "李萌3",
 					statusName: '进行中',
 					reportTime: "2020-06-01",
 					reportName: "张倩",
@@ -113,7 +129,7 @@
 						len: '00:50'
 					}]
 				},{
-					name: "培田古村4",
+					name: "李萌4",
 					statusName: '进行中',
 					reportTime: "2020-06-01",
 					reportName: "张倩",
@@ -158,7 +174,6 @@
 					this.playEnd();
 				});
 				this.innerAudioContext.onWaiting(() => {
-					console.log("loading")
 					uni.showLoading({
 					    title: '音频资源加载中'
 					});
@@ -217,6 +232,26 @@
 					this.innerAudioContext.play();
 				}
 				
+			},
+			playDetailAudio(e){
+				let index = e.currentTarget.dataset.index;
+				let audios = this.detail.audios;
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.detailIndex == index){
+					this.innerAudioContext.stop();
+					return
+				}
+				this.detailIndex = index
+				if(this.innerAudioContext){
+					this.innerAudioContext.destroy();
+					this.innerAudioContext = null
+				}
+				uni.showLoading({
+					title: '音频资源加载中'
+				});
+				this.initAudioContext()
+				this.innerAudioContext.src = audios[index].src;
+				this.innerAudioContext.autoplay = true;
+				this.innerAudioContext.play();
 			},
 			toDetail(){
 				uni.navigateTo({
@@ -333,6 +368,22 @@
 .light-hight{
 	color: #DE1727;
 }
+.audio-list{
+	padding-left: 50upx;
+	flex-grow: 1;
+}
+.audio-list >.audio-item{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 400upx;
+	height: 60upx;
+	line-height: 60upx;
+	padding: 0 24upx;
+	border-radius: 30upx;
+	background: #FEF3F3;
+	margin-bottom: 30upx;
+}
 
 /* 任务完成列表begin */
 .towns-list{
@@ -389,7 +440,7 @@
 	color: #aaa;
 	line-height: 36upx;
 }
-.audio-item{
+.towns-audios >.audio-item{
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

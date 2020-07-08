@@ -22,6 +22,9 @@
         ,{
             "path" : "pages/taskDetail2/index"
         }
+        ,{
+            "path" : "pages/taskDetail3/index"
+        }
     ],
 	"easycom": {
 		"autoscan": true,
