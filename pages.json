@@ -25,6 +25,10 @@
         ,{
             "path" : "pages/taskDetail3/index"
         }
+        ,{
+            "path" : "pages/questionDetail/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

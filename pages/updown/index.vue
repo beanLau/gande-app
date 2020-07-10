@@ -88,7 +88,7 @@
 				<block v-for="(item, index) in productList" :key="index">
 					<!-- <template is="productItem" data="{{item,index:index,isList:isList}}" /> -->
 					<!--商品列表-->
-					<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150" @tap="detail">
+					<view class="tui-pro-item tui-flex-list" date-type="1" hover-class="hover" :hover-start-time="150" @click="detail(index)">
 						<view class="item-top">
 							<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
 							<view>甘德县政府工作报告准时发布</view>
@@ -445,10 +445,16 @@ export default {
 				uni.navigateBack();
 			}
 		},
-		detail: function() {
-			uni.navigateTo({
-				url: '../taskDetail/index'
-			});
+		detail: function(type) {
+			if(type){
+				uni.navigateTo({
+					url: '../questionDetail/index'
+				});
+			}else{
+				uni.navigateTo({
+					url: '../taskDetail/index'
+				});
+			}
 		},
 		toCreateTask(){
 			uni.navigateTo({

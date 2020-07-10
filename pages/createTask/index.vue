@@ -242,7 +242,7 @@
 		background: #D4091C;
 		color: #fff;
 	}
-	.uni-radio-input-checked{
+	.uni-radio-input-checked {
 		background-color: rgb(222, 23, 39) !important;
 		border-color: rgb(222, 23, 39) !important;
 	}

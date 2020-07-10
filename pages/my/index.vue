@@ -1,53 +1,62 @@
 <template>
-	<view>
-		<cu-custom bgColor="bg-gradual-pink" :isBack="true"><block slot="backText">返回</block>
-			<block slot="content">轮播图</block>
-		</cu-custom>
-		<view class="cu-bar bg-white">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 全屏限高轮播
-			</view>
-			<view class="action">
-				<switch @change="DotStyle" :class="dotStyle?'checked':''" :checked="dotStyle?true:false"></switch>
-			</view>
-		</view>
-		<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500">
-			<swiper-item v-for="(item,index) in swiperList" :key="index">
-				<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-				<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-			</swiper-item>
-		</swiper>
-		<!-- #ifndef MP-ALIPAY -->
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 卡片式轮播
-			</view>
-		</view>
-		<swiper class="card-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500" @change="cardSwiper" indicator-color="#8799a3"
-		 indicator-active-color="#0081ff">
-			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+	<view class="page-content">
+		<uni-nav-bar status-bar color="#fff" :border="false" background-color="#DE1727" title="我的"></uni-nav-bar>
+		<view class="top-bg" :class="{ 'top-bg-show': hideQuick }"></view>
+		<view class="info-wrap" :class="{ 'info-wrap-show': hideQuick }">
+			<view class="info-top"  :class="{ 'info-top-border': hideQuick }">
+				<view class="top-left">
+					<image src="../../static/tabbar/my-cur.png" mode="" class="user-pic"></image>
+					<view class="user-info">
+						<text class="user-name">张丽丽</text>
+						<text class="user-phone">1828383838383</text>
+					</view>
 				</view>
-			</swiper-item>
-		</swiper>
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 堆叠式轮播 
+				<uni-icons type="arrowright" :size="18"></uni-icons>
 			</view>
-		</view>
-		<view class="tower-swiper" @touchmove="TowerMove" @touchstart="TowerStart" @touchend="TowerEnd">
-			<view class="tower-item" :class="item.zIndex==1?'none':''" v-for="(item,index) in swiperList" :key="index" :style="[{'--index': item.zIndex,'--left':item.mLeft}]" :data-direction="direction">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+			<view class="quick-btns" v-if="!hideQuick">
+				<view class="quick-item">
+					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
+					<text class="quick-name">我的问题</text>
+				</view>
+				<view class="quick-item">
+					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
+					<text class="quick-name">我的任务</text>
+				</view>
+				<view class="quick-item">
+					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
+					<text class="quick-name">我的党建</text>
 				</view>
 			</view>
 		</view>
-		<!-- #endif -->
+		
+		<view class="menu-wrap">
+			<tui-list-view>
+				<tui-list-cell @click="detail" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="people" :size="24" color="#2E2E2E"></tui-icon>
+						<text class="tui-list-cell_name">我的信息</text>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="detail" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">修改密码</view>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="detail" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="search" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">检测更新</view>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="detail" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="shut" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">退出登录</view>
+					</view>
+				</tui-list-cell>
+			</tui-list-view>
+		</view>
 	</view>
 </template>
 
@@ -55,108 +64,205 @@
 	export default {
 		data() {
 			return {
-				cardCur: 0,
-				swiperList: [{
-					id: 0,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big84000.jpg'
-				}, {
-					id: 1,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
-				}, {
-					id: 2,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
-				}, {
-					id: 3,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
-				}, {
-					id: 4,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big25011.jpg'
-				}, {
-					id: 5,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big21016.jpg'
-				}, {
-					id: 6,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big99008.jpg'
-				}],
-				dotStyle: false,
-				towerStart: 0,
-				direction: ''
+				hideQuick: true
 			};
 		},
 		onLoad() {
-			this.TowerSwiper('swiperList');
-			// 初始化towerSwiper 传已有的数组名即可
+			
 		},
 		methods: {
-			DotStyle(e) {
-				this.dotStyle = e.detail.value
-			},
-			// cardSwiper
-			cardSwiper(e) {
-				this.cardCur = e.detail.current
-			},
-			// towerSwiper
-			// 初始化towerSwiper
-			TowerSwiper(name) {
-				let list = this[name];
-				for (let i = 0; i < list.length; i++) {
-					list[i].zIndex = parseInt(list.length / 2) + 1 - Math.abs(i - parseInt(list.length / 2))
-					list[i].mLeft = i - parseInt(list.length / 2)
-				}
-				this.swiperList = list
-			},
-
-			// towerSwiper触摸开始
-			TowerStart(e) {
-				this.towerStart = e.touches[0].pageX
-			},
-
-			// towerSwiper计算方向
-			TowerMove(e) {
-				this.direction = e.touches[0].pageX - this.towerStart > 0 ? 'right' : 'left'
-			},
-
-			// towerSwiper计算滚动
-			TowerEnd(e) {
-				let direction = this.direction;
-				let list = this.swiperList;
-				if (direction == 'right') {
-					let mLeft = list[0].mLeft;
-					let zIndex = list[0].zIndex;
-					for (let i = 1; i < this.swiperList.length; i++) {
-						this.swiperList[i - 1].mLeft = this.swiperList[i].mLeft
-						this.swiperList[i - 1].zIndex = this.swiperList[i].zIndex
-					}
-					this.swiperList[list.length - 1].mLeft = mLeft;
-					this.swiperList[list.length - 1].zIndex = zIndex;
-				} else {
-					let mLeft = list[list.length - 1].mLeft;
-					let zIndex = list[list.length - 1].zIndex;
-					for (let i = this.swiperList.length - 1; i > 0; i--) {
-						this.swiperList[i].mLeft = this.swiperList[i - 1].mLeft
-						this.swiperList[i].zIndex = this.swiperList[i - 1].zIndex
-					}
-					this.swiperList[0].mLeft = mLeft;
-					this.swiperList[0].zIndex = zIndex;
-				}
-				this.direction = ""
-				this.swiperList = this.swiperList
-			},
+			detail(){
+				
+			}
 		}
 	}
 </script>
 
 <style>
-	.tower-swiper .tower-item {
-		transform: scale(calc(0.5 + var(--index) / 10));
-		margin-left: calc(var(--left) * 100upx - 150upx);
-		z-index: var(--index);
+	.tui-item-box {
+		width: 100%;
+		display: flex;
+		align-items: center;
+	}
+	
+	.tui-list-cell_name {
+		padding-left: 20rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.tui-ml-auto {
+		margin-left: auto;
+	}
+	
+	.tui-right {
+		margin-left: auto;
+		margin-right: 34rpx;
+		font-size: 26rpx;
+		color: #999;
+	}
+	
+	.tui-logo {
+		height: 52rpx;
+		width: 52rpx;
+		flex-shrink: 0;
+	}
+	
+	.tui-flex {
+		display: flex;
+		align-items: center;
+	}
+	
+	.tui-msg-box {
+		display: flex;
+		align-items: center;
+	}
+	
+	.tui-msg-pic {
+		width: 100rpx;
+		height: 100rpx;
+		border-radius: 50%;
+		display: block;
+		margin-right: 24rpx;
+		flex-shrink: 0;
+	}
+	
+	.tui-msg-item {
+		max-width: 500rpx;
+		min-height: 80rpx;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	
+	.tui-msg-name {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-size: 34rpx;
+		line-height: 1;
+		color: #262b3a;
+	}
+	
+	.tui-msg-content {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-size: 26rpx;
+		line-height: 1;
+		color: #9397a4;
+	}
+	
+	.tui-msg-right {
+		max-width: 120rpx;
+		height: 88rpx;
+		margin-left: auto;
+		text-align: right;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-end;
+	}
+	
+	.tui-right-dot {
+		height: 76rpx !important;
+		padding-bottom: 10rpx !important;
+	
+	}
+	
+	.tui-msg-time {
+		width: 100%;
+		font-size: 24rpx;
+		line-height: 24rpx;
+		color: #9397a4;
+	}
+	
+	
+	
+	.top-bg{
+		z-index: 1;
+		height: 280rpx;
+		background: #DE1727;
+	}
+	.top-bg-show{
+		
+		height: 200rpx;
+	}
+	.info-wrap{
+		width: 690rpx;
+		margin: -260rpx auto 0;
+		background: #fff;
+		border-radius:10rpx;
+		box-shadow:0px 0px 10px 0px rgba(170,170,170,0.1);
+		padding: 38rpx 20rpx;
+	}
+	.info-wrap-show{
+		margin: -180rpx auto 0;
+	}
+	.info-top{
+		padding: 0 10rpx 30rpx 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1rpx solid #eee;
+	}
+	.info-top-border{
+		border: none;
+	}
+	.top-left{
+		display: flex;
+		align-items: center;
+	}
+	.user-pic{
+		margin-right: 26rpx;
+		width: 120rpx;
+		height: 120rpx;
+		border-radius: 60rpx;
+	}
+	.user-info{
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 22rpx;
+	}
+	.user-name{
+		color: #222222;
+		font-size: 38rpx;
+		font-weight: bold;
+	}
+	.user-phone{
+		color: #666;
+		font-size: 26rpx;
+	}
+	.quick-btns{
+		padding-top: 42rpx;
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+	}
+	.quick-item{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.quick-icon{
+		width: 36rpx;
+		height: 36rpx;
+	}
+	.quick-name{
+		margin-top: 20rpx;
+		color: #2E2E2E;
+		font-size: 26rpx;
+		
+	}
+	
+	.menu-wrap{
+		width: 690rpx;
+		margin: 20rpx auto 0;
+		background: #fff;
+		border-radius:10rpx;
+		box-shadow:0px 0px 10px 0px rgba(170,170,170,0.1);
 	}
 </style>

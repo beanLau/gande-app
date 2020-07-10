@@ -16,7 +16,7 @@
 				<view class='cuIcon-cu-image'>
 					<image :src="'/static/tabbar/archives' + [PageCur == 'archives'?'-cur':''] + '.png'"></image>
 				</view>
-				<view :class="PageCur=='archives'?'text-red':'text-gray'">户档案</view>
+				<view :class="PageCur=='archives'?'text-red':'text-gray'">AI档案库</view>
 			</view>
 			<view class="action" @click="NavChange" data-cur="updown">
 				<view class='cuIcon-cu-image'>
