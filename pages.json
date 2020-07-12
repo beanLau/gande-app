@@ -29,6 +29,42 @@
             "path" : "pages/questionDetail/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/familyList/index",
+			"style": {
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+        }
+        ,{
+            "path" : "pages/peopleList/index",
+			"style": {
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
+        }
+        ,{
+            "path" : "pages/peopleDetail/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/familyDetail/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/buildList/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/createBuildTask/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

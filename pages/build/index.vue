@@ -1,162 +1,195 @@
 <template>
-	<view>
-		<cu-custom bgColor="bg-gradual-pink" :isBack="true"><block slot="backText">返回</block>
-			<block slot="content">轮播图</block>
-		</cu-custom>
-		<view class="cu-bar bg-white">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 全屏限高轮播
+	<view class="container">
+		<uni-nav-bar status-bar color="#fff" fixed background-color="#DE1727" title="党建"></uni-nav-bar>
+		<view class="title-wrap">
+			<view class="group-title">
+				党建任务
 			</view>
-			<view class="action">
-				<switch @change="DotStyle" :class="dotStyle?'checked':''" :checked="dotStyle?true:false"></switch>
-			</view>
-		</view>
-		<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500">
-			<swiper-item v-for="(item,index) in swiperList" :key="index">
-				<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-				<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-			</swiper-item>
-		</swiper>
-		<!-- #ifndef MP-ALIPAY -->
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 卡片式轮播
+			<view class="title-right" @click="moreBuild">
+				<text>更多</text>
+				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<swiper class="card-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
-		 :autoplay="true" interval="5000" duration="500" @change="cardSwiper" indicator-color="#8799a3"
-		 indicator-active-color="#0081ff">
-			<swiper-item v-for="(item,index) in swiperList" :key="index" :class="cardCur==index?'cur':''">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-				</view>
-			</swiper-item>
-		</swiper>
-		<view class="cu-bar bg-white margin-top">
-			<view class="action">
-				<text class="cuIcon-title text-pink"></text> 堆叠式轮播 
-			</view>
-		</view>
-		<view class="tower-swiper" @touchmove="TowerMove" @touchstart="TowerStart" @touchend="TowerEnd">
-			<view class="tower-item" :class="item.zIndex==1?'none':''" v-for="(item,index) in swiperList" :key="index" :style="[{'--index': item.zIndex,'--left':item.mLeft}]" :data-direction="direction">
-				<view class="swiper-item">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+		<view class="task-list" v-for="item in list">
+			<view class="task-item">
+				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<view class="task-right">
+					<view class="task-title">
+						岗龙乡党风建设进展情况
+					</view>
+					<view class="task-desc">
+						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					</view>
+					<view class="task-time">
+						2020-06-07
+					</view>
 				</view>
 			</view>
 		</view>
-		<!-- #endif -->
+		<view class="title-wrap">
+			<view class="group-title">
+				党支部会议
+			</view>
+			<view class="title-right">
+				<text>更多</text>
+				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
+			</view>
+		</view>
+		<view class="task-list" v-for="item in list">
+			<view class="task-item">
+				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<view class="task-right">
+					<view class="task-title">
+						岗龙乡党风建设进展情况
+					</view>
+					<view class="task-desc">
+						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					</view>
+					<view class="task-time">
+						2020-06-07
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="title-wrap">
+			<view class="group-title">
+				党员会议
+			</view>
+			<view class="title-right">
+				<text>更多</text>
+				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
+			</view>
+		</view>
+		<view class="task-list" v-for="item in list">
+			<view class="task-item">
+				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<view class="task-right">
+					<view class="task-title">
+						岗龙乡党风建设进展情况
+					</view>
+					<view class="task-desc">
+						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					</view>
+					<view class="task-time">
+						2020-06-07
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="title-wrap">
+			<view class="group-title">
+				党课
+			</view>
+			<view class="title-right">
+				<text>更多</text>
+				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
+			</view>
+		</view>
+		<view class="task-list" v-for="item in list">
+			<view class="task-item">
+				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<view class="task-right">
+					<view class="task-title">
+						岗龙乡党风建设进展情况
+					</view>
+					<view class="task-desc">
+						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					</view>
+					<view class="task-time">
+						2020-06-07
+					</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
-
 <script>
+	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	export default {
+		components: {uniNavBar},
 		data() {
 			return {
-				cardCur: 0,
-				swiperList: [{
-					id: 0,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big84000.jpg'
-				}, {
-					id: 1,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big37006.jpg',
-				}, {
-					id: 2,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big39000.jpg'
-				}, {
-					id: 3,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big10001.jpg'
-				}, {
-					id: 4,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big25011.jpg'
-				}, {
-					id: 5,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big21016.jpg'
-				}, {
-					id: 6,
-					type: 'image',
-					url: 'https://ossweb-img.qq.com/images/lol/web201310/skin/big99008.jpg'
-				}],
-				dotStyle: false,
-				towerStart: 0,
-				direction: ''
-			};
-		},
-		onLoad() {
-			this.TowerSwiper('swiperList');
-			// 初始化towerSwiper 传已有的数组名即可
+				list: [1,2,3,4]
+			}
 		},
 		methods: {
-			DotStyle(e) {
-				this.dotStyle = e.detail.value
-			},
-			// cardSwiper
-			cardSwiper(e) {
-				this.cardCur = e.detail.current
-			},
-			// towerSwiper
-			// 初始化towerSwiper
-			TowerSwiper(name) {
-				let list = this[name];
-				for (let i = 0; i < list.length; i++) {
-					list[i].zIndex = parseInt(list.length / 2) + 1 - Math.abs(i - parseInt(list.length / 2))
-					list[i].mLeft = i - parseInt(list.length / 2)
-				}
-				this.swiperList = list
-			},
-
-			// towerSwiper触摸开始
-			TowerStart(e) {
-				this.towerStart = e.touches[0].pageX
-			},
-
-			// towerSwiper计算方向
-			TowerMove(e) {
-				this.direction = e.touches[0].pageX - this.towerStart > 0 ? 'right' : 'left'
-			},
-
-			// towerSwiper计算滚动
-			TowerEnd(e) {
-				let direction = this.direction;
-				let list = this.swiperList;
-				if (direction == 'right') {
-					let mLeft = list[0].mLeft;
-					let zIndex = list[0].zIndex;
-					for (let i = 1; i < this.swiperList.length; i++) {
-						this.swiperList[i - 1].mLeft = this.swiperList[i].mLeft
-						this.swiperList[i - 1].zIndex = this.swiperList[i].zIndex
-					}
-					this.swiperList[list.length - 1].mLeft = mLeft;
-					this.swiperList[list.length - 1].zIndex = zIndex;
-				} else {
-					let mLeft = list[list.length - 1].mLeft;
-					let zIndex = list[list.length - 1].zIndex;
-					for (let i = this.swiperList.length - 1; i > 0; i--) {
-						this.swiperList[i].mLeft = this.swiperList[i - 1].mLeft
-						this.swiperList[i].zIndex = this.swiperList[i - 1].zIndex
-					}
-					this.swiperList[0].mLeft = mLeft;
-					this.swiperList[0].zIndex = zIndex;
-				}
-				this.direction = ""
-				this.swiperList = this.swiperList
-			},
+			moreBuild(){
+				uni.navigateTo({
+					url: '../buildList/index'
+				})
+			}
 		}
 	}
 </script>
 
 <style>
-	.tower-swiper .tower-item {
-		transform: scale(calc(0.5 + var(--index) / 10));
-		margin-left: calc(var(--left) * 100upx - 150upx);
-		z-index: var(--index);
+	.container {
+		padding-bottom: 120upx;
+		background: #fff;
+	}
+	.title-wrap{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 22rpx 30rpx;
+		margin-top: 20rpx;
+		border-bottom: 1px solid #eee;
+	}
+	.group-title{
+		position: relative;
+		color: #2E2E2E;
+		font-size: 32rpx;
+		font-weight:bold;
+		line-height:34rpx;
+		padding-left: 20rpx;
+	}
+	.group-title::after{
+		position: absolute;
+		left: 0;
+		top: 3upx;
+		content: "";
+		width: 8upx;
+		height: 30upx;
+		background: #DE1727;
+	}
+	.title-right{
+		font-size: 26rpx;
+		color: #9A9A9A;
+	}
+	.task-list{
+		padding: 25rpx 30rpx;
+	}
+	.task-item{
+		display: flex;
+		align-items: center;
+		margin-bottom: 40rpx;
+	}
+	.task-item:last-of-type{
+		margin-bottom: 0;
+	}
+	.task-pic{
+		width: 160rpx;
+		height: 160rpx;
+		flex-shrink: 0;
+	}
+	.task-right{
+		height: 160rpx;
+		padding-left: 25rpx;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	.task-title{
+		color: #4E4E4E;
+		font-size: 32rpx;
+	}
+	.task-desc{
+		color: #aaa;
+		font-size: 24rpx;
+	}
+	.task-time{
+		color: #aaa;
+		font-size: 24rpx;
 	}
 </style>

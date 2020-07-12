@@ -68,6 +68,10 @@
 				</view>
 			</view>
 		</view>
+		<view class="bottom-fix">
+			<view class="report-btn">汇报</view>
+			<view class="send-btn">下发</view>
+		</view>
 	</view>
 </template>
 
@@ -230,6 +234,32 @@
 <style>
 .page-content{
 	background: #FAFAFA;
+	padding-bottom: 100rpx;
+}
+.bottom-fix{
+	position: fixed;
+	background: #DE1727;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100rpx;
+}
+.report-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+	border-right: 1px solid #eee;
+}
+.send-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
 }
 .navbar-wrap{
 	position: relative;
