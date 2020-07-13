@@ -59,10 +59,32 @@
         }
         ,{
             "path" : "pages/buildList/index",
-            "style" : {}
+			"style": {
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50,
+				"app-plus": {
+					"bounce": "vertical"
+				}
+			}
         }
         ,{
             "path" : "pages/createBuildTask/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/buildDetail/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/zhibuList/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/dangyuanList/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/dangkeList/index",
             "style" : {}
         }
     ],

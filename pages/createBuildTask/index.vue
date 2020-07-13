@@ -27,17 +27,10 @@
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">选择分类</view>
-					<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
-						<view class="uni-input">{{array[index]}}</view>
-					</picker>
-				</view>
-			</tui-list-cell>
-			<tui-list-cell :hover="false">
-				<view class="tui-line-cell">
 					<view class="tui-title">任务执行人</view>
 					<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
 						<view class="uni-input">{{array[index]}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
 					</picker>
 				</view>
 			</tui-list-cell>
@@ -51,7 +44,7 @@
 				<textarea placeholder-style="color:#999" placeholder="占位符字体是红色的"/>
 			</view>
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
@@ -69,6 +62,9 @@
 			}
 		},
 		methods: {
+			cancelCb(){
+				uni.navigateBack()
+			},
 			bindPickerChange(){
 				console.log('picker发送选择改变，携带值为', e.target.value)
 				this.index = e.target.value
@@ -245,5 +241,8 @@
 	.uni-radio-input-checked {
 		background-color: rgb(222, 23, 39) !important;
 		border-color: rgb(222, 23, 39) !important;
+	}
+	.uni-input{
+		display: inline-block;
 	}
 </style>

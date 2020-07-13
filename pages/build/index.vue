@@ -10,8 +10,8 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in list">
-			<view class="task-item">
+		<view class="task-list">
+			<view class="task-item" v-for="item in list" @click="buildDetail">
 				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
@@ -30,7 +30,7 @@
 			<view class="group-title">
 				党支部会议
 			</view>
-			<view class="title-right">
+			<view class="title-right" @click="moreZhibu">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -55,7 +55,7 @@
 			<view class="group-title">
 				党员会议
 			</view>
-			<view class="title-right">
+			<view class="title-right" @click="moreDangyuan">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -80,7 +80,7 @@
 			<view class="group-title">
 				党课
 			</view>
-			<view class="title-right">
+			<view class="title-right" @click="moreDangke">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -116,6 +116,26 @@
 			moreBuild(){
 				uni.navigateTo({
 					url: '../buildList/index'
+				})
+			},
+			moreZhibu(){
+				uni.navigateTo({
+					url: '../zhibuList/index'
+				})
+			},
+			moreDangyuan(){
+				uni.navigateTo({
+					url: '../dangyuanList/index'
+				})
+			},
+			moreDangke(){
+				uni.navigateTo({
+					url: '../dangkeList/index'
+				})
+			},
+			buildDetail(){
+				uni.navigateTo({
+					url: '../buildDetail/index'
 				})
 			}
 		}
