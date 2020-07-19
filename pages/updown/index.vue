@@ -277,6 +277,7 @@ export default {
 				this.jibie = 4
 			}
 		}
+		console.log(this.jibie)
 		let date = new Date()
 		let month = date.getMonth() + 1
 		if(month < 10){

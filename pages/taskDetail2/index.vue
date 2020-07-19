@@ -85,24 +85,24 @@
 			<view class="towns-title">
 				完成情况
 			</view>
-			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail">
+			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
-					<text class="towns-name">{{item.CunName}}</text>
+					<text class="towns-name">{{item.cunData.CunName}}</text>
 					<text class="towns-btn">详情</text>
 				</view>
 				<view class="towns-audios">
-					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click="playAudio">
+					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
 						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
 						<text class="audio-len">{{audio.len}}</text>
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.CreateDate}}</text>
-					<text class="towns-person">汇报人 {{item.CreateUserName}}</text>
+					<text class="towns-time">汇报时间 {{item.cunData.CreateDate}}</text>
+					<text class="towns-person">汇报人 {{item.cunData.CreateUserName}}</text>
 				</view>
 			</view>
 		</view>
-		<view class="bottom-fix" v-if="!showReportBtn">
+		<view class="bottom-fix" v-if="showReportBtn">
 			<view class="report-btn" @click="toReport">汇报</view>
 			<view class="send-btn" @click="toIssue">下发</view>
 		</view>
@@ -159,7 +159,16 @@
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
-				console.log(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && !userinfo.Nature){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
 			}
 		},
 		mounted() {
@@ -216,9 +225,11 @@
 				this.innerAudioContext = uni.createInnerAudioContext();
 				this.innerAudioContext.autoplay = true;
 				this.innerAudioContext.onCanplay(() => {
+					console.log('onCanplay')
 					uni.hideLoading();
 				});
 				this.innerAudioContext.onPlay(() => {
+					console.log('onPlay')
 					uni.hideLoading();
 				});
 				this.innerAudioContext.onEnded(() => {
@@ -229,12 +240,16 @@
 				});
 				this.innerAudioContext.onWaiting(() => {
 					console.log("loading")
-					uni.showLoading({
-					    title: '音频资源加载中'
-					});
+					// uni.showLoading({
+					//     title: '音频资源加载中'
+					// });
 				});
 				this.innerAudioContext.onError((e) => {
 					console.log(e)
+					uni.hideLoading()
+					uni.showToast({
+						title: '资源加载失败'
+					})
 				});
 			},
 			//音频播放结束处理逻辑
@@ -275,26 +290,28 @@
 					}
 					this.initAudioContext()
 					src = list[idx].audios[index].src;
-					//播放对应音频
-					uni.showLoading({
-						title: '音频资源加载中'
-					});
 					if(!this.innerAudioContext){
 						this.initAudioContext()
 					}
 					this.innerAudioContext.src = src;
 					this.innerAudioContext.autoplay = true;
+					uni.showLoading({
+					    title: '音频资源加载中'
+					});
 					this.innerAudioContext.play();
 				}
 				
 			},
 			toDetail(item){
 				uni.navigateTo({
-					url: '../taskDetail3/index?id='+item.ID
+					url: '../taskDetail3/index?id='+ item.cunData.ID
 				})
 			},
 			toReport(){
-				this.showReport = true
+				let detailData = this.detailData;
+				uni.navigateTo({
+					url: `../reportXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+				})
 			},
 			toIssue(){
 				let _this = this;
@@ -320,10 +337,13 @@
 				this.showReport = false
 			},
 			getDetail(){
+				let _this = this;
 				this.tui.request("/Siji/AFP_RenwuXiang/GetAppXiangRenWuDetail?keyValue="+this.id,"get",{
 					keyValue: this.id
 				}).then((res)=>{
-					console.log(res)
+					if(_this.jibie == 2 &&  res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
+						_this.showReportBtn = true
+					}
 					let jinjicode = res.xiangRenWuData.JinjiCode
 					if(jinjicode == 1){
 						res.xiangRenWuData.jinjiColor = '#4B8AFC'
@@ -331,12 +351,24 @@
 					}else if(jinjicode == 2){
 						res.xiangRenWuData.jinjiColor = '#4B8AFC'
 						res.xiangRenWuData.jinjiClass = 'warning'
-					}else  if(jinjiCode == 3){
+					}else  if(jinjicode == 3){
 						res.xiangRenWuData.jinjiColor = '#4B8AFC'
 						res.xiangRenWuData.jinjiClass = 'danger'
 					}
-					this.detailData = res.xiangRenWuData;
-					this.renWuCun = res.renWuCun || [];
+					_this.detailData = res.xiangRenWuData;
+					res.renWuCun.map(item=>{
+						let audioList = item.audioList.split(";");
+						let audios = []
+						audioList.map((audio,index)=>{
+							let url = 'http://60.6.198.123:8003/' + audio
+							audios[index] = {
+								src: url
+							}
+						})
+						item.audios = audios
+					})
+					_this.renWuCun = res.renWuCun || [];
+					
 				})
 			}
 		}

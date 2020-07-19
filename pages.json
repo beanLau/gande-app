@@ -98,6 +98,10 @@
             "path" : "pages/dangkeList/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/reportXiang/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

@@ -32,7 +32,7 @@
 			<view class="towns-title">
 				完成情况
 			</view>
-			<view class="towns-item" v-for="item in xiangRenWu" :key="index" @click="toDetail(item)">
+			<view class="towns-item" v-for="item in xiangRenWu" :key="item.ID" @click="toDetail(item)">
 				<view class="towns-top">
 					<text class="towns-name">{{item.XiangName}}</text>
 					<text class="towns-status">{{item.StatusName}}</text>
@@ -60,6 +60,11 @@
 		},
 		onLoad(opt) {
 			this.id = opt.id
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				console.log(userinfo)
+			}
 		},
 		mounted() {
 			this.getDetail();

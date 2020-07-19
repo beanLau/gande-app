@@ -73,20 +73,15 @@ const tui = {
 	 */
 	request: function(url, method, postData, isDelay, isForm, hideLoading) {
 		//接口请求
-		let loadding = false;
-		tui.delayed && uni.hideLoading();
-		clearTimeout(tui.delayed);
-		tui.delayed = null;
+		// let loadding = false;
+		// tui.delayed && uni.hideLoading();
+		// clearTimeout(tui.delayed);
+		// tui.delayed = null;
 		if (!hideLoading) {
-			tui.delayed = setTimeout(() => {
-				uni.showLoading({
-					mask: true,
-					title: '请稍候...',
-					success(res) {
-						loadding = true
-					}
-				})
-			}, isDelay ? 1000 : 0)
+			uni.showLoading({
+				mask: true,
+				title: '请稍候...'
+			})
 		}
 
 		return new Promise((resolve, reject) => {
@@ -100,9 +95,7 @@ const tui = {
 				method: method, //'GET','POST'
 				dataType: 'json',
 				success: (res) => {
-					clearTimeout(tui.delayed)
-					tui.delayed = null;
-					if (loadding && !hideLoading) {
+					if (!hideLoading) {
 						uni.hideLoading()
 					}
 					// if (res.data && res.data.code == 1) {
