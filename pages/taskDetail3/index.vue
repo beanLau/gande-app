@@ -141,9 +141,12 @@
 				}]
 			}
 		},
-		
+		onLoad(opt) {
+			this.id = opt.id
+		},
 		mounted() {
 			this.initAudioContext()
+			this.getDetail();
 		},
 		onUnload: function (option) {
 			uni.hideLoading();
@@ -256,6 +259,26 @@
 			toDetail(){
 				uni.navigateTo({
 					url: '../taskDetail3/index'
+				})
+			},
+			getDetail(){
+				this.tui.request("/Siji/AFP_RenwuCun/GetCunRenWuDetail?keyValue="+this.id,"get",{
+					keyValue: this.id
+				}).then((res)=>{
+					console.log(res)
+					let jinjicode = res.xiangRenWuData.JinjiCode
+					if(jinjicode == 1){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'green'
+					}else if(jinjicode == 2){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'warning'
+					}else  if(jinjiCode == 3){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'danger'
+					}
+					this.detailData = res.xiangRenWuData;
+					this.renWuCun = res.renWuCun || [];
 				})
 			}
 		}

@@ -361,7 +361,6 @@
 					data:{
 					},
 					success: function(res) {
-						console.log(res.data.data)
 						let ColumnStack={
 							"categories": ["任城镇", "新店镇", "邢湾镇"],
 							"series": [{

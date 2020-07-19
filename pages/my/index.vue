@@ -49,7 +49,7 @@
 						<view class="tui-list-cell_name">检测更新</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="detail" :arrow="true">
+				<tui-list-cell @click="loginout" :arrow="true">
 					<view class="tui-item-box">
 						<tui-icon name="shut" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">退出登录</view>
@@ -73,6 +73,11 @@
 		methods: {
 			detail(){
 				
+			},
+			loginout(){
+				uni.navigateTo({
+					url: '../login/index'
+				})
 			}
 		}
 	}

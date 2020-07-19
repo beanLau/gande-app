@@ -6,40 +6,41 @@
 		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">
 				<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
-				<view>甘德县政府工作报告准时发布</view>
+				<view>{{detailData.Title}}</view>
 			</view>
 			<view class="bottom-wrap">
 				<view class="bottom-left">
-					<tui-tag padding="8rpx" size="24rpx" type="light-blue">
-						<tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon>
-						<text>紧急</text>
+					<tui-tag padding="8rpx" size="24rpx" :type="detailData.jinjiClass" v-if="detailData.JinjiName">
+						<!-- <tui-icon name="about" :size="10" :color="detailData.jinjiColor"></tui-icon> -->
+						<text>{{detailData.JinjiName}}</text>
 					</tui-tag>
-					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">扶贫</tui-tag>
+					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{detailData.TypeName}}</tui-tag>
 					<view class="bottom-time">
-						县政府  2020-06-01
+						{{detailData.CreateUserName}}  {{detailData.RenWuDaoQiRiQi}}
 					</view>
 				</view>
 				<view class="item-status">
-					待处理
+					{{detailData.StatusName}}
 				</view>
 			</view>
+			
 			<view class="item-desc">
-				2019年是新中国70华诞，是决胜全面建成小康社会的关键之年。一年来，我们始终坚持以习近平新时代中国特色社会主义思想为指导，坚决贯彻党的十九大、十九届历次全会精神、习近平总书记“4·13”重要讲话和中央12号文件精神，在县委、县政府及镇委的坚强领导下，践行新发展理念，推动高质量发展，较好完成了镇三届人大四次会议确定的目标任务，取得重大进展。
+				{{detailData.Neirong}}
 			</view>
 		</view>
 		<view class="report-content">
-			<view class="report-title">柯曲镇任务汇报</view>
+			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
 			<view class="group">
 				<text class="group-label">汇报时间</text>
-				<text class="group-value">2020-06-01</text>
+				<text class="group-value">{{detailData.CreateDate}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">汇报人</text>
-				<text class="group-value">张倩</text>
+				<text class="group-value">{{detailData.CreateUserName}}</text>
 			</view>
 			<view class="group" v-if="!showReport">
 				<text class="group-label">完成状态</text>
-				<text class="group-value light-hight">已完结</text>
+				<text class="group-value light-hight">{{detailData.StatusName}}</text>
 			</view>
 			<view class="group" v-else>
 				<text class="group-label">完成状态</text>
@@ -55,7 +56,7 @@
 			
 			<view class="group" v-if="!showReport">
 				<text class="group-label">汇报内容</text>
-				<text class="group-value">在县委、县政府及镇委的坚强领导下，践行发展理念，推动高质量发展，较好完成了镇三届人大四次会议确定的任务，取得重大进展。</text>
+				<text class="group-value">{{detailData.Neirong}}</text>
 			</view>
 			<view class="group" v-if="showReport">
 				<text class="group-label">汇报内容</text>
@@ -72,7 +73,7 @@
 				</view>
 			</view>
 			<view class="textarea-wrap" v-if="showReport">
-				<textarea placeholder-style="color:#999" placeholder="占位符字体是红色的"/>
+				<textarea placeholder-style="color:#999" placeholder="请输入汇报内容"/>
 			</view>
 			<view class="tui-btn-box flex" v-if="showReport">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
@@ -84,10 +85,10 @@
 			<view class="towns-title">
 				完成情况
 			</view>
-			<view class="towns-item" v-for="(item,idx) in villageList" :key="item.name">
+			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail">
 				<view class="towns-top">
-					<text class="towns-name">{{item.name}}</text>
-					<text class="towns-btn" @click="toDetail">详情</text>
+					<text class="towns-name">{{item.CunName}}</text>
+					<text class="towns-btn">详情</text>
 				</view>
 				<view class="towns-audios">
 					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click="playAudio">
@@ -96,16 +97,16 @@
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.reportTime}}</text>
-					<text class="towns-person">汇报人 {{item.reportName}}</text>
+					<text class="towns-time">汇报时间 {{item.CreateDate}}</text>
+					<text class="towns-person">汇报人 {{item.CreateUserName}}</text>
 				</view>
 			</view>
 		</view>
-		<view class="bottom-fix" v-if="!showReport">
+		<view class="bottom-fix" v-if="!showReportBtn">
 			<view class="report-btn" @click="toReport">汇报</view>
 			<view class="send-btn" @click="toIssue">下发</view>
 		</view>
-		<view class="bottom-fix" v-else>
+		<view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
 		</view>
 	</view>
@@ -118,62 +119,22 @@
 	export default {
 		data() {
 			return {
+				detailData: {},
+				id: '',
 				showReport: false, //是否显示提交汇报信息
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
-				villageList: [{
-					name: "培田古村",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					},{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "培田古村2",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "培田古村3",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "培田古村4",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				}],
+				renWuCun: [],
 				audios: [],
 				recordIndex: -1,
 				recordBeginTime: '',
-				recordLen: 0
+				recordLen: 0,
+				showReportBtn: false
 			}
 		},
-		onLoad() {
+		onLoad(opt) {
+			this.id = opt.id
 			let self = this;
 			recorderManager.onStop(function (res) {
 				self.recordLen = (Date.now() - self.recordBeginTime)/1000
@@ -195,9 +156,15 @@
 				self.recordBeginTime = '';
 				self.recordLen = 0;
 			});
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				console.log(userinfo)
+			}
 		},
 		mounted() {
 			this.initAudioContext()
+			this.getDetail();
 		},
 		onUnload: function (option) {
 			uni.hideLoading();
@@ -284,7 +251,7 @@
 				let index = e.currentTarget.dataset.index;
 				let currentVillage = this.currentVillage;
 				let currentAudioIndex = this.currentAudioIndex;
-				let list = this.villageList;
+				let list = this.renWuCun;
 				let src;
 				//如果当前正在播放
 				if(this.innerAudioContext && !this.innerAudioContext.paused && idx == currentVillage && index == currentAudioIndex){
@@ -321,9 +288,9 @@
 				}
 				
 			},
-			toDetail(){
+			toDetail(item){
 				uni.navigateTo({
-					url: '../taskDetail3/index'
+					url: '../taskDetail3/index?id='+item.ID
 				})
 			},
 			toReport(){
@@ -351,6 +318,26 @@
 			},
 			submit(){
 				this.showReport = false
+			},
+			getDetail(){
+				this.tui.request("/Siji/AFP_RenwuXiang/GetAppXiangRenWuDetail?keyValue="+this.id,"get",{
+					keyValue: this.id
+				}).then((res)=>{
+					console.log(res)
+					let jinjicode = res.xiangRenWuData.JinjiCode
+					if(jinjicode == 1){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'green'
+					}else if(jinjicode == 2){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'warning'
+					}else  if(jinjiCode == 3){
+						res.xiangRenWuData.jinjiColor = '#4B8AFC'
+						res.xiangRenWuData.jinjiClass = 'danger'
+					}
+					this.detailData = res.xiangRenWuData;
+					this.renWuCun = res.renWuCun || [];
+				})
 			}
 		}
 	}
@@ -626,6 +613,7 @@ uni-radio .wx-radio-input, uni-checkbox .wx-checkbox-input, uni-radio .uni-radio
 	align-items: center;
 }
 .delete-icon{
+	margin-left: 30rpx;
 	margin-bottom: 30rpx;
 }
 /* 任务完成列表end */

@@ -23,6 +23,8 @@ Vue.component('cu-custom',cuCustom)
 
 Vue.config.productionTip = false
 
+Vue.prototype.tui = tui
+
 App.mpType = 'app'
 
 const app = new Vue({

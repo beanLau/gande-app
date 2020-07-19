@@ -6,7 +6,7 @@
 const tui = {
 	//接口地址
 	interfaceUrl: function() {
-		return 'https://www.thorui.cn'
+		return 'http://60.6.198.123:8003/'
 		//return 'https://test.thorui.cn'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'
@@ -95,7 +95,7 @@ const tui = {
 				data: postData,
 				header: {
 					'content-type': isForm ? 'application/x-www-form-urlencoded' : 'application/json',
-					'Authorization': tui.getToken()
+					'token': tui.getToken()
 				},
 				method: method, //'GET','POST'
 				dataType: 'json',
@@ -181,7 +181,7 @@ const tui = {
 	},
 	//获取token
 	getToken() {
-		return uni.getStorageSync("thorui_token")
+		return uni.getStorageSync("token")
 	},
 	//判断是否登录
 	isLogin: function() {

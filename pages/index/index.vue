@@ -2,7 +2,7 @@
 	<view>
 		<home v-if="PageCur=='home'"></home>
 		<archives v-if="PageCur=='archives'"></archives>
-		<updown v-if="PageCur=='updown'"></updown>
+		<updown ref="updown" v-if="PageCur=='updown'"></updown>
 		<build v-if="PageCur=='build'"></build>
 		<my v-if="PageCur=='my'"></my>
 		<view class="cu-bar tabbar bg-white shadow foot">
@@ -44,13 +44,27 @@
 	export default {
 		data() {
 		return {
-				PageCur: 'updown'
+				PageCur: 'home'
 			}
 		},
 		methods: {
 			NavChange: function(e) {
 				this.PageCur = e.currentTarget.dataset.cur
 			}
+		},
+		onReachBottom: function() {
+			if(this.PageCur == 'updown'){
+				this.$refs.updown.loadMore()
+			}
+		},
+		//页面相关事件处理函数--监听用户下拉动作
+		onPullDownRefresh: function() {
+			if(this.PageCur == 'updown'){
+				this.$refs.updown.refresh()
+			}
+			setTimeout(()=>{
+				uni.stopPullDownRefresh();
+			},1500)
 		}
 	}
 </script>

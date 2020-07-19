@@ -9,8 +9,20 @@
 					<view>日期</view>
 					<tui-icon name="arrowdown" :size="14" color="#444"></tui-icon>
 				</view>
-				<tui-datetime ref="filterTime" :type="3" :cancelColor="cancelColor" :color="color"
-				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeFilterTime"></tui-datetime>
+				<rangeDatePick 
+					:show="isShow"
+					@showchange="showchange"
+					:start="startDate"
+					:end="endDate"
+					:value="rangeDate"
+					@change="bindChange"
+					@cancel="bindCancel"
+					themeColor="#4C83D6"
+					fields="month"
+				></rangeDatePick>
+				
+				<!-- <tui-datetime ref="filterTime" :type="3" :cancelColor="cancelColor" :color="color"
+				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeFilterTime"></tui-datetime> -->
 				<view class="tui-top-item tui-icon-ml" :class="[degreeId ? 'tui-active tui-bold' : '']" data-index="0" @tap="showFilterDegree">
 					<view>{{degreeName}}</view>
 					<tui-icon :name="degreeH > 0 ? 'arrowup' : 'arrowdown'" :size="14" :color="degreeId ? '#e41f19' : '#444'"></tui-icon>
@@ -26,7 +38,7 @@
 						@tap.stop="selectDegree"
 						:data-index="index"
 					>
-						<text class="tui-ml tui-middle">{{ item.name }}</text>
+						<text class="tui-ml tui-middle">{{ item.ItemName }}</text>
 						<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="item.selected"></tui-icon>
 					</view>
 				</view>
@@ -49,19 +61,46 @@
 						@tap.stop="selectType"
 						:data-index="index"
 					>
-						<text class="tui-ml tui-middle">{{ item.name }}</text>
+						<text class="tui-ml tui-middle">{{ item.ItemName }}</text>
 						<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="item.selected"></tui-icon>
 					</view>
 				</view>
 				<view class="tui-dropdownlist-mask" :class="[typeH > 0 ? 'tui-mask-show' : '']" @tap.stop="hideFilterType"></view>
 				<!--下拉选择列表--类型-->
-
+				
+				
+				
+				<view class="tui-top-item tui-icon-ml" :class="[statusId ? 'tui-active tui-bold' : '']" data-index="0" @tap="showFilterClassify">
+					<view>{{classifyName}}</view>
+					<tui-icon :name="statusH > 0 ? 'arrowup' : 'arrowdown'" :size="14" :color="statusId ? '#e41f19' : '#444'"></tui-icon>
+				</view>
+				
+				<!--下拉选择列表--分类-->
+				<view class="tui-dropdownlist" :class="[classifyH > 0 ? 'tui-dropdownlist-show' : '']" :style="{ height: classifyH + 'rpx' }">
+					<view
+						class="tui-dropdownlist-item tui-icon-middle"
+						:class="[item.selected ? 'tui-bold' : '']"
+						v-for="(item, index) in classifyList"
+						:key="index"
+						@tap.stop="selectClassify"
+						:data-index="index"
+					>
+						<text class="tui-ml tui-middle">{{ item.ItemName }}</text>
+						<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="item.selected"></tui-icon>
+					</view>
+				</view>
+				<view class="tui-dropdownlist-mask" :class="[classifyH > 0 ? 'tui-mask-show' : '']" @tap.stop="hideFilterClassify"></view>
+				<!--下拉选择列表--分类-->
+				
+				
+				
+				
 				<view class="tui-top-item tui-icon-ml" :class="[statusId ? 'tui-active tui-bold' : '']" data-index="0" @tap="showFilterStatus">
 					<view>{{statusName}}</view>
 					<tui-icon :name="statusH > 0 ? 'arrowup' : 'arrowdown'" :size="14" :color="statusId ? '#e41f19' : '#444'"></tui-icon>
 				</view>
 				
-				<!--下拉选择列表--分类-->
+				<!--下拉选择列表--状态-->
 				<view class="tui-dropdownlist" :class="[statusH > 0 ? 'tui-dropdownlist-show' : '']" :style="{ height: statusH + 'rpx' }">
 					<view
 						class="tui-dropdownlist-item tui-icon-middle"
@@ -71,12 +110,12 @@
 						@tap.stop="selectStatus"
 						:data-index="index"
 					>
-						<text class="tui-ml tui-middle">{{ item.name }}</text>
+						<text class="tui-ml tui-middle">{{ item.ItemName }}</text>
 						<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="item.selected"></tui-icon>
 					</view>
 				</view>
 				<view class="tui-dropdownlist-mask" :class="[statusH > 0 ? 'tui-mask-show' : '']" @tap.stop="hideFilterStatus"></view>
-				<!--下拉选择列表--分类-->
+				<!--下拉选择列表--状态-->
 				
 			</view>
 		</view>
@@ -88,48 +127,60 @@
 				<block v-for="(item, index) in productList" :key="index">
 					<!-- <template is="productItem" data="{{item,index:index,isList:isList}}" /> -->
 					<!--商品列表-->
-					<view class="tui-pro-item tui-flex-list" date-type="1" hover-class="hover" :hover-start-time="150" @click="detail(index)">
+					<view class="tui-pro-item tui-flex-list" date-type="1" hover-class="hover" :hover-start-time="150" @click="detail(item)">
 						<view class="item-top">
-							<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
-							<view>甘德县政府工作报告准时发布</view>
+							<tui-tag margin="0 15upx 0 0" padding="8rpx" :type="item.leixingType" size="24rpx">{{item.leixingName}}</tui-tag>
+							<view>{{item.title}}</view>
 						</view>
 						<view class="item-desc">
-							具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发布甘德县政府报告准时发布
+							具体工作内容：{{item.neirong}}
 						</view>
 						<view class="bottom-wrap">
 							<view class="bottom-left">
-								<tui-tag padding="8rpx" size="24rpx" type="light-blue">
-									<tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon>
-									<text>紧急</text>
+								<tui-tag padding="8rpx" size="24rpx" :type="item.jinjiClass" v-if="item.jinjiname">
+									<!-- <tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon> -->
+									<text>{{item.jinjiname}}</text>
 								</tui-tag>
-								<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">扶贫</tui-tag>
+								<tui-tag v-if="item.typename" margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{item.typename}}</tui-tag>
 								<view class="bottom-time">
-									县政府  2020-06-01
+									{{item.createusername + '  '}}  {{item.createdate}}
 								</view>
 							</view>
 							<view class="item-status">
-								待处理
+								{{item.statusname}}
 							</view>
 						</view>
 					</view>
 					<!--商品列表-->
 				</block>
 			</view>
+			
 		</view>
-
+		<view class="load-wrap">
+			<!--加载loadding-->
+			<tui-loadmore v-if="loadding" :index="3" type="red"></tui-loadmore>
+			<tui-nomore v-if="!pullUpOn" backgroundColor="#f7f7f7"></tui-nomore>
+			<!--加载loadding-->
+		</view>
 		<!--list-->
 
-		<!--加载loadding-->
-		<tui-loadmore v-if="loadding" :index="3" type="red"></tui-loadmore>
-		<tui-nomore v-if="!pullUpOn && isList" backgroundColor="#f7f7f7"></tui-nomore>
-		<!--加载loadding-->
 	</view>
 </template>
 
 <script>
+import rangeDatePick from '@/components/range-dtpicker/index.vue';
 export default {
+	components: {rangeDatePick},
 	data() {
 		return {
+			isShow: false,
+			rangeDate: [],
+			startDate: '',
+			endDate: '',
+			endTime: '',
+			beginTime: '',
+			
+			
 			cancelColor: '#888',
 			color: '#5677fc',
 			setDateTime: '',
@@ -140,49 +191,28 @@ export default {
 			degreeH: 0,
 			degreeName: '紧急程度',
 			degreeId: '',
-			degreeList: [{
-				id: '1',
-				name: '一般',
-				selected: false
-			},{
-				id: '2',
-				name: '紧急',
-				selected: false
-			},{
-				id: '3',
-				name: '特急',
-				selected: false
-			}], //紧急程度相关参数
+			degreeList: [], //紧急程度相关参数
 			
 			typeH: 0,
 			typeName: '类型',
 			typeId: '',
 			typeList: [{
-				id: '1',
-				name: '问题',
-				selected: false
+				ItemName: "任务",
+				ItemValue: 'renwu'
 			},{
-				id: '2',
-				name: '任务',
-				selected: false
+				ItemName: "问题",
+				ItemValue: 'wenti'
 			}], //类型相关参数
+
+			classifyH: 0,
+			classifyName: '分类',
+			classifyId: '',
+			classifyList: [], //分类相关参数
 			
 			statusH: 0,
 			statusName: '状态',
 			statusId: '',
-			statusList: [{
-				id: '1',
-				name: '进行中',
-				selected: false
-			},{
-				id: '2',
-				name: '待处理',
-				selected: false
-			},{
-				id: '3',
-				name: '已完成',
-				selected: false
-			}],//类型筛选相关参数
+			statusList: [],//类型筛选相关参数
 			
 			dropScreenH: 200, //下拉筛选框距顶部距离
 			attrData: [],
@@ -190,7 +220,6 @@ export default {
 			dropScreenShow: true,
 			scrollTop: 0,
 			tabIndex: 0, //顶部筛选索引
-			isList: true, //是否以列表展示  | 列表或大图
 			drawer: false,
 			drawerH: 0, //抽屉内部scrollview高度
 			selectedName: '综合',
@@ -209,94 +238,16 @@ export default {
 					selected: false
 				}
 			],
-			productList: [
-				{
-					img: 1,
-					name: '欧莱雅（LOREAL）奇焕光彩粉嫩透亮修颜霜 30ml（欧莱雅彩妆 BB霜 粉BB 遮瑕疵 隔离）',
-					sale: 599,
-					factory: 899,
-					payNum: 2342
-				},
-				{
-					img: 2,
-					name: '德国DMK进口牛奶  欧德堡（Oldenburger）超高温处理全脂纯牛奶1L*12盒',
-					sale: 29,
-					factory: 69,
-					payNum: 999
-				},
-				{
-					img: 3,
-					name: '【第2支1元】柔色尽情丝柔口红唇膏女士不易掉色保湿滋润防水 珊瑚红',
-					sale: 299,
-					factory: 699,
-					payNum: 666
-				},
-				{
-					img: 4,
-					name: '百雀羚套装女补水保湿护肤品',
-					sale: 1599,
-					factory: 2899,
-					payNum: 236
-				},
-				{
-					img: 5,
-					name: '百草味 肉干肉脯 休闲零食 靖江精制猪肉脯200g/袋',
-					sale: 599,
-					factory: 899,
-					payNum: 2399
-				},
-				{
-					img: 6,
-					name: '短袖睡衣女夏季薄款休闲家居服短裤套装女可爱韩版清新学生两件套 短袖粉色长颈鹿 M码75-95斤',
-					sale: 599,
-					factory: 899,
-					payNum: 2399
-				},
-				{
-					img: 1,
-					name: '欧莱雅（LOREAL）奇焕光彩粉嫩透亮修颜霜',
-					sale: 599,
-					factory: 899,
-					payNum: 2342
-				},
-				{
-					img: 2,
-					name: '德国DMK进口牛奶',
-					sale: 29,
-					factory: 69,
-					payNum: 999
-				},
-				{
-					img: 3,
-					name: '【第2支1元】柔色尽情丝柔口红唇膏女士不易掉色保湿滋润防水 珊瑚红',
-					sale: 299,
-					factory: 699,
-					payNum: 666
-				},
-				{
-					img: 4,
-					name: '百雀羚套装女补水保湿护肤品',
-					sale: 1599,
-					factory: 2899,
-					payNum: 236
-				}
-			],
+			productList: [],
 			pageIndex: 1,
+			pageSize: 5,
 			loadding: false,
-			pullUpOn: true
+			pullUpOn: true,
+			listUrl: '',
+			jibie: ''
 		};
 	},
-	onLoad: function(options) {
-		let obj = {};
-		// #ifdef MP-WEIXIN
-		obj = wx.getMenuButtonBoundingClientRect();
-		// #endif
-		// #ifdef MP-BAIDU
-		obj = swan.getMenuButtonBoundingClientRect();
-		// #endif
-		// #ifdef MP-ALIPAY
-		my.hideAddToDesktopMenu();
-		// #endif
+	mounted: function(options) {
 		uni.getSystemInfo({
 			success: res => {
 				this.width = obj.left || res.windowWidth;
@@ -308,10 +259,89 @@ export default {
 				this.drawerH = res.windowHeight - uni.upx2px(150) - this.height;
 			}
 		});
+		let userinfo = uni.getStorageSync("userinfo")
+		if(userinfo){
+			userinfo = JSON.parse(userinfo)
+			this.userinfo = userinfo
+			if(userinfo.Nature == 3){ //县
+				this.listUrl = 'Siji/AFP_RenwuXian/GetPageListJson'
+				this.jibie = 1
+			}else if(userinfo.Nature == 6){ //乡
+				this.listUrl = 'Siji/AFP_RenwuXiang/GetPageListJson'
+				this.jibie = 2
+			}else if(userinfo.Nature == 7 && !userinfo.Nature){ //村
+				this.listUrl = 'Siji/AFP_RenwuCun/GetPageListJson'
+				this.jibie = 3
+			}else{ //联户员
+				this.listUrl = 'Siji/AFP_RenWuLianHuYuan/GetPageListJson'
+				this.jibie = 4
+			}
+		}
+		let date = new Date()
+		let month = date.getMonth() + 1
+		if(month < 10){
+			month = '0' + month
+		}
+		this.startDate = '2020-01'
+		this.endDate = date.getFullYear() + '-' + month
+		let dataItem = uni.getStorageSync('dataItem');
+		this.statusList = dataItem.renwuzhuangtai || [];
+		this.classifyList = dataItem.renwufenlei || [];
+		this.degreeList = dataItem.jinjichengdu || [];
+		// this.getStatusData();
+		// this.getTypeData();
+		// this.getDegreeList();
+		this.getListData();
 	},
 	methods: {
+		showchange(){
+			if(this.isShow){
+				this.refresh()
+			}
+			this.isShow=!this.isShow; 
+		},
+		bindChange(list){
+			if(list.length > 1){
+				this.beginTime = list[0]
+				this.endTime = list[1]
+			}
+		},
+		bindCancel(){
+			this.isShow = false
+		},
+		// getStatusData(){
+		// 	let _this = this;
+		// 	this.tui.request("/SystemManage/DataItemDetail/GetDataItemListJson","GET",{
+		// 		EnCode: 'renwuzhuangtai'
+		// 	}).then((res)=>{
+		// 		if(Array.isArray(res)){
+		// 			_this.statusList = res || []
+		// 		}
+		// 	})
+		// },
+		// getTypeData(){
+		// 	let _this = this;
+		// 	this.tui.request("/SystemManage/DataItemDetail/GetDataItemListJson","GET",{
+		// 		EnCode: 'renwufenlei'
+		// 	}).then((res)=>{
+		// 		if(Array.isArray(res)){
+		// 			_this.typeList = res || []
+		// 		}
+		// 	})
+		// },
+		// getDegreeList(){
+		// 	let _this = this;
+		// 	this.tui.request("/SystemManage/DataItemDetail/GetDataItemListJson","GET",{
+		// 		EnCode: 'jinjichengdu'
+		// 	}).then((res)=>{
+		// 		if(Array.isArray(res)){
+		// 			_this.degreeList = res || []
+		// 		}
+		// 	})
+		// },
 		showFilterTime(){
-			this.$refs.filterTime.show();
+			//this.$refs.filterTime.show();
+			this.isShow = true;
 		},
 		changeFilterTime(e){
 			this.taskMonth = e.result;
@@ -326,6 +356,7 @@ export default {
 			this.degreeH = 246;
 			this.typeH = 0;
 			this.statusH = 0;
+			this.classifyH = 0;
 			this.tabIndex = 0;
 		},
 		selectDegree(e){
@@ -338,14 +369,15 @@ export default {
 				this.degreeList.map((item,index)=>{
 					if (eindex === index) {
 						item.selected = true;
-						this.degreeName = item.name
-						this.degreeId = item.id
+						this.degreeName = item.ItemName
+						this.degreeId = item.ItemValue
 					} else {
 						item.selected = false;
 					}
 				})
 			}
 			this.degreeH = 0;
+			this.refresh()
 		},
 		hideFilterDegree(){
 			this.degreeH = 0;
@@ -357,6 +389,7 @@ export default {
 			this.typeH = 246;
 			this.degreeH = 0;
 			this.statusH = 0;
+			this.classifyH = 0;
 			this.tabIndex = 1;
 		},
 		selectType(e){
@@ -369,14 +402,15 @@ export default {
 				this.typeList.map((item,index)=>{
 					if (eindex === index) {
 						item.selected = true;
-						this.typeName = item.name
-						this.typeId = item.id
+						this.typeName = item.ItemName
+						this.typeId = item.ItemValue
 					} else {
 						item.selected = false;
 					}
 				})
 			}
 			this.typeH = 0;
+			this.refresh()
 		},
 		hideFilterType(){
 			this.typeH = 0;
@@ -387,8 +421,15 @@ export default {
 		showFilterStatus(){
 			this.typeH = 0;
 			this.degreeH = 0;
+			this.classifyH = 0;
 			this.statusH = 246;
 			this.tabIndex = 1;
+		},
+		showFilterClassify(){
+			this.typeH = 0;
+			this.degreeH = 0;
+			this.statusH = 0;
+			this.classifyH = 246;
 		},
 		selectStatus(e){
 			let eindex = e.currentTarget.dataset.index;
@@ -400,17 +441,41 @@ export default {
 				this.statusList.map((item,index)=>{
 					if (eindex === index) {
 						item.selected = true;
-						this.statusName = item.name
-						this.statusId = item.id
+						this.statusName = item.ItemName
+						this.statusId = item.ItemValue
 					} else {
 						item.selected = false;
 					}
 				})
 			}
 			this.statusH = 0;
+			this.refresh()
+		},
+		selectClassify(e){
+			let eindex = e.currentTarget.dataset.index;
+			if(this.classifyList[eindex].selected){
+				this.classifyList[eindex].selected = false
+				this.classifyName = "分类"
+				this.classifyId = ''
+			}else{
+				this.classifyList.map((item,index)=>{
+					if (eindex === index) {
+						item.selected = true;
+						this.classifyName = item.ItemName
+						this.classifyId = item.ItemValue
+					} else {
+						item.selected = false;
+					}
+				})
+			}
+			this.classifyH = 0;
+			this.refresh()
 		},
 		hideFilterStatus(){
 			this.statusH = 0;
+		},
+		hideFilterClassify(){
+			this.classifyH = 0;
 		},
 		//显示分类筛选相关事件end
 		
@@ -445,38 +510,97 @@ export default {
 				uni.navigateBack();
 			}
 		},
-		detail: function(type) {
-			if(type){
+		detail: function(item) {
+			let url = item.id + '&jibie=' + item.jibie
+			if(item.leixing == 'wenti'){
 				uni.navigateTo({
-					url: '../questionDetail/index'
+					url: '../questionDetail/index?id=' + url
 				});
 			}else{
-				uni.navigateTo({
-					url: '../taskDetail/index'
-				});
+				if(item.jibie == 1){
+					uni.navigateTo({
+						url: '../taskDetail/index?id=' + url
+					});
+				}else if(item.jibie == 2){
+					uni.navigateTo({
+						url: '../taskDetail2/index?id=' + url
+					});
+				}else{
+					uni.navigateTo({
+						url: '../taskDetail3/index?id=' + url
+					});
+				}
 			}
 		},
 		toCreateTask(){
 			uni.navigateTo({
 				url: '../createTask/index'
 			});
-		}
-	},
-	onReachBottom: function() {
-		if (!this.pullUpOn) return;
-		this.loadding = true;
-		if (this.pageIndex == 4) {
-			this.loadding = false;
-			this.pullUpOn = false;
-		} else {
-			let loadData = JSON.parse(JSON.stringify(this.productList));
-			loadData = loadData.splice(0, 10);
-			if (this.pageIndex == 1) {
-				loadData = loadData.reverse();
+		},
+		getListData(){
+			let _this = this;
+			let resData = {
+				"queryJson": decodeURIComponent(JSON.stringify({
+					XiangCode: _this.userinfo.XiangCode || '',
+					CunCode: _this.userinfo.CunCode || '',
+					LianHuYuanID: _this.userinfo.LianHuYuanID || '',
+					beginTime: _this.beginTime,
+					endTime: _this.endTime,
+					Title: "",
+					JinjiCode: _this.degreeId,
+					TypeCode: _this.classifyId,
+					StatusCode: _this.statusId,
+					leixing: _this.typeId,
+					jibie: _this.jibie
+				})),
+				"rows": _this.pageSize,
+				"page": _this.pageIndex,
+				"sidx": "CreateDate",
+				"sord": "desc"
 			}
-			this.productList = this.productList.concat(loadData);
+			this.tui.request('Siji/AFP_WenTi/GetUpDownList',"GET",resData).then((res)=>{
+				res.resultdata.rows.map(item=>{
+					if(item.leixing == 'wenti'){
+						item.leixingName = "问题"
+						item.leixingType = 'danger'
+					}else{
+						item.leixingType = 'warning'
+						item.leixingName = '任务'
+					}
+					if(item.jinjicode == 1){
+						item.jinjiClass = 'green'
+					}else if(item.jinjicode == 2){
+						item.jinjiClass = 'warning'
+					}else  if(item.jinjicode == 3){
+						item.jinjiClass = 'danger'
+					}
+				})
+				
+				if(_this.pageIndex == 1){
+					_this.productList = res.resultdata.rows;
+				}else{
+					_this.productList = [..._this.productList,...res.resultdata.rows]
+				}
+				console.log('总共：' + res.resultdata.records)
+				if(_this.pageIndex * _this.pageSize >= res.resultdata.records){
+					_this.pullUpOn = false
+				}else{
+					_this.pullUpOn = true;
+				}
+				_this.loadding = false;
+			})
+		},
+		loadMore(){
+			console.log(`pull${this.pullUpOn}`)
+			if (!this.pullUpOn) return;
+			this.loadding = true;
 			this.pageIndex = this.pageIndex + 1;
-			this.loadding = false;
+			this.getListData();
+		},
+		refresh(){
+			this.pageIndex = 1;
+			this.pullUpOn = true;
+			this.getListData()
 		}
 	}
 };
@@ -731,6 +855,7 @@ page {
 	top: 88rpx;
 	visibility: hidden;
 	transition: all 0.2s ease-in-out;
+	overflow: auto;
 	z-index: 999;
 }
 
@@ -924,14 +1049,17 @@ page {
 }
 
 /* 商品列表*/
-
+.load-wrap{
+	padding-bottom: 100upx;
+}
 .tui-product-list {
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	flex-direction: row;
 	flex-wrap: wrap;
 	box-sizing: border-box;
-	padding: 270upx 30upx 100upx 30upx;
+	padding: 270upx 30upx 30upx 30upx;
 	background: #FBFAFA;
 }
 
@@ -977,9 +1105,11 @@ page {
 .item-desc{
 	margin-top: 27upx;
 	margin-bottom: 42upx;
+	max-height: 100rpx;
 	color: #aaa;
 	font-size: 24upx;
 	line-height: 36upx;
+	overflow: hidden;
 }
 .bottom-wrap{
 	display: flex;
