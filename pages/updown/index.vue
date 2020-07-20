@@ -277,7 +277,6 @@ export default {
 				this.jibie = 4
 			}
 		}
-		console.log(this.jibie)
 		let date = new Date()
 		let month = date.getMonth() + 1
 		if(month < 10){
@@ -589,6 +588,8 @@ export default {
 					_this.pullUpOn = true;
 				}
 				_this.loadding = false;
+			}).catch(e=>{
+				console.log(e)
 			})
 		},
 		loadMore(){

@@ -102,6 +102,10 @@
             "path" : "pages/reportXiang/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/sendXiang/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

@@ -46,13 +46,15 @@
 		onLoad() {
 			
 		},
-		
-		mounted() {
+		created() {
 			if(uni.getStorageSync('token')){
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '../index/index'
 				})
 			}
+		},
+		mounted() {
+			
 		},
 		methods: {
 			changeUsername(e){

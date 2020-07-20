@@ -75,6 +75,11 @@
 				
 			},
 			loginout(){
+				uni.removeStorageSync("dataItem")
+				uni.removeStorageSync("authorizeMenu")
+				uni.removeStorageSync("userinfo")
+				uni.removeStorageSync("token")
+				
 				uni.navigateTo({
 					url: '../login/index'
 				})

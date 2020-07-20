@@ -315,20 +315,10 @@
 			},
 			toIssue(){
 				let _this = this;
-				uni.showModal({
-				    title: '任务下发提醒',
-				    content: '是否确认进行任务下发？',
-				    success: function (res) {
-				        if (res.confirm) {
-							uni.showToast({
-								icon :'none',
-								title: '下发成功'
-							})
-				        } else if (res.cancel) {
-				            
-				        }
-				    }
-				});
+				let detailData = _this.detailData;
+				uni.navigateTo({
+					url: `../sendXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+				})
 			},
 			cancelCb(){
 				this.showReport = false

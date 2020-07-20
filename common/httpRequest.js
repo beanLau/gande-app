@@ -100,6 +100,7 @@ const tui = {
 				method: method, //'GET','POST'
 				dataType: 'json',
 				success: (res) => {
+					console.log(res)
 					clearTimeout(tui.delayed)
 					tui.delayed = null;
 					if (loadding && !hideLoading) {
@@ -118,8 +119,12 @@ const tui = {
 					resolve(res.data)
 				},
 				fail: (res) => {
+					console.log(res)
 					clearTimeout(tui.delayed)
 					tui.delayed = null;
+					if (loadding && !hideLoading) {
+						uni.hideLoading()
+					}
 					tui.toast("网络不给力，请稍后再试~")
 					reject(res)
 				}
