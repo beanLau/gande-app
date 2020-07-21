@@ -1,7 +1,7 @@
 <template>
 	<view class="page-content">
 		<view class="tip-wrap">
-			<image src="../../static/default-pic.png" mode="" class="logo"></image>
+			<image src="../../static/logo.png" mode="" class="logo"></image>
 			<view class="tip-zh">甘德县四级联户工作机制平台</view>
 			<view class="tip-en">Gande county work platform</view>
 			
