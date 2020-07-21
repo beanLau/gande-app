@@ -69,17 +69,32 @@
 				</view>
 			</view>
 		</view>
+		<view class="bottom-fix" v-if="showReportBtn">
+			<view class="report-btn" @click="toReport">汇报</view>
+			<view class="send-btn" @click="toIssue">下发</view>
+		</view>
+		<!-- <view class="bottom-fix" v-if="showReportAudio">
+			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
+		</view> -->
 	</view>
 </template>
 
 <script>
+	const recorderManager = uni.getRecorderManager();
+	const innerAudioContext = uni.createInnerAudioContext();
+	innerAudioContext.autoplay = true;
 	export default {
 		data() {
 			return {
+				showReportBtn: false,
+				showReportAudio: false,
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
 				detailIndex: -1,
+				detailData: {
+
+				},
 				detail: {
 					name: '',
 					person: '剑侠客',
@@ -143,6 +158,41 @@
 		},
 		onLoad(opt) {
 			this.id = opt.id
+			let self = this;
+			recorderManager.onStop(function (res) {
+				self.recordLen = (Date.now() - self.recordBeginTime)/1000
+				let len = parseInt(Math.floor(self.recordLen / 60));
+				let mo = parseInt(self.recordLen % 60);
+				if(len == 0){
+					len = '00'
+				}else if(len < 10){
+					len = '0' + len
+				}
+				len += ':'
+				if(mo < 10){
+					mo = '0' + mo
+				}
+				self.audios.push({
+					src: res.tempFilePath,
+					len: len + mo
+				})
+				self.recordBeginTime = '';
+				self.recordLen = 0;
+			});
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && !userinfo.Nature){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
+			}
 		},
 		mounted() {
 			this.initAudioContext()
@@ -265,7 +315,9 @@
 				this.tui.request("/Siji/AFP_RenwuCun/GetCunRenWuDetail?keyValue="+this.id,"get",{
 					keyValue: this.id
 				}).then((res)=>{
-					console.log(res)
+					if(_this.jibie == 3 &&  res.xiangRenWuData.CunCode == _this.userinfo.CunCode){
+						_this.showReportBtn = true
+					}
 					let jinjicode = res.xiangRenWuData.JinjiCode
 					if(jinjicode == 1){
 						res.xiangRenWuData.jinjiColor = '#4B8AFC'
@@ -279,6 +331,19 @@
 					}
 					this.detailData = res.xiangRenWuData;
 					this.renWuCun = res.renWuCun || [];
+				})
+			},
+			toReport(){
+				let detailData = this.detailData;
+				uni.navigateTo({
+					url: `../reportCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+				})
+			},
+			toIssue(){
+				let _this = this;
+				let detailData = _this.detailData;
+				uni.navigateTo({
+					url: `../sendCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
 				})
 			}
 		}
@@ -498,4 +563,29 @@
 	font-size: 24upx;
 }
 /* 任务完成列表end */
+.bottom-fix{
+	position: fixed;
+	background: #DE1727;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100rpx;
+}
+.report-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+	border-right: 1px solid #eee;
+}
+.send-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+}
 </style>
