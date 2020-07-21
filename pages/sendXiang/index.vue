@@ -16,8 +16,8 @@
 							@change="checkboxChange" 
 							v-model="item.checked" 
 							v-for="(item, index) in statusList" :key="index" 
-							:name="item.ItemName"
-						>{{item.name}}</u-checkbox>
+							:name="item.FullName"
+						>{{item.FullName}}</u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -66,6 +66,9 @@
 			this.getCunList();
 		},
 		methods: {
+			sendData(res){
+				
+			},
 			getCunList(){
 				let _this = this;
 				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
@@ -81,6 +84,9 @@
 				// let index = e.target.value
 				// this.selectName = this.statusList[index].ItemName
 				// this.selectId = this.statusList[index].ItemValue
+			},
+			checkboxChange(e){
+				
 			},
 			changeContent(e){
 				this.content = e.target.value

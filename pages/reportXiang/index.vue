@@ -106,12 +106,10 @@
 					"entity": entity
 				}).then((res)=>{
 					_this.isLoading = false;
-					plus.nativeUI.toast( "汇报成功" ,{
-						verticalAlign: 'center'
-					});
-					setTimeout(()=>{
-						uni.navigateBack()
-					},1500)
+					_this.$refs.uToast.show({
+						title: '汇报成功',
+						back: true
+					})
 				})
 			},
 			formReset: function(e) {
