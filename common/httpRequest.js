@@ -73,20 +73,21 @@ const tui = {
 	 */
 	request: function(url, method, postData, isDelay, isForm, hideLoading) {
 		//接口请求
-		let loadding = false;
-		tui.delayed && uni.hideLoading();
-		clearTimeout(tui.delayed);
+		// let loadding = false;
+		// tui.delayed && uni.hideLoading();
+		// clearTimeout(tui.delayed);
 		tui.delayed = null;
 		if (!hideLoading) {
-			tui.delayed = setTimeout(() => {
-				uni.showLoading({
-					mask: true,
-					title: '请稍候...',
-					success(res) {
-						loadding = true
-					}
-				})
-			}, isDelay ? 1000 : 0)
+			plus.nativeUI.showWaiting('加载中');
+			// tui.delayed = setTimeout(() => {
+			// 	uni.showLoading({
+			// 		mask: true,
+			// 		title: '请稍候...',
+			// 		success(res) {
+			// 			loadding = true
+			// 		}
+			// 	})
+			// }, isDelay ? 1000 : 0)
 		}
 
 		return new Promise((resolve, reject) => {
@@ -100,11 +101,12 @@ const tui = {
 				method: method, //'GET','POST'
 				dataType: 'json',
 				success: (res) => {
-					console.log(res)
-					clearTimeout(tui.delayed)
-					tui.delayed = null;
-					if (loadding && !hideLoading) {
-						uni.hideLoading()
+					// console.log(res)
+					// clearTimeout(tui.delayed)
+					// tui.delayed = null;
+					if (!hideLoading) {
+						//uni.hideLoading()
+						plus.nativeUI.closeWaiting();
 					}
 					// if (res.data && res.data.code == 1) {
 					// 	uni.clearStorageSync()
@@ -119,13 +121,11 @@ const tui = {
 					resolve(res.data)
 				},
 				fail: (res) => {
-					console.log(res)
-					clearTimeout(tui.delayed)
-					tui.delayed = null;
-					if (loadding && !hideLoading) {
-						uni.hideLoading()
+					if (!hideLoading) {
+						//uni.hideLoading()
+						plus.nativeUI.closeWaiting();
 					}
-					tui.toast("网络不给力，请稍后再试~")
+					plus.nativeUI.toast("网络不给力，请稍后再试~");
 					reject(res)
 				}
 			})

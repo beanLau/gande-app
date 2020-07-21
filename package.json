@@ -1,0 +1,27 @@
+{
+  "name": "gande-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beanLau/gande-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beanLau/gande-app/issues"
+  },
+  "homepage": "https://github.com/beanLau/gande-app#readme",
+  "dependencies": {
+    "sass-loader": "^9.0.2",
+    "uview-ui": "^1.5.4"
+  },
+  "devDependencies": {
+    "node-sass": "^4.14.1"
+  }
+}

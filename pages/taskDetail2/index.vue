@@ -1,7 +1,7 @@
 <template>
 	<view class="page-content">
 		<view class="navbar-wrap">
-			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="完成情况"></uni-nav-bar>
+			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="完成情况"></uni-nav-bar>
 		</view>
 		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">

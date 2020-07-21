@@ -3,6 +3,9 @@ import App from './App'
 import store from './store'
 import tui from './common/httpRequest'
 
+import uView from "uview-ui";
+Vue.use(uView);
+
 import home from './pages/home/index.vue'
 Vue.component('home',home)
 

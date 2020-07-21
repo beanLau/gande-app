@@ -26,7 +26,6 @@
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
-		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
@@ -78,19 +77,17 @@
 				}
 				let _this = this;
 				if(!_this.selectName){
-					this.$refs.uToast.show({
-						title: '请选择完成状态',
-					})
+					plus.nativeUI.toast( "请选择完成状态" ,{
+						verticalAlign: 'center',
+						background: 'rgba(0,0,0,.7)'
+					});
 					return
 				}
 				if(!_this.content){
-					this.$refs.uToast.show({
-						title: '请输入汇报内容',
-					})
-					// plus.nativeUI.toast( "请输入汇报内容" ,{
-					// 	verticalAlign: 'center',
-					// 	background: 'rgba(0,0,0,.7)'
-					// });
+					plus.nativeUI.toast( "请输入汇报内容" ,{
+						verticalAlign: 'center',
+						background: 'rgba(0,0,0,.7)'
+					});
 					return
 				}
 				let entity = {

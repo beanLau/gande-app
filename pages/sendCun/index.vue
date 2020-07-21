@@ -6,8 +6,8 @@
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">完成状态</view>
-					<picker @change="bindPickerChange" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
-						<view class="uni-input">{{selectName || '请选择完成状态'}}</view>
+					<picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
+						<view class="uni-input">{{selectNames || '请选择下发的村庄'}}</view>
 						<uni-icons type="arrowright" :size="18"></uni-icons>
 					</picker>
 				</view>
@@ -26,7 +26,6 @@
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
-		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
@@ -45,22 +44,32 @@
 				statusList: [],
 				curentItem: {},
 				isLoading: false,
-				selectName: '',
-				selectId: ''
+				selectNames: '',
+				selectIds: ''
 			}
 		},
 		onLoad(opt) {
 			this.RenwuID = opt.RenwuID
 			this.XiangCode = opt.XiangCode
 			this.XiangName = opt.XiangName
-			let dataItem = uni.getStorageSync('dataItem');
-			this.statusList = dataItem.renwuzhuangtai || [];
+			this.getCunList();
 		},
 		methods: {
+			getCunList(){
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: _this.XiangCode,
+					nature: 7
+				}).then((res)=>{
+					console.log(res)
+					this.statusList = res || []
+				})
+			},
 			bindPickerChange(e){
-				let index = e.target.value
-				this.selectName = this.statusList[index].ItemName
-				this.selectId = this.statusList[index].ItemValue
+				console.log(e)
+				// let index = e.target.value
+				// this.selectName = this.statusList[index].ItemName
+				// this.selectId = this.statusList[index].ItemValue
 			},
 			changeContent(e){
 				this.content = e.target.value
@@ -78,19 +87,15 @@
 				}
 				let _this = this;
 				if(!_this.selectName){
-					this.$refs.uToast.show({
-						title: '请选择完成状态',
-					})
+					plus.nativeUI.toast( "请选择完成状态" ,{
+						verticalAlign: 'center'
+					});
 					return
 				}
 				if(!_this.content){
-					this.$refs.uToast.show({
-						title: '请输入汇报内容',
-					})
-					// plus.nativeUI.toast( "请输入汇报内容" ,{
-					// 	verticalAlign: 'center',
-					// 	background: 'rgba(0,0,0,.7)'
-					// });
+					plus.nativeUI.toast( "请输入汇报内容" ,{
+						verticalAlign: 'center'
+					});
 					return
 				}
 				let entity = {
