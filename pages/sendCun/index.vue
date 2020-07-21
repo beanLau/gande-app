@@ -5,16 +5,24 @@
 		<form @submit="formSubmit" @reset="formReset">
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">完成状态</view>
-					<picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
+					<view class="tui-title">下发村庄</view>
+					<!-- <picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
 						<view class="uni-input">{{selectNames || '请选择下发的村庄'}}</view>
 						<uni-icons type="arrowright" :size="18"></uni-icons>
-					</picker>
+					</picker> -->
+					<u-checkbox-group @change="bindPickerChange">
+						<u-checkbox 
+							@change="checkboxChange" 
+							v-model="item.checked" 
+							v-for="(item, index) in statusList" :key="index" 
+							:name="item.ItemName"
+						>{{item.name}}</u-checkbox>
+					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务内容</view>
+					<view class="tui-title">下发内容</view>
 				</view>
 				
 			</tui-list-cell>
@@ -70,6 +78,9 @@
 				// let index = e.target.value
 				// this.selectName = this.statusList[index].ItemName
 				// this.selectId = this.statusList[index].ItemValue
+			},
+			checkboxChange(){
+				console.log(e)
 			},
 			changeContent(e){
 				this.content = e.target.value

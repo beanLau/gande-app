@@ -6,10 +6,19 @@
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">完成状态</view>
-					<picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
+					<!-- <picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
 						<view class="uni-input">{{selectNames || '请选择下发的村庄'}}</view>
 						<uni-icons type="arrowright" :size="18"></uni-icons>
-					</picker>
+					</picker> -->
+					
+					<u-checkbox-group @change="bindPickerChange">
+						<u-checkbox 
+							@change="checkboxChange" 
+							v-model="item.checked" 
+							v-for="(item, index) in statusList" :key="index" 
+							:name="item.ItemName"
+						>{{item.name}}</u-checkbox>
+					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
@@ -21,6 +30,7 @@
 			<view class="textarea-wrap">
 				<textarea placeholder-style="color:#999" name="content" @input="changeContent" :value="content" placeholder="请输入汇报内容"/>
 			</view>
+			<teacher-chat @sendData="sendData"/>
 			<view class="tui-btn-box flex">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
@@ -30,9 +40,10 @@
 </template>
 <script>
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+	import TeacherChat from "@/components/TeacherChat.vue"
 	const form = require("@/components/common/tui-validation/tui-validation.js")
 	export default {
-		components: {uniNavBar},
+		components: {uniNavBar,TeacherChat},
 		data() {
 			return {
 				array: ['中国', '美国', '巴西', '日本'],

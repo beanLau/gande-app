@@ -106,9 +106,9 @@
 			<view class="report-btn" @click="toReport">汇报</view>
 			<view class="send-btn" @click="toIssue">下发</view>
 		</view>
-		<view class="bottom-fix" v-if="showReport">
+		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
