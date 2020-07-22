@@ -230,4 +230,16 @@
 	.uni-input{
 		display: inline-block;
 	}
+	
+	.record-audios{
+		padding-left: 40rpx;
+	}
+	.audio-item-wrap{
+		display: flex;
+		align-items: center;
+	}
+	.delete-icon{
+		margin-left: 30rpx;
+		margin-bottom: 30rpx;
+	}
 </style>

@@ -12,6 +12,7 @@
 					</picker> -->
 					<u-checkbox-group @change="bindPickerChange">
 						<u-checkbox 
+							active-color="#DE1727"
 							@change="checkboxChange" 
 							v-model="item.checked" 
 							v-for="(item, index) in statusList" :key="index" 

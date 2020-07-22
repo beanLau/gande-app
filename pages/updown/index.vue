@@ -3,7 +3,9 @@
 		
 		<!--screen-->
 		<view class="tui-header-screen">
-			<uni-nav-bar status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-if="jibie == 1" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-else status-bar color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			
 			<view class="tui-screen-top">
 				<view class="tui-top-item tui-icon-ml" @click="showFilterTime()">
 					<view>日期</view>

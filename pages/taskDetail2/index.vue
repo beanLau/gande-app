@@ -63,7 +63,8 @@
 				<view class="record-audios">
 					<view class="audio-item-wrap" v-for="(audio,index) in audios">
 						<view class="audio-item" :data-index="index" @click="playRecordAudio">
-							<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
+							<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
 							<text class="audio-len">{{audio.len}}</text>
 						</view>
 						<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
@@ -92,7 +93,8 @@
 				</view>
 				<view class="towns-audios">
 					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
-						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
+						<image v-if="currentVillage == idx && currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+						<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
 						<text class="audio-len">{{audio.len}}</text>
 					</view>
 				</view>
@@ -256,9 +258,10 @@
 			playEnd(){
 				if(this.innerAudioContext.stop){
 					this.innerAudioContext.stop();
-					this.currentVillage = -1;
-					this.currentAudioIndex = -1;
 				}
+				this.currentVillage = -1;
+				this.currentAudioIndex = -1;
+				this.recordIndex = -1;
 				uni.hideLoading();
 			},
 			playAudio(e){
@@ -637,6 +640,10 @@ uni-radio .wx-radio-input, uni-checkbox .wx-checkbox-input, uni-radio .uni-radio
 .delete-icon{
 	margin-left: 30rpx;
 	margin-bottom: 30rpx;
+}
+.play-icon{
+	width: 20rpx;
+	height: 20rpx;
 }
 /* 任务完成列表end */
 </style>

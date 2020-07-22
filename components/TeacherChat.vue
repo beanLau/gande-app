@@ -27,7 +27,7 @@
 
 const recorderManager = uni.getRecorderManager();
 const innerAudioContext = uni.createInnerAudioContext();
-innerAudioContext.autoplay = true;
+innerAudioContext.autoplay = false;
 export default {
     components: {},
     props: {
@@ -43,31 +43,72 @@ export default {
             moveTimer: null,
             beginTime: '',
 			beginTop: 0,
-			currentTop: 0
+			currentTop: 0,
+			userinfo: {
+				
+			}
         }
     },
     created() {
 		let self = this;
+		let userinfo = uni.getStorageSync("userinfo")
+		if(userinfo){
+			userinfo = JSON.parse(userinfo)
+			this.userinfo = userinfo
+		}
 		recorderManager.onStop(function (res) {
 			if(Date.now() - self.beginTime <= 500){
 				return
 			}
-			self.recordLen = (Date.now() - self.recordBeginTime)/1000
-			let len = parseInt(Math.floor(self.recordLen / 60));
-			let mo = parseInt(self.recordLen % 60);
-			if(len == 0){
-				len = '00'
-			}else if(len < 10){
-				len = '0' + len
+			if(self.cancelRecord){
+				return
 			}
-			len += ':'
-			if(mo < 10){
-				mo = '0' + mo
+			innerAudioContext.src = res.tempFilePath
+			// console.log(innerAudioContext.duration)
+			// self.recordLen = (Date.now() - self.beginTime)/1000
+			// let len = parseInt(Math.floor(self.recordLen / 60));
+			// let mo = parseInt(self.recordLen % 60);
+			// if(len == 0){
+			// 	len = '00'
+			// }else if(len < 10){
+			// 	len = '0' + len
+			// }
+			// len += ':'
+			// if(mo < 10){
+			// 	mo = '0' + mo
+			// }
+			let formData = {
+				'folder': self.userinfo.UserId
 			}
-			self.audios.push({
-				src: res.tempFilePath,
-				len: len + mo
-			})
+			uni.uploadFile({
+				url: 'http://60.6.198.123:8003/PublicInfoManage/ResourceFile/UploadFolderFile',
+				filePath: res.tempFilePath,
+				name: 'File',
+				formData: formData,
+				header: {
+					"token": uni.getStorageSync("token")
+				},
+				success: (uploadFileRes) => {
+					try{
+						let data,url;
+						if (uploadFileRes.statusCode === 200) {
+							data = JSON.parse(uploadFileRes.data)
+							url = 'http://60.6.198.123:8003/' + data.resultdata
+							url = url.replace(';','')
+							self.$emit("sendData", {
+								src: url,
+								len: ''
+							})
+						}
+					}catch(e){
+						//TODO handle the exception
+					}
+				}
+			});
+			// self.audios.push({
+			// 	src: res.tempFilePath,
+			// 	len: len + mo
+			// })
 			self.recordBeginTime = '';
 			self.recordLen = 0;
 		});
@@ -86,6 +127,7 @@ export default {
         /**开始录音**/
         recStart(e) { //打开了录音后才能进行start、stop调用
             this.isRecording = true
+			this.cancelRecord = false
             this.beginTime = Date.now();
 			this.beginTop = e.touches[0].clientY
             recorderManager.start();
