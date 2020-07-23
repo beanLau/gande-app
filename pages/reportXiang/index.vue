@@ -105,11 +105,18 @@
 				_this.tui.request("/Siji/AFP_RenWuXiangHuiBao/SaveForm",'POST',{
 					"entity": entity
 				}).then((res)=>{
+					console.log(res)
 					_this.isLoading = false;
-					_this.$refs.uToast.show({
-						title: '汇报成功',
-						back: true
-					})
+					if(res.type == 1){
+						_this.$refs.uToast.show({
+							title: '汇报成功',
+							back: true
+						})
+					}else{
+						_this.$refs.uToast.show({
+							title: res.message
+						})
+					}
 				})
 			},
 			formReset: function(e) {

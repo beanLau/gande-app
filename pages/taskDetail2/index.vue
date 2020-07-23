@@ -320,7 +320,7 @@
 				let _this = this;
 				let detailData = _this.detailData;
 				uni.navigateTo({
-					url: `../sendXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+					url: `../sendXiang/index?RenwuID=${detailData.ID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
 				})
 			},
 			cancelCb(){
