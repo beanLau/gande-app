@@ -1,71 +1,106 @@
 <template>
 	<view class="page-content">
 		<view class="navbar-wrap">
-			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="完成情况"></uni-nav-bar>
+			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="完成情况"></uni-nav-bar>
 		</view>
 		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">
 				<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
-				<view>甘德县政府工作报告准时发布</view>
+				<view>{{detailData.Title}}</view>
 			</view>
 			<view class="bottom-wrap">
 				<view class="bottom-left">
-					<tui-tag padding="8rpx" size="24rpx" type="light-blue">
-						<tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon>
-						<text>紧急</text>
+					<tui-tag padding="8rpx" size="24rpx" :type="detailData.jinjiClass" v-if="detailData.JinjiName">
+						<!-- <tui-icon name="about" :size="10" :color="detailData.jinjiColor"></tui-icon> -->
+						<text>{{detailData.JinjiName}}</text>
 					</tui-tag>
-					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">扶贫</tui-tag>
+					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{detailData.TypeName}}</tui-tag>
 					<view class="bottom-time">
-						县政府  2020-06-01
+						{{detailData.CreateUserName}}  {{detailData.RenWuDaoQiRiQi}}
 					</view>
 				</view>
 				<view class="item-status">
-					待处理
+					{{detailData.StatusName}}
 				</view>
 			</view>
 			
 			<view class="item-desc">
-				2019年是新中国70华诞，是决胜全面建成小康社会的关键之年。一年来，我们始终坚持以习近平新时代中国特色社会主义思想为指导，坚决贯彻党的十九大、十九届历次全会精神、习近平总书记“4·13”重要讲话和中央12号文件精神，在县委、县政府及镇委的坚强领导下，践行新发展理念，推动高质量发展，较好完成了镇三届人大四次会议确定的目标任务，取得重大进展。
+				{{detailData.Neirong}}
 			</view>
 		</view>
 		<view class="report-content">
-			<view class="report-title">培田古村任务汇报</view>
+			<view class="report-title">{{detailData.CunName}}任务汇报</view>
 			<view class="group">
 				<text class="group-label">汇报时间</text>
-				<text class="group-value">{{detail.time}}</text>
+				<text class="group-value">{{detailData.CreateDate}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">汇报人</text>
-				<text class="group-value">{{detail.person}}</text>
+				<text class="group-value">{{detailData.CreateUserName}}</text>
 			</view>
-			<view class="group">
+			<view class="group" v-if="!showReport">
+				<text class="group-label">完成状态</text>
+				<text class="group-value light-hight">{{detailData.StatusName}}</text>
+			</view>
+			<view class="group" v-else>
+				<text class="group-label">完成状态</text>
+				<radio-group class="radio-group group-value" name="chengdu">
+					<label class="tui-radio">
+						<radio value="1" color="#5677fc" />未完结
+					</label>
+					<label class="tui-radio">
+						<radio value="2" color="#5677fc" checked/>已完结
+					</label>
+				</radio-group>
+			</view>
+			
+			<view class="group" v-if="!showReport">
 				<text class="group-label">汇报内容</text>
-				<view class="audio-list">
-					<view class="audio-item" v-for="(audio,index) in detail.audios" :data-index="index" @click="playDetailAudio">
-						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
-						<text class="audio-len">{{audio.len}}</text>
+				<text class="group-value">{{detailData.Neirong}}</text>
+			</view>
+			<view class="group" v-if="showReport">
+				<text class="group-label">汇报内容</text>
+				<view class="record-audios">
+					<view class="audio-item-wrap" v-for="(audio,index) in audios">
+						<view class="audio-item" :data-index="index" @click="playRecordAudio">
+							<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+							<text class="audio-len">{{audio.len}}</text>
+						</view>
+						<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
+							<tui-icon name="delete" :size="18" ></tui-icon>
+						</view>
 					</view>
 				</view>
 			</view>
+			<view class="textarea-wrap" v-if="showReport">
+				<textarea placeholder-style="color:#999" placeholder="请输入汇报内容"/>
+			</view>
+			<view class="tui-btn-box flex" v-if="showReport">
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
+				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" @click="submit">提交</button>
+			</view>
+			
 		</view>
-		<view class="towns-list">
+		<view class="towns-list" v-if="!showReport">
 			<view class="towns-title">
 				完成情况
 			</view>
-			<view class="towns-item" v-for="(item,idx) in villageList" :key="item.name">
+			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
-					<text class="towns-name">联护员  {{item.name}}</text>
-					<text class="towns-btn" @click="toDetail">详情</text>
+					<text class="towns-name">{{item.lianHuYuanRenwuData.LianHuYuanName}}</text>
+					<text class="towns-btn">详情</text>
 				</view>
 				<view class="towns-audios">
-					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click="playAudio">
-						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
+					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
+						<image v-if="currentVillage == idx && currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+						<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
 						<text class="audio-len">{{audio.len}}</text>
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.reportTime}}</text>
-					<text class="towns-person">汇报人 {{item.reportName}}</text>
+					<text class="towns-time">汇报时间 {{item.lianHuYuanRenwuData.CreateDate}}</text>
+					<text class="towns-person">汇报人 {{item.lianHuYuanRenwuData.CreateUserName}}</text>
 				</view>
 			</view>
 		</view>
@@ -73,7 +108,7 @@
 			<view class="report-btn" @click="toReport">汇报</view>
 			<view class="send-btn" @click="toIssue">下发</view>
 		</view>
-		<!-- <view class="bottom-fix" v-if="showReportAudio">
+		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
 		</view> -->
 	</view>
@@ -86,74 +121,18 @@
 	export default {
 		data() {
 			return {
-				showReportBtn: false,
-				showReportAudio: false,
+				detailData: {},
+				id: '',
+				showReport: false, //是否显示提交汇报信息
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
-				detailIndex: -1,
-				detailData: {
-
-				},
-				detail: {
-					name: '',
-					person: '剑侠客',
-					time: '2020-07-08',
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					},{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},
-				villageList: [{
-					name: "李萌",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					},{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "李萌2",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "李萌3",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				},{
-					name: "李萌4",
-					statusName: '进行中',
-					reportTime: "2020-06-01",
-					reportName: "张倩",
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				}]
+				renWuCun: [],
+				audios: [],
+				recordIndex: -1,
+				recordBeginTime: '',
+				recordLen: 0,
+				showReportBtn: false
 			}
 		},
 		onLoad(opt) {
@@ -187,7 +166,7 @@
 					this.jibie = 1
 				}else if(userinfo.Nature == 6){ //乡
 					this.jibie = 2
-				}else if(userinfo.Nature == 7 && !userinfo.Nature){ //村
+				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
 					this.jibie = 3
 				}else{ //联户员
 					this.jibie = 4
@@ -210,14 +189,49 @@
 			pageBack(){
 				uni.navigateBack()
 			},
+			endRecord(){
+				recorderManager.stop();
+			},
+			beginRecord(){
+				this.recordBeginTime = Date.now();
+				recorderManager.start();
+			},
+			deleteRecordAudio(e){
+				let index = e.currentTarget.dataset.index;
+				let audios = this.audios;
+				this.audios.splice(index,1);
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+					this.innerAudioContext.stop();
+				}
+			},
+			playRecordAudio(e){
+				let index = e.currentTarget.dataset.index;
+				let audios = this.audios;
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+					this.innerAudioContext.stop();
+					return
+				}
+				this.recordIndex = index
+				if(this.innerAudioContext){
+					this.innerAudioContext.destroy();
+					this.innerAudioContext = null
+				}
+				uni.showLoading({
+					title: '音频资源加载中'
+				});
+				this.initAudioContext()
+				this.innerAudioContext.src = audios[index].src;
+				this.innerAudioContext.play();
+			},
 			initAudioContext(){
 				this.innerAudioContext = uni.createInnerAudioContext();
 				this.innerAudioContext.autoplay = true;
-				this.innerAudioContext.loop = true;
 				this.innerAudioContext.onCanplay(() => {
+					console.log('onCanplay')
 					uni.hideLoading();
 				});
 				this.innerAudioContext.onPlay(() => {
+					console.log('onPlay')
 					uni.hideLoading();
 				});
 				this.innerAudioContext.onEnded(() => {
@@ -227,21 +241,27 @@
 					this.playEnd();
 				});
 				this.innerAudioContext.onWaiting(() => {
-					uni.showLoading({
-					    title: '音频资源加载中'
-					});
+					console.log("loading")
+					// uni.showLoading({
+					//     title: '音频资源加载中'
+					// });
 				});
 				this.innerAudioContext.onError((e) => {
 					console.log(e)
+					uni.hideLoading()
+					uni.showToast({
+						title: '资源加载失败'
+					})
 				});
 			},
 			//音频播放结束处理逻辑
 			playEnd(){
 				if(this.innerAudioContext.stop){
 					this.innerAudioContext.stop();
-					this.currentVillage = -1;
-					this.currentAudioIndex = -1;
 				}
+				this.currentVillage = -1;
+				this.currentAudioIndex = -1;
+				this.recordIndex = -1;
 				uni.hideLoading();
 			},
 			playAudio(e){
@@ -249,7 +269,7 @@
 				let index = e.currentTarget.dataset.index;
 				let currentVillage = this.currentVillage;
 				let currentAudioIndex = this.currentAudioIndex;
-				let list = this.villageList;
+				let list = this.renWuCun;
 				let src;
 				//如果当前正在播放
 				if(this.innerAudioContext && !this.innerAudioContext.paused && idx == currentVillage && index == currentAudioIndex){
@@ -273,77 +293,83 @@
 					}
 					this.initAudioContext()
 					src = list[idx].audios[index].src;
-					//播放对应音频
-					uni.showLoading({
-						title: '音频资源加载中'
-					});
 					if(!this.innerAudioContext){
 						this.initAudioContext()
 					}
 					this.innerAudioContext.src = src;
 					this.innerAudioContext.autoplay = true;
+					uni.showLoading({
+					    title: '音频资源加载中'
+					});
 					this.innerAudioContext.play();
 				}
 				
 			},
-			playDetailAudio(e){
-				let index = e.currentTarget.dataset.index;
-				let audios = this.detail.audios;
-				if(this.innerAudioContext && !this.innerAudioContext.paused && this.detailIndex == index){
-					this.innerAudioContext.stop();
-					return
-				}
-				this.detailIndex = index
-				if(this.innerAudioContext){
-					this.innerAudioContext.destroy();
-					this.innerAudioContext = null
-				}
-				uni.showLoading({
-					title: '音频资源加载中'
-				});
-				this.initAudioContext()
-				this.innerAudioContext.src = audios[index].src;
-				this.innerAudioContext.autoplay = true;
-				this.innerAudioContext.play();
-			},
-			toDetail(){
+			toDetail(item){
 				uni.navigateTo({
-					url: '../taskDetail3/index'
-				})
-			},
-			getDetail(){
-				this.tui.request("/Siji/AFP_RenwuCun/GetCunRenWuDetail?keyValue="+this.id,"get",{
-					keyValue: this.id
-				}).then((res)=>{
-					if(_this.jibie == 3 &&  res.xiangRenWuData.CunCode == _this.userinfo.CunCode){
-						_this.showReportBtn = true
-					}
-					let jinjicode = res.xiangRenWuData.JinjiCode
-					if(jinjicode == 1){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'green'
-					}else if(jinjicode == 2){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'warning'
-					}else  if(jinjiCode == 3){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'danger'
-					}
-					this.detailData = res.xiangRenWuData;
-					this.renWuCun = res.renWuCun || [];
+					url: '../taskDetail3/index?id='+ item.cunData.ID
 				})
 			},
 			toReport(){
 				let detailData = this.detailData;
 				uni.navigateTo({
-					url: `../reportCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+					url: `../reportCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}&CunCode=${detailData.CunCode}&CunName=${detailData.CunName}`
 				})
 			},
 			toIssue(){
 				let _this = this;
 				let detailData = _this.detailData;
 				uni.navigateTo({
-					url: `../sendCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+					url: `../sendCun/index?RenwuID=${detailData.ID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+				})
+			},
+			cancelCb(){
+				this.showReport = false
+			},
+			submit(){
+				this.showReport = false
+			},
+			getDetail(){
+				let _this = this;
+				console.log(_this.id)
+				this.tui.request("/Siji/AFP_RenwuCun/GetAppCunRenWuDetail?keyValue="+this.id,"get",{
+					keyValue: _this.id
+				}).then((res)=>{
+					console.log(res)
+					try{
+						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode){
+							_this.showReportBtn = true
+						}
+						let jinjicode = res.cunRenWuData.JinjiCode
+						if(jinjicode == 1){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'green'
+						}else if(jinjicode == 2){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'warning'
+						}else  if(jinjicode == 3){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'danger'
+						}
+						_this.detailData = res.cunRenWuData;
+						res.renWuLianHuYuanData.map(item=>{
+							let audioList = item.audioList.split(";");
+							let audios = []
+							audioList.map((audio,index)=>{
+								let url = 'http://60.6.198.123:8003/' + audio
+								audios[index] = {
+									src: url
+								}
+							})
+							item.audios = audios
+						})
+						_this.renWuCun = res.renWuLianHuYuanData || [];
+					}catch(e){
+						console.log(e)
+						//TODO handle the exception
+					}
+					
+					
 				})
 			}
 		}
@@ -353,6 +379,32 @@
 <style>
 .page-content{
 	background: #FAFAFA;
+	padding-bottom: 100rpx;
+}
+.bottom-fix{
+	position: fixed;
+	background: #DE1727;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100rpx;
+}
+.report-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+	border-right: 1px solid #eee;
+}
+.send-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
 }
 .navbar-wrap{
 	position: relative;
@@ -456,22 +508,6 @@
 .light-hight{
 	color: #DE1727;
 }
-.audio-list{
-	padding-left: 50upx;
-	flex-grow: 1;
-}
-.audio-list >.audio-item{
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 400upx;
-	height: 60upx;
-	line-height: 60upx;
-	padding: 0 24upx;
-	border-radius: 30upx;
-	background: #FEF3F3;
-	margin-bottom: 30upx;
-}
 
 /* 任务完成列表begin */
 .towns-list{
@@ -528,7 +564,7 @@
 	color: #aaa;
 	line-height: 36upx;
 }
-.towns-audios >.audio-item{
+.audio-item{
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -562,30 +598,60 @@
 	color: #D4091C;
 	font-size: 24upx;
 }
-/* 任务完成列表end */
-.bottom-fix{
-	position: fixed;
-	background: #DE1727;
+
+.cancel-btn{
+	background: #eee;
+	color: #999;
+	margin: 0 20rpx;
+}
+.submit-btn{
+	background: #D4091C;
+	color: #fff;
+	margin: 0 20rpx;
+}
+.uni-radio-input-checked {
+	background-color: rgb(222, 23, 39) !important;
+	border-color: rgb(222, 23, 39) !important;
+}
+.uni-input{
+	display: inline-block;
+}
+
+uni-radio .wx-radio-input, uni-checkbox .wx-checkbox-input, uni-radio .uni-radio-input, uni-checkbox .uni-checkbox-input {
+	margin: 0;
+	width: 36upx;
+	height: 36upx;
+	margin-right: 8upx;
+}
+
+.textarea-wrap textarea{
+	padding: 10upx 20upx;
+	width: 100%;
+	border: 1px solid #ccc;
+	color: #666;
+}
+.tui-btn-box{
+	margin-top: 40rpx;
+}
+
+.tui-radio{
+	margin-right: 20rpx;
+}
+
+.record-audios{
+	padding-left: 40rpx;
+}
+.audio-item-wrap{
 	display: flex;
 	align-items: center;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-	height: 100rpx;
 }
-.report-btn{
-	text-align: center;
-	color: #fff;
-	font-size: 36rpx;
-	line-height: 100rpx;
-	flex: 1;
-	border-right: 1px solid #eee;
+.delete-icon{
+	margin-left: 30rpx;
+	margin-bottom: 30rpx;
 }
-.send-btn{
-	text-align: center;
-	color: #fff;
-	font-size: 36rpx;
-	line-height: 100rpx;
-	flex: 1;
+.play-icon{
+	width: 20rpx;
+	height: 20rpx;
 }
+/* 任务完成列表end */
 </style>

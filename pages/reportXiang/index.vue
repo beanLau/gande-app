@@ -22,7 +22,7 @@
 				<textarea placeholder-style="color:#999" name="content" @input="changeContent" :value="content" placeholder="请输入汇报内容"/>
 			</view>
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="pageBack">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>

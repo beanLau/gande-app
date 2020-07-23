@@ -6,39 +6,44 @@
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">任务标题</view>
-					<input placeholder-class="tui-phcolor" class="tui-input" name="title" placeholder="请输入任务标题" maxlength="50" type="text" />
+					<input placeholder-class="tui-phcolor" @input="changeTitle" :value="title" class="tui-input" name="title" placeholder="请输入任务标题" maxlength="50" type="text" />
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">任务期限（天）</view>
+					<input placeholder-class="tui-phcolor" type="number" min="0" @input="changeQixian" :value="qixian" class="tui-input" name="title" placeholder="请输入任务期限天数"/>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">紧急程度</view>
-					<radio-group class="radio-group" name="chengdu">
-						<label class="tui-radio">
-							<radio value="1" color="#5677fc" />一般
-						</label>
-						<label class="tui-radio">
-							<radio value="2" color="#5677fc" />紧急
-						</label>
-						<label class="tui-radio">
-							<radio value="3" color="#5677fc" />特急
-						</label>
-					</radio-group>
+					<picker @change="bindDegreeChange" :value="index" rangeKey="ItemName" :range="degreeList" class="form-right">
+						<view class="uni-input">{{degreeName || '请选择紧急程度'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">选择分类</view>
-					<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
-						<view class="uni-input">{{array[index]}}</view>
+					<picker @change="bindClassifyChange" :value="index" rangeKey="ItemName" :range="classifyList" class="form-right">
+						<view class="uni-input">{{classifyName || '请选择分类'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
 					</picker>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">任务执行人</view>
-					<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
-						<view class="uni-input">{{array[index]}}</view>
-					</picker>
+					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
+						<u-checkbox 
+							active-color="#DE1727"
+							v-model="item.checked" 
+							v-for="(item, index) in xiangList" :key="index" 
+							:name="item.FullName"
+						>{{item.FullName}}</u-checkbox>
+					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
@@ -48,13 +53,14 @@
 				
 			</tui-list-cell>
 			<view class="textarea-wrap">
-				<textarea placeholder-style="color:#999" placeholder="占位符字体是红色的"/>
+				<textarea placeholder-style="color:#999" placeholder="请输入任务内容" @input="changeContent" :value="content"/>
 			</view>
 			<view class="tui-btn-box flex">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
+		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
@@ -65,71 +71,157 @@
 		data() {
 			return {
 				array: ['中国', '美国', '巴西', '日本'],
-				index: 0
+				index: 0,
+				xiangList: [],
+				classifyList: [],
+				classifyId: '',
+				classifyName: '',
+				degreeList: [],
+				degreeId: '',
+				degreeName: '',
+				selectNames: '',
+				selectIds: '',
+				title: '',
+				content: "",
+				qixian: '',
+				isLoading: false
 			}
 		},
+		mounted() {
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+			}
+			let dataItem = uni.getStorageSync('dataItem');
+			this.classifyList = dataItem.renwufenlei || [];
+			this.degreeList = dataItem.jinjichengdu || [];
+			console.log(this.classifyList)
+			console.log(this.degreeList)
+			this.getXiangList();
+		},
 		methods: {
-			bindPickerChange(){
-				console.log('picker发送选择改变，携带值为', e.target.value)
-				this.index = e.target.value
+			changeQixian(e){
+				this.qixian = e.detail.value
+			},
+			changeTitle(e){
+				this.title = e.detail.value
+			},
+			changeContent(e){
+				this.content = e.detail.value
+			},
+			bindDegreeChange(e){
+				let index = e.target.value;
+				this.degreeId = this.degreeList[index].ItemValue
+				this.degreeName = this.degreeList[index].ItemName
+			},
+			bindClassifyChange(e){
+				let index = e.target.value;
+				this.classifyId = this.classifyList[index].ItemValue
+				this.classifyName = this.classifyList[index].ItemName
+			},
+			bindPickerChange(arr){
+				let xiangList = this.xiangList;
+				let selectArr;
+				let selectNames = [];
+				let selectIds = [];
+				if(arr.length == 0){
+					this.selectNames = '';
+					this.selectIds = '';
+					return
+				}
+				selectArr = xiangList.filter(item=>{
+					return arr.includes(item.FullName)
+				})
+				selectArr.map(item=>{
+					selectNames.push(item.FullName)
+					selectIds.push(item.OrganizeId)
+				})
+				selectNames = selectNames.join(",")
+				selectIds = selectIds.join(",")
+				this.selectNames = selectNames;
+				this.selectIds = selectIds;
+			},
+			getXiangList(){
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: this.userinfo.XianCode,
+					nature: 6
+				}).then((res)=>{
+					console.log(res)
+					this.xiangList = res || []
+				})
 			},
 			formSubmit: function(e) {
-				//表单规则
-				let rules = [{
-					name: "name",
-					rule: ["required", "isChinese", "minLength:2", "maxLength:6"], //可使用区间，此处主要测试功能
-					msg: ["请输入姓名", "姓名必须全部为中文", "姓名必须2个或以上字符", "姓名不能超过6个字符"]
-				}, {
-					name: "sex",
-					rule: ["required"],
-					msg: ["请选择性别"]
-				}, {
-					name: "age",
-					rule: ["required", "isNum", "range:[0,150]"],
-					msg: ["请输入年龄", "请输入正确的年龄", "请输入正确的年龄范围：0-150"]
-				}, {
-					name: "mobile",
-					rule: ["required", "isMobile"],
-					msg: ["请输入手机号", "请输入正确的手机号"]
-				}, {
-					name: "email",
-					rule: ["required", "isEmail"],
-					msg: ["请输入邮箱", "请输入正确的邮箱"]
-				}, {
-					name: "idcard",
-					rule: ["required", "isIdCard"],
-					msg: ["请输入身份证号码", "请输入正确的身份证号码"]
-				}, {
-					name: "pwd",
-					rule: ["required", "isEnAndNo"],
-					msg: ["请输入密码", "密码为8~20位数字和字母组合"]
-				}, {
-					name: "pwd2",
-					rule: ["required", "isSame:pwd"],
-					msg: ["请输入确认密码", "两次输入的密码不一致"]
-				}, {
-					name: "range",
-					rule: ["required", "range:[3,20]"],
-					msg: ["请输入区间数字", "请输入3-20之间的数字"]
-				}, {
-					name: "amount",
-					rule: ["required", "isAmount"],
-					msg: ["请输入金额", "请输入正确的金额，允许保留两位小数"]
-				}];
-				//进行表单检查
-				let formData = e.detail.value;
-				let checkRes = form.validation(formData, rules);
-				if (!checkRes) {
-					uni.showToast({
-						title: "验证通过!",
-						icon: "none"
-					});
-				} else {
-					uni.showToast({
-						title: checkRes,
-						icon: "none"
-					});
+				if(this.isLoading){
+					return
 				}
+				let _this = this;
+				if(!_this.title){
+					_this.$refs.uToast.show({
+						title: '请输入任务标题',
+					})
+					return
+				}
+				if(!_this.qixian){
+					_this.$refs.uToast.show({
+						title: '请输入任务期限',
+					})
+					return
+				}
+				if(!_this.degreeId){
+					_this.$refs.uToast.show({
+						title: '请选择紧急程度',
+					})
+					return
+				}
+				if(!_this.classifyId){
+					_this.$refs.uToast.show({
+						title: '请选择分类',
+					})
+					return
+				}
+				if(!_this.selectIds){
+					_this.$refs.uToast.show({
+						title: '请选择下发的乡镇',
+					})
+					return
+				}
+				if(!_this.content){
+					_this.$refs.uToast.show({
+						title: '请输入下发内容',
+					})
+					return
+				}
+				let reqData = {
+					"entity":{
+						"Title": _this.title,
+						"JinjiCode": _this.degreeId,
+						"TypeCode": _this.classifyId,
+						"RenWuQiXian": parseInt(_this.qixian),
+						"Neirong": _this.content,
+						"RenWuDuiXiangName": _this.selectNames,
+						"JinjiName": _this.degreeName,
+						"TypeName": _this.classifyName,
+						"RenWuDuiXiangCode": _this.selectIds
+					}
+				}
+				_this.isLoading = true
+				_this.tui.request("/AFP_RenwuXian/APPSaveForm",'POST',reqData).then((res)=>{
+					console.log(res)
+					_this.isLoading = false;
+					if(res.type == 1){
+						_this.$refs.uToast.show({
+							title: '任务创建成功~',
+							back: true
+						})
+					}else{
+						_this.$refs.uToast.show({
+							title: res.message
+						})
+					}
+					
+				})
 			},
 			formReset: function(e) {
 				console.log("清空数据")
@@ -245,5 +337,19 @@
 	.uni-radio-input-checked {
 		background-color: rgb(222, 23, 39) !important;
 		border-color: rgb(222, 23, 39) !important;
+	}
+	.form-right{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		flex-grow: 1;
+		text-align: right;
+	}
+	input{
+		text-align: right;
+	}
+	.checkbox-group{
+		justify-content: flex-end;
+		padding-left: 20rpx;
 	}
 </style>

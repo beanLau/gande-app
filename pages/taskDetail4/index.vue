@@ -29,7 +29,7 @@
 			</view>
 		</view>
 		<view class="report-content">
-			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
+			<view class="report-title">{{detailData.CunName}}任务汇报</view>
 			<view class="group">
 				<text class="group-label">汇报时间</text>
 				<text class="group-value">{{detailData.CreateDate}}</text>
@@ -88,7 +88,7 @@
 			</view>
 			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
-					<text class="towns-name">{{item.cunData.CunName}}</text>
+					<text class="towns-name">{{item.lianHuYuanRenwuData.LianHuYuanName}}</text>
 					<text class="towns-btn">详情</text>
 				</view>
 				<view class="towns-audios">
@@ -99,14 +99,13 @@
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.cunData.CreateDate}}</text>
-					<text class="towns-person">汇报人 {{item.cunData.CreateUserName}}</text>
+					<text class="towns-time">汇报时间 {{item.lianHuYuanRenwuData.CreateDate}}</text>
+					<text class="towns-person">汇报人 {{item.lianHuYuanRenwuData.CreateUserName}}</text>
 				</view>
 			</view>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
 			<view class="report-btn" @click="toReport">汇报</view>
-			<view class="send-btn" @click="toIssue">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
@@ -313,14 +312,7 @@
 			toReport(){
 				let detailData = this.detailData;
 				uni.navigateTo({
-					url: `../reportXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
-				})
-			},
-			toIssue(){
-				let _this = this;
-				let detailData = _this.detailData;
-				uni.navigateTo({
-					url: `../sendXiang/index?RenwuID=${detailData.ID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+					url: `../reportPeople/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}&CunCode=${detailData.CunCode}&CunName=${detailData.CunName}`
 				})
 			},
 			cancelCb(){
@@ -331,36 +323,44 @@
 			},
 			getDetail(){
 				let _this = this;
-				this.tui.request("/Siji/AFP_RenwuXiang/GetAppXiangRenWuDetail?keyValue="+this.id,"get",{
-					keyValue: this.id
+				console.log(_this.id)
+				this.tui.request("/Siji/AFP_RenWuLianHuYuan/GetLianHuYuanRenWuDetail?keyValue="+this.id,"get",{
+					keyValue: _this.id
 				}).then((res)=>{
-					if(_this.jibie == 2 &&  res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
-						_this.showReportBtn = true
-					}
-					let jinjicode = res.xiangRenWuData.JinjiCode
-					if(jinjicode == 1){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'green'
-					}else if(jinjicode == 2){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'warning'
-					}else  if(jinjicode == 3){
-						res.xiangRenWuData.jinjiColor = '#4B8AFC'
-						res.xiangRenWuData.jinjiClass = 'danger'
-					}
-					_this.detailData = res.xiangRenWuData;
-					res.renWuCun.map(item=>{
-						let audioList = item.audioList.split(";");
-						let audios = []
-						audioList.map((audio,index)=>{
-							let url = 'http://60.6.198.123:8003/' + audio
-							audios[index] = {
-								src: url
-							}
+					console.log(res)
+					try{
+						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode){
+							_this.showReportBtn = true
+						}
+						let jinjicode = res.cunRenWuData.JinjiCode
+						if(jinjicode == 1){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'green'
+						}else if(jinjicode == 2){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'warning'
+						}else  if(jinjicode == 3){
+							res.cunRenWuData.jinjiColor = '#4B8AFC'
+							res.cunRenWuData.jinjiClass = 'danger'
+						}
+						_this.detailData = res.cunRenWuData;
+						res.renWuLianHuYuanData.map(item=>{
+							let audioList = item.audioList.split(";");
+							let audios = []
+							audioList.map((audio,index)=>{
+								let url = 'http://60.6.198.123:8003/' + audio
+								audios[index] = {
+									src: url
+								}
+							})
+							item.audios = audios
 						})
-						item.audios = audios
-					})
-					_this.renWuCun = res.renWuCun || [];
+						_this.renWuCun = res.renWuLianHuYuanData || [];
+					}catch(e){
+						console.log(e)
+						//TODO handle the exception
+					}
+					
 					
 				})
 			}

@@ -3,39 +3,67 @@
 		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务汇报"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
-			<tui-list-cell :hover="false">
+			<!-- <tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">完成状态</view>
-					<picker @change="bindPickerChange" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
-						<view class="uni-input">{{selectName || '请选择完成状态'}}</view>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
-					</picker>
+					<view class="tui-title">下发村庄</view>
+					
+					<u-checkbox-group @change="bindPickerChange">
+						<u-checkbox 
+							active-color="#DE1727"
+							@change="checkboxChange" 
+							v-model="item.checked" 
+							v-for="(item, index) in statusList" :key="index" 
+							:name="item.FullName"
+						>{{item.FullName}}</u-checkbox>
+					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务内容</view>
+					<view class="tui-title">下发内容</view>
 				</view>
 				
 			</tui-list-cell>
 			<view class="textarea-wrap">
 				<textarea placeholder-style="color:#999" name="content" @input="changeContent" :value="content" placeholder="请输入汇报内容"/>
-			</view>
+			</view> -->
+			<tui-list-cell :hover="false">
+				<view class="group">
+					<text class="group-label">语音内容</text>
+					<view class="record-audios">
+						<view class="audio-item-wrap" v-for="(audio,index) in audios">
+							<view class="audio-item" :data-index="index" @click="playRecordAudio">
+								<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+								<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+								<text class="audio-len">{{audio.len}}</text>
+							</view>
+							<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
+								<tui-icon name="delete" :size="18" ></tui-icon>
+							</view>
+						</view>
+					</view>
+				</view>
+			</tui-list-cell>
+			<teacher-chat @sendData="sendData"/>
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="pageBack">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
+		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
+	import TeacherChat from "@/components/TeacherChat.vue"
 	const form = require("@/components/common/tui-validation/tui-validation.js")
+	const recorderManager = uni.getRecorderManager();
 	export default {
-		components: {uniNavBar},
+		components: {uniNavBar,TeacherChat},
 		data() {
 			return {
 				array: ['中国', '美国', '巴西', '日本'],
+				audios: [],
 				index: 0,
 				RenwuID: '',
 				XiangCode: '',
@@ -44,22 +72,129 @@
 				statusList: [],
 				curentItem: {},
 				isLoading: false,
-				selectName: '',
-				selectId: ''
+				selectNames: '',
+				selectIds: '',
+				recordIndex: -1,
+				innerAudioContext: null
 			}
 		},
 		onLoad(opt) {
 			this.RenwuID = opt.RenwuID
 			this.XiangCode = opt.XiangCode
 			this.XiangName = opt.XiangName
-			let dataItem = uni.getStorageSync('dataItem');
-			this.statusList = dataItem.renwuzhuangtai || [];
+			this.CunCode = opt.CunCode
+			this.CunName = opt.CunName
+			console.log(opt)
+			let self = this;
+			//this.getCunList();
 		},
 		methods: {
-			bindPickerChange(e){
-				let index = e.target.value
-				this.selectName = this.statusList[index].ItemName
-				this.selectId = this.statusList[index].ItemValue
+			deleteRecordAudio(e){
+				let index = e.currentTarget.dataset.index;
+				let audios = this.audios;
+				this.audios.splice(index,1);
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+					this.innerAudioContext.stop();
+				}
+			},
+			playRecordAudio(e){
+				let index = e.currentTarget.dataset.index;
+				let audios = this.audios;
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+					this.innerAudioContext.stop();
+					return
+				}
+				this.recordIndex = index
+				if(this.innerAudioContext){
+					this.innerAudioContext.destroy();
+					this.innerAudioContext = null
+				}
+				uni.showLoading({
+					title: '音频资源加载中'
+				});
+				this.initAudioContext()
+				console.log(audios[index].src)
+				this.innerAudioContext.src = audios[index].src;
+				this.innerAudioContext.play();
+			},
+			initAudioContext(){
+				let _this = this;
+				this.innerAudioContext = uni.createInnerAudioContext();
+				this.innerAudioContext.autoplay = true;
+				this.innerAudioContext.onCanplay(() => {
+					console.log('onCanplay')
+					uni.hideLoading();
+				});
+				this.innerAudioContext.onPlay(() => {
+					console.log('onPlay')
+					uni.hideLoading();
+				});
+				this.innerAudioContext.onEnded(() => {
+					_this.playEnd();
+				});
+				this.innerAudioContext.onStop(() => {
+					_this.playEnd();
+				});
+				this.innerAudioContext.onWaiting(() => {
+					console.log("loading")
+					// uni.showLoading({
+					//     title: '音频资源加载中'
+					// });
+				});
+				this.innerAudioContext.onError((e) => {
+					console.log(e)
+					uni.hideLoading()
+					_this.$refs.uToast.show({
+						title: '资源加载失败',
+					})
+				});
+			},
+			//音频播放结束处理逻辑
+			playEnd(){
+				if(this.innerAudioContext.stop){
+					this.innerAudioContext.stop();
+				}
+				this.recordIndex = -1;
+				uni.hideLoading();
+			},
+			sendData(res){
+				console.log(res)
+				this.audios.push(res)
+			},
+			getCunList(){
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: _this.XiangCode,
+					nature: 7
+				}).then((res)=>{
+					console.log(res)
+					this.statusList = res || []
+				})
+			},
+			bindPickerChange(arr){
+				let statusList = this.statusList;
+				let selectArr;
+				let selectNames = [];
+				let selectIds = [];
+				if(arr.length == 0){
+					this.selectNames = '';
+					this.selectIds = '';
+					return
+				}
+				selectArr = statusList.filter(item=>{
+					return arr.includes(item.FullName)
+				})
+				selectArr.map(item=>{
+					selectNames.push(item.FullName)
+					selectIds.push(item.OrganizeId)
+				})
+				selectNames = selectNames.join(",")
+				selectIds = selectIds.join(",")
+				this.selectNames = selectNames;
+				this.selectIds = selectIds;
+			},
+			checkboxChange(e){
+				console.log(e)
 			},
 			changeContent(e){
 				this.content = e.target.value
@@ -76,39 +211,42 @@
 					return
 				}
 				let _this = this;
-				if(!_this.selectName){
-					plus.nativeUI.toast( "请选择完成状态" ,{
-						verticalAlign: 'center',
-						background: 'rgba(0,0,0,.7)'
-					});
+				if(_this.audios.length == 0){
+					_this.$refs.uToast.show({
+						title: '请进行录音汇报！',
+					})
 					return
 				}
-				if(!_this.content){
-					plus.nativeUI.toast( "请输入汇报内容" ,{
-						verticalAlign: 'center',
-						background: 'rgba(0,0,0,.7)'
-					});
-					return
+				let audioUrlList = []
+				_this.audios.map(item=>{
+					audioUrlList.push(item.src)
+				})
+				let reqData = {
+					entity: {
+						RenwuID: _this.RenwuID,
+						XiangCode: _this.XiangCode,
+						XiangName: _this.XiangName,
+						CunCode: _this.CunCode,
+						CunName: _this.CunName,
+					},
+					audioUrlList: audioUrlList.join(',')
 				}
-				let entity = {
-					"RenwuID": _this.RenwuID,
-					"XiangCode": _this.XiangCode,
-					"XiangName": _this.selectName,
-					"StatusCode": _this.selectId,
-					"StatusName": _this.ItemName,
-					"HuibaoNeirong": _this.content
-				}
+				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/Siji/AFP_RenWuXiangHuiBao/SaveForm",'POST',{
-					"entity": entity
-				}).then((res)=>{
+				_this.tui.request("/Siji/AFP_RenWuCunHuiBao/SaveForm",'POST',reqData).then((res)=>{
+					console.log(res)
 					_this.isLoading = false;
-					plus.nativeUI.toast( "汇报成功" ,{
-						verticalAlign: 'center'
-					});
-					setTimeout(()=>{
-						uni.navigateBack()
-					},1500)
+					if(res.type == 1){
+						_this.$refs.uToast.show({
+							title: '汇报成功',
+							back: true
+						})
+					}else{
+						_this.$refs.uToast.show({
+							title: res.message
+						})
+					}
+					
 				})
 			},
 			formReset: function(e) {
@@ -228,5 +366,36 @@
 	}
 	.uni-input{
 		display: inline-block;
+	}
+	
+	.audio-item{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 400upx;
+		height: 60upx;
+		line-height: 60upx;
+		padding: 0 24upx;
+		border-radius: 30upx;
+		background: #FEF3F3;
+		margin-bottom: 30upx;
+	}
+	.audio-len{
+		color: #DE1727;
+		font-size: 22upx;
+	}
+	.audio-item-wrap{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding-top: 30rpx;
+	}
+	.play-icon{
+		width: 20rpx;
+		height: 20rpx;
+	}
+	.delete-icon{
+		margin-left: 30rpx;
+		margin-bottom: 30rpx;
 	}
 </style>

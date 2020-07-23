@@ -271,7 +271,7 @@ export default {
 			}else if(userinfo.Nature == 6){ //乡
 				this.listUrl = 'Siji/AFP_RenwuXiang/GetPageListJson'
 				this.jibie = 2
-			}else if(userinfo.Nature == 7 && !userinfo.Nature){ //村
+			}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
 				this.listUrl = 'Siji/AFP_RenwuCun/GetPageListJson'
 				this.jibie = 3
 			}else{ //联户员
@@ -279,6 +279,8 @@ export default {
 				this.jibie = 4
 			}
 		}
+		console.log(userinfo)
+		console.log(this.jibie)
 		let date = new Date()
 		let month = date.getMonth() + 1
 		if(month < 10){
@@ -527,9 +529,13 @@ export default {
 					uni.navigateTo({
 						url: '../taskDetail2/index?id=' + url
 					});
-				}else{
+				}else if(item.jibie == 3){
 					uni.navigateTo({
 						url: '../taskDetail3/index?id=' + url
+					});
+				}else{
+					uni.navigateTo({
+						url: '../taskDetail4/index?id=' + url
 					});
 				}
 			}
@@ -560,6 +566,7 @@ export default {
 				"sidx": "CreateDate",
 				"sord": "desc"
 			}
+			console.log(resData)
 			this.tui.request('Siji/AFP_WenTi/GetUpDownList',"GET",resData).then((res)=>{
 				res.resultdata.rows.map(item=>{
 					if(item.leixing == 'wenti'){
@@ -577,7 +584,7 @@ export default {
 						item.jinjiClass = 'danger'
 					}
 				})
-				
+				console.log(res.resultdata.rows)
 				if(_this.pageIndex == 1){
 					_this.productList = res.resultdata.rows;
 				}else{
