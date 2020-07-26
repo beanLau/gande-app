@@ -4,6 +4,7 @@
 		<!--screen-->
 		<view class="tui-header-screen">
 			<uni-nav-bar v-if="jibie == 1" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-else-if="jibie == 4" status-bar right-text="问题反馈" @clickRight="toCreateQuestion"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			<uni-nav-bar v-else status-bar color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			
 			<view class="tui-screen-top">
@@ -543,6 +544,11 @@ export default {
 		toCreateTask(){
 			uni.navigateTo({
 				url: '../createTask/index'
+			});
+		},
+		toCreateQuestion(){
+			uni.navigateTo({
+				url: '../createQuestion/index'
 			});
 		},
 		getListData(){

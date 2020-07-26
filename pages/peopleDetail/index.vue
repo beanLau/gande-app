@@ -13,9 +13,9 @@
 						<image src="../../static/default-pic.png" mode="" class="family-pic"></image>
 						<view class="family-info">
 							<view class="info-top">
-								<text class="family-name">张伟民</text>
-								<text class="family-sex">女</text>
-								<text class="family-age">36岁</text>
+								<text class="family-name">{{detailData.Name}}</text>
+								<text class="family-sex">{{detailData.Sex}}</text>
+								<text class="family-age">{{detailData.Age}}</text>
 							</view>
 							<view class="info-bottom">
 								<text class="family-area">上贡麻乡 田共村 家庭成员  3</text>
@@ -151,17 +151,39 @@
 </template>
 
 <script>
+	import Decrypt from '@/common/decript.js'
 	export default {
 		data() {
 			return {
 				pageIndex: 1,
-				familyList: [1,2,3,4,5]
+				familyList: [1,2,3,4,5],
+				id:'',
+				detailData: {}
 			}
 		},
+		onLoad(opt){
+			this.id = opt.id
+		},
 		mounted(){
-		
+			this.getDetail();
 		},
 		methods: {
+			getDetail(){
+				console.log(this.id)
+				let _this = this;
+				this.tui.request("Siji/AFP_HuRenkou/GetFormJson?keyValue=1fabcf7c-d5d1-4d86-9202-cf8de7bb49b0"+this.id,"get",{
+					keyValue: this.id
+				}).then((res)=>{
+					if(res.IDCard){
+						res.IDCard = Decrypt(res.IDCard)
+					}
+					if(res.Tel){
+						res.Tel = Decrypt(res.Tel)
+					}
+					this.detailData = res || {}
+					console.log(res)
+				})
+			},
 			pageBack(){
 				uni.navigateBack()
 			},

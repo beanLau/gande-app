@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务汇报"></uni-nav-bar>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="问题反馈"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
 			<!-- <tui-list-cell :hover="false">
@@ -27,6 +27,13 @@
 			<view class="textarea-wrap">
 				<textarea placeholder-style="color:#999" name="content" @input="changeContent" :value="content" placeholder="请输入汇报内容"/>
 			</view> -->
+			
+			<!-- <tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">任务标题</view>
+					<input placeholder-class="tui-phcolor" @input="changeTitle" :value="title" class="tui-input" name="title" placeholder="输入问题标题" maxlength="50" type="text" />
+				</view>
+			</tui-list-cell> -->
 			<tui-list-cell :hover="false">
 				<view class="group">
 					<text class="group-label">语音内容</text>
@@ -76,16 +83,17 @@
 				selectIds: '',
 				recordIndex: -1,
 				innerAudioContext: null,
-				userinfo: {}
+				userinfo: {},
+				title: ''
 			}
 		},
 		onLoad(opt) {
-			this.RenwuID = opt.RenwuID
-			this.XiangCode = opt.XiangCode
-			this.XiangName = opt.XiangName
-			this.CunCode = opt.CunCode
-			this.CunName = opt.CunName
-			console.log(opt)
+			// this.RenwuID = opt.RenwuID
+			// this.XiangCode = opt.XiangCode
+			// this.XiangName = opt.XiangName
+			// this.CunCode = opt.CunCode
+			// this.CunName = opt.CunName
+			// console.log(opt)
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
@@ -93,6 +101,10 @@
 			}
 		},
 		methods: {
+			
+			changeTitle(e){
+				this.title = e.detail.value
+			},
 			deleteRecordAudio(e){
 				let index = e.currentTarget.dataset.index;
 				let audios = this.audios;
@@ -225,26 +237,23 @@
 				_this.audios.map(item=>{
 					audioUrlList.push(item.src)
 				})
-				let reqData = {
-					entity: {
-						RenwuID: _this.RenwuID,
-						XiangCode: _this.XiangCode,
-						XiangName: _this.XiangName,
-						CunCode: _this.CunCode,
-						CunName: _this.CunName,
-						"LianHuYuanID": _this.userinfo.UserId,
-						"LianHuYuanName": _this.userinfo.UserName
-					},
-					audioUrlList: audioUrlList.join(',')
-				}
-				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/Siji/AFP_RenWuCunHuiBao/SaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("/Siji/AFP_WenTi/SaveForm?keyValue=",'POST',{
+					"XiangCode": _this.userinfo.XiangCode,
+					"XiangName": _this.userinfo.XiangName,
+					"CunCode": _this.userinfo.CunCode,
+					"CunName": _this.userinfo.CunName,
+					"LianHuYuanID": _this.userinfo.LianHuYuanID,
+					"LianHuYuanName": _this.userinfo.LianHuYuanName,
+					"YuanShiRadioUrl": audioUrlList.join(','),
+					"StatusCode": "1",
+					"StatusName": "联户员已反馈"
+				}).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){
 						_this.$refs.uToast.show({
-							title: '汇报成功',
+							title: '问题反馈成功',
 							back: true
 						})
 					}else{

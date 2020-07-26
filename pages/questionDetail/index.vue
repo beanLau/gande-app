@@ -5,40 +5,41 @@
 		</view>
 		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">
-				<view>下贡麻乡扶贫进展情况</view>
+				<view>{{detailData.Title}}</view>
 			</view>
 			<view class="bottom-wrap">
 				<view class="bottom-left">
-					<tui-tag padding="8rpx" size="24rpx" type="light-blue">
-						<tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon>
-						<text>一般</text>
+					<tui-tag padding="8rpx" size="24rpx" :type="detailData.jinjiClass" v-if="detailData.JinjiCode">
+						<!-- <tui-icon name="about" :size="10" :color="detailData.jinjiColor"></tui-icon> -->
+						<text>{{detailData.JinjiName}}</text>
 					</tui-tag>
-					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">扶贫</tui-tag>
+					<tui-tag v-if="detailData.TypeName" margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{detailData.TypeName}}</tui-tag>
 				</view>
 			</view>
 		</view>
 		<view class="report-content">
 			<view class="group">
 				<text class="group-label">反馈时间</text>
-				<text class="group-value">{{detail.time}}</text>
+				<text class="group-value">{{detailData.FanKuiShiJian}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">反馈人</text>
-				<text class="group-value">{{detail.person}}</text>
+				<text class="group-value">{{detailData.LianHuYuanName}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">完成进度</text>
-				<text class="group-value light-hight">联护员已反馈/村已上报</text>
+				<text class="group-value light-hight">{{detailData.StatusName}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">问题内容</text>
-				<text class="group-value">暂未登记</text>
+				<text class="group-value">{{detailData.Neirong || ''}}</text>
 			</view>
 			<view class="group">
 				<text class="group-label">原始问题反馈语音</text>
 				<view class="audio-list">
-					<view class="audio-item" v-for="(audio,index) in detail.audios" :data-index="index" @click="playDetailAudio">
-						<tui-icon name="about" :size="14" color="#DE1727"></tui-icon>
+					<view class="audio-item" v-for="(audio,index) in audios" :data-index="index" @click="playDetailAudio">
+						<image v-if="detailIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+						<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
 						<text class="audio-len">{{audio.len}}</text>
 					</view>
 				</view>
@@ -48,33 +49,41 @@
 			<view class="solve-title">
 				解决报告
 			</view>
-			<view class="solve-content">
+			<view class="solve-content" v-if="detailData.JieJueBaoGao">
 				<view class="group">
 					<text class="group-label">解决部门</text>
-					<text class="group-value">环保</text>
+					<text class="group-value">{{detailData.JieJueRen}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">汇报人</text>
-					<text class="group-value">解决时间</text>
+					<text class="group-value">{{detailData.JieJueBaoGao}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">跟进人</text>
-					<text class="group-value">张倩</text>
+					<text class="group-value">{{detailData.GenJinRenName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">解决报告</text>
-					<text class="group-value">在县委、县政府及镇委的坚强领导下，践行发展理念，推动高质量发展，较好完成了镇三届人大四次会议确定的任务，取得重大进展。</text>
+					<text class="group-value">{{detailData.JieJueBaoGao}}</text>
 				</view>
 			</view>
-			<view class="no-data">
-				<image src="../../static/BasicsBg.png" mode="" class="no-data-pic"></image>
+			<view class="no-data" v-else>
+				<image src="../../static/e256b4ce-d9a4-488b-8da2-032747213982.png" mode="" class="no-data-pic"></image>
 				<text class="no-data-tip">暂无解决报告</text>
 			</view>
+		</view>
+		<u-toast ref="uToast" />
+		<u-modal v-model="showModule" content="确认提交改问题吗?" @confirm="confirm"></u-modal>
+		<view class="bottom-fix" v-if="showReportBtn">
+			<view class="report-btn" @click="toReport">汇报</view>
 		</view>
 	</view>
 </template>
 
 <script>
+	const recorderManager = uni.getRecorderManager();
+	const innerAudioContext = uni.createInnerAudioContext();
+	innerAudioContext.autoplay = true;
 	export default {
 		data() {
 			return {
@@ -82,25 +91,56 @@
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
 				detailIndex: -1,
-				detail: {
-					name: '',
-					person: '剑侠客',
-					time: '2020-07-08',
-					audios: [{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					},{
-						src: 'http://www.douxue.top/audio.mp3',
-						isPlay: false,
-						len: '00:50'
-					}]
-				}
+				detailData: {},
+				audios: [],
+				showReportBtn: false,
+				showModule: false,
+				isLoading: false,
+				userinfo: {}
 			}
 		},
-		
+		onLoad(opt) {
+			this.id = opt.id
+			let self = this;
+			recorderManager.onStop(function (res) {
+				self.recordLen = (Date.now() - self.recordBeginTime)/1000
+				let len = parseInt(Math.floor(self.recordLen / 60));
+				let mo = parseInt(self.recordLen % 60);
+				if(len == 0){
+					len = '00'
+				}else if(len < 10){
+					len = '0' + len
+				}
+				len += ':'
+				if(mo < 10){
+					mo = '0' + mo
+				}
+				self.audios.push({
+					src: res.tempFilePath,
+					len: len + mo
+				})
+				self.recordBeginTime = '';
+				self.recordLen = 0;
+			});
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
+			}
+			console.log(userinfo)
+		},
 		mounted() {
 			this.initAudioContext()
+			this.getDetail();
 		},
 		onUnload: function (option) {
 			uni.hideLoading();
@@ -111,8 +151,87 @@
 			this.playEnd();
         },
 		methods: {
+			toReport(){
+				this.showModule = true
+			},
 			pageBack(){
 				uni.navigateBack()
+			},
+			confirm(){
+				let _this = this;
+				if(this.isLoading){
+					return
+				}
+				_this.isLoading = true
+				_this.tui.request("/Siji/AFP_WenTi/SaveForm",'POST',{
+					"XiangCode": _this.detailData.XiangCode,
+					"XiangName": _this.detailData.XiangName,
+					"CunCode": _this.detailData.CunCode,
+					"CunName": _this.detailData.CunName,
+					"LianHuYuanID": _this.detailData.LianHuYuanID,
+					"LianHuYuanName": _this.detailData.LianHuYuanName,
+					"YuanShiRadioUrl": _this.detailData.YuanShiRadioUrl,
+					"StatusCode": "2",
+					"StatusName": "村级已提交"
+				}).then((res)=>{
+					console.log(res)
+					_this.isLoading = false;
+					if(res.type == 1){
+						_this.$refs.uToast.show({
+							title: '问题提交成功',
+							back: true
+						})
+					}else{
+						_this.$refs.uToast.show({
+							title: res.message
+						})
+					}
+					
+				})
+			},
+			cancel(){
+				this.showModule = false
+			},
+			getDetail(){
+				let _this = this;
+				this.tui.request("/Siji/AFP_WenTi/GetFormJson?keyValue="+this.id,"get",{
+					keyValue: this.id
+				}).then((res)=>{
+					console.log(res)
+					try{
+						let jinjicode = res.JinjiCode
+						
+						if(_this.jibie == 3 &&  res.CunCode == _this.userinfo.CunCode){
+							_this.showReportBtn = true
+						}
+						if(jinjicode == 1){
+							res.jinjiColor = '#4B8AFC'
+							res.jinjiClass = 'green'
+						}else if(jinjicode == 2){
+							res.jinjiColor = '#4B8AFC'
+							res.jinjiClass = 'warning'
+						}else  if(jinjicode == 3){
+							res.jinjiColor = '#4B8AFC'
+							res.jinjiClass = 'danger'
+						}
+						let audios = [];
+						let YuanShiRadioUrl = res.YuanShiRadioUrl || '';
+						YuanShiRadioUrl = YuanShiRadioUrl.split(';');
+						YuanShiRadioUrl.map(item=>{
+							if(item.indexOf('http') == -1){
+								item = 'http://116.131.134.198:9001/' + item
+							}
+							audios.push({
+								src: item
+							})
+						})
+						this.audios = audios
+						this.detailData = res;
+					}catch(e){
+						console.log(e)
+						//TODO handle the exception
+					}
+				})
 			},
 			initAudioContext(){
 				this.innerAudioContext = uni.createInnerAudioContext();
@@ -143,14 +262,13 @@
 			playEnd(){
 				if(this.innerAudioContext.stop){
 					this.innerAudioContext.stop();
-					this.currentVillage = -1;
-					this.currentAudioIndex = -1;
+					this.detailIndex = -1;
 				}
 				uni.hideLoading();
 			},
 			playDetailAudio(e){
 				let index = e.currentTarget.dataset.index;
-				let audios = this.detail.audios;
+				let audios = this.audios;
 				if(this.innerAudioContext && !this.innerAudioContext.paused && this.detailIndex == index){
 					this.innerAudioContext.stop();
 					return
@@ -164,6 +282,7 @@
 					title: '音频资源加载中'
 				});
 				this.initAudioContext()
+				console.log(audios[index].src)
 				this.innerAudioContext.src = audios[index].src;
 				this.innerAudioContext.autoplay = true;
 				this.innerAudioContext.play();
@@ -358,5 +477,28 @@
 	color: #bbb;
 	font-size: 28rpx;
 	margin-top: 2rpx;
+}
+.play-icon{
+	width: 20rpx;
+	height: 20rpx;
+}
+
+.bottom-fix{
+	position: fixed;
+	background: #DE1727;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100rpx;
+}
+.report-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+	border-right: 1px solid #eee;
 }
 </style>

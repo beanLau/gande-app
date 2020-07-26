@@ -13,12 +13,12 @@
 						<image src="../../static/default-pic.png" mode="" class="family-pic"></image>
 						<view class="family-info">
 							<view class="info-top">
-								<text class="family-name">张伟民</text>
-								<text class="family-sex">女</text>
-								<text class="family-age">36岁</text>
+								<text class="family-name">{{detailData.Name}}</text>
+								<text class="family-sex">{{detailData.Sex || ''}}</text>
+								<text class="family-age">{{detailData.Age || ''}}</text>
 							</view>
 							<view class="info-bottom">
-								<text class="family-area">上贡麻乡 田共村 家庭成员  3</text>
+								<text class="family-area">{{detailData.XiangName}} {{detailData.CunName}} 家庭成员  </text>
 							</view>
 						</view>
 					</view>
@@ -26,11 +26,11 @@
 				<view class="family-bottom">
 					<view class="bottom-group">
 						<text class="bottom-label">手机号码</text>
-						<text class="bottom-value">18800000000</text>
+						<text class="bottom-value">{{detailData.Tel}}</text>
 					</view>
 					<view class="bottom-group">
 						<text class="bottom-label">身份证号</text>
-						<text class="bottom-value">110506197804230381</text>
+						<text class="bottom-value">{{detailData.IDCard}}</text>
 					</view>
 				</view>
 			</view>
@@ -40,75 +40,75 @@
 			<view class="report-content">
 				<view class="group">
 					<text class="group-label">低保</text>
-					<text class="group-value">一档</text>
+					<text class="group-value">{{hudata.DibaoName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">房屋</text>
-					<text class="group-value">异地搬迁</text>
+					<text class="group-value">{{hudata.FangziName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">特困</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{hudata.Tekun ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">草补</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Caobu ? '有':'无'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">林补</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Linbu ? '有':'无'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">保险</text>
-					<text class="group-value">牲畜保险</text>
+					<text class="group-value">{{hudata.BaoxianName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">饮水</text>
-					<text class="group-value">水井</text>
+					<text class="group-value">{{hudata.YinshuiName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">用电</text>
-					<text class="group-value">动力电</text>
+					<text class="group-value">{{hudata.YongdianName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">户厕</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Cesuo}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">路</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Lu}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">就业</text>
-					<text class="group-value">管护员</text>
+					<text class="group-value">{{hudata.JiuyeName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">信贷</text>
-					<text class="group-value">双基联动</text>
+					<text class="group-value">{{hudata.XindaiName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">信号</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Xinhao}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">牲畜</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{hudata.Shengchu}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">五星级文明户</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{hudata.Wuxing}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">扶贫产业</text>
-					<text class="group-value">扶贫产业</text>
+					<text class="group-value">{{hudata.Chanye}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">村集体经济</text>
-					<text class="group-value">村集体经济</text>
+					<text class="group-value">{{hudata.Cunjinji}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">合作社</text>
-					<text class="group-value">合作社</text>
+					<text class="group-value">{{hudata.Hezuoshe}}</text>
 				</view>
 			</view>
 		</view>
@@ -149,17 +149,40 @@
 </template>
 
 <script>
+	import Decrypt from '@/common/decript.js'
 	export default {
 		data() {
 			return {
 				pageIndex: 1,
-				familyList: [1,2,3,4,5]
+				familyList: [1,2,3,4,5],
+				id:'',
+				detailData: {},
+				hudata: {}
 			}
 		},
+		onLoad(opt){
+			this.id = opt.id
+		},
 		mounted(){
-		
+			this.getDetail();
 		},
 		methods: {
+			getDetail(){
+				let _this = this;
+				this.tui.request("Siji/AFP_Hu/GetAppFormJson?keyValue=1fabcf7c-d5d1-4d86-9202-cf8de7bb49b0"+this.id,"get",{
+					keyValue: this.id
+				}).then((res)=>{
+					if(res.huzhudata.IDCard){
+						res.huzhudata.IDCard = Decrypt(res.huzhudata.IDCard)
+					}
+					if(res.huzhudata.Tel){
+						res.huzhudata.Tel = Decrypt(res.huzhudata.Tel)
+					}
+					this.detailData = res.huzhudata || {}
+					this.hudata = res.hudata || {}
+					console.log(res)
+				})
+			},
 			pageBack(){
 				uni.navigateBack()
 			},

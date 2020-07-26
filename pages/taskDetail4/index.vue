@@ -38,69 +38,32 @@
 				<text class="group-label">汇报人</text>
 				<text class="group-value">{{detailData.CreateUserName}}</text>
 			</view>
-			<view class="group" v-if="!showReport">
+			<view class="group">
 				<text class="group-label">完成状态</text>
 				<text class="group-value light-hight">{{detailData.StatusName}}</text>
 			</view>
-			<view class="group" v-else>
-				<text class="group-label">完成状态</text>
-				<radio-group class="radio-group group-value" name="chengdu">
-					<label class="tui-radio">
-						<radio value="1" color="#5677fc" />未完结
-					</label>
-					<label class="tui-radio">
-						<radio value="2" color="#5677fc" checked/>已完结
-					</label>
-				</radio-group>
-			</view>
-			
-			<view class="group" v-if="!showReport">
-				<text class="group-label">汇报内容</text>
-				<text class="group-value">{{detailData.Neirong}}</text>
-			</view>
-			<view class="group" v-if="showReport">
-				<text class="group-label">汇报内容</text>
-				<view class="record-audios">
-					<view class="audio-item-wrap" v-for="(audio,index) in audios">
-						<view class="audio-item" :data-index="index" @click="playRecordAudio">
-							<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-							<text class="audio-len">{{audio.len}}</text>
-						</view>
-						<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
-							<tui-icon name="delete" :size="18" ></tui-icon>
-						</view>
-					</view>
-				</view>
-			</view>
-			<view class="textarea-wrap" v-if="showReport">
-				<textarea placeholder-style="color:#999" placeholder="请输入汇报内容"/>
-			</view>
-			<view class="tui-btn-box flex" v-if="showReport">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
-				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" @click="submit">提交</button>
-			</view>
-			
 		</view>
 		<view class="towns-list" v-if="!showReport">
 			<view class="towns-title">
-				完成情况
+				{{detailData.XiangName}}下发语音
 			</view>
-			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
-				<view class="towns-top">
-					<text class="towns-name">{{item.lianHuYuanRenwuData.LianHuYuanName}}</text>
-					<text class="towns-btn">详情</text>
+			<view class="towns-audios">
+				<view class="audio-item" v-for="(audio,index) in xiangAudios" :data-index="index" @click.stop="playAudio">
+					<image v-if="currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+					<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+					<text class="audio-len">{{audio.len}}</text>
 				</view>
-				<view class="towns-audios">
-					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
-						<image v-if="currentVillage == idx && currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-						<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-						<text class="audio-len">{{audio.len}}</text>
-					</view>
-				</view>
-				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.lianHuYuanRenwuData.CreateDate}}</text>
-					<text class="towns-person">汇报人 {{item.lianHuYuanRenwuData.CreateUserName}}</text>
+			</view>
+		</view>
+		<view class="towns-list" v-if="!showReport">
+			<view class="towns-title">
+				{{detailData.CunName}}下发语音
+			</view>
+			<view class="towns-audios">
+				<view class="audio-item" v-for="(audio,index) in cunAudios" :data-index="index" @click.stop="playCunAudio">
+					<image v-if="currentVillage == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+					<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+					<text class="audio-len">{{audio.len}}</text>
 				</view>
 			</view>
 		</view>
@@ -127,7 +90,8 @@
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
 				renWuCun: [],
-				audios: [],
+				cunAudios: [],
+				xiangAudios: [],
 				recordIndex: -1,
 				recordBeginTime: '',
 				recordLen: 0,
@@ -264,34 +228,69 @@
 				uni.hideLoading();
 			},
 			playAudio(e){
-				let idx = e.currentTarget.dataset.idx; //村子的index
+				this.currentVillage = -1;
 				let index = e.currentTarget.dataset.index;
-				let currentVillage = this.currentVillage;
 				let currentAudioIndex = this.currentAudioIndex;
-				let list = this.renWuCun;
+				let list = this.xiangAudios;
 				let src;
 				//如果当前正在播放
-				if(this.innerAudioContext && !this.innerAudioContext.paused && idx == currentVillage && index == currentAudioIndex){
+				if(this.innerAudioContext && !this.innerAudioContext.paused && index == currentAudioIndex){
 					//如果点击的是当前在播放的，暂停播放
 					this.innerAudioContext.stop();
-					this.currentVillage = -1;
 					this.currentAudioIndex = -1;
 					//设置字段isPlay = flase
-					list[idx].audios[index].isPlay = false;
+					list[index].isPlay = false;
 					return
 				}else{
-					if(currentVillage != -1 && currentAudioIndex != -1){
-						list[currentVillage].audios[currentAudioIndex].isPlay = false;
+					if(currentAudioIndex != -1){
+						list[index].isPlay = false;
 					}
-					list[idx].audios[index].isPlay = true;
-					this.currentVillage = idx;
+					list[index].isPlay = true;
 					this.currentAudioIndex = index;
 					if(this.innerAudioContext){
 						this.innerAudioContext.destroy();
 						this.innerAudioContext = null
 					}
 					this.initAudioContext()
-					src = list[idx].audios[index].src;
+					src = list[index].src;
+					if(!this.innerAudioContext){
+						this.initAudioContext()
+					}
+					this.innerAudioContext.src = src;
+					this.innerAudioContext.autoplay = true;
+					uni.showLoading({
+					    title: '音频资源加载中'
+					});
+					this.innerAudioContext.play();
+				}
+				
+			},
+			playCunAudio(e){
+				this.currentAudioIndex = -1;
+				let index = e.currentTarget.dataset.index;
+				let currentVillage = this.currentVillage;
+				let list = this.cunAudios;
+				let src;
+				//如果当前正在播放
+				if(this.innerAudioContext && !this.innerAudioContext.paused && index == currentVillage){
+					//如果点击的是当前在播放的，暂停播放
+					this.innerAudioContext.stop();
+					this.currentVillage = -1;
+					//设置字段isPlay = flase
+					list[index].isPlay = false;
+					return
+				}else{
+					if(currentVillage != -1){
+						list[index].isPlay = false;
+					}
+					list[index].isPlay = true;
+					this.currentVillage = index;
+					if(this.innerAudioContext){
+						this.innerAudioContext.destroy();
+						this.innerAudioContext = null
+					}
+					this.initAudioContext()
+					src = list[index].src;
 					if(!this.innerAudioContext){
 						this.initAudioContext()
 					}
@@ -329,33 +328,34 @@
 				}).then((res)=>{
 					console.log(res)
 					try{
-						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode){
+						if(_this.jibie == 4 &&  res.lianHuYuanRenWuData.CunCode == _this.userinfo.CunCode){
 							_this.showReportBtn = true
 						}
-						let jinjicode = res.cunRenWuData.JinjiCode
-						if(jinjicode == 1){
-							res.cunRenWuData.jinjiColor = '#4B8AFC'
-							res.cunRenWuData.jinjiClass = 'green'
-						}else if(jinjicode == 2){
-							res.cunRenWuData.jinjiColor = '#4B8AFC'
-							res.cunRenWuData.jinjiClass = 'warning'
-						}else  if(jinjicode == 3){
-							res.cunRenWuData.jinjiColor = '#4B8AFC'
-							res.cunRenWuData.jinjiClass = 'danger'
-						}
-						_this.detailData = res.cunRenWuData;
-						res.renWuLianHuYuanData.map(item=>{
-							let audioList = item.audioList.split(";");
-							let audios = []
-							audioList.map((audio,index)=>{
-								let url = 'http://60.6.198.123:8003/' + audio
-								audios[index] = {
-									src: url
-								}
+						_this.detailData = res.lianHuYuanRenWuData
+						let jinjicode = res.lianHuYuanRenWuData.JinjiCode;
+						let currentXiang,currentCun;
+						let xiangAudios = [];
+						let cunAudios = []
+						res.xiangXiaFaData.map(item=>{
+							let url = item.XiaFaRadioUrl
+							if(url.indexOf('http') == -1){
+								url = 'http://116.131.134.198:9001/' + url
+							}
+							xiangAudios.push({
+								src: url
 							})
-							item.audios = audios
 						})
-						_this.renWuCun = res.renWuLianHuYuanData || [];
+						res.cunXiaFaData.map(item=>{
+							let url = item.XiaFaRadioUrl
+							if(url.indexOf('http') == -1){
+								url = 'http://116.131.134.198:9001/' + url
+							}
+							cunAudios.push({
+								src: url
+							})
+						})
+						_this.xiangAudios = xiangAudios || [];
+						_this.cunAudios = cunAudios || [];
 					}catch(e){
 						console.log(e)
 						//TODO handle the exception

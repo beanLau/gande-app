@@ -7,26 +7,26 @@
 				
 				<tui-list-cell :hover="false">
 					<view class="tui-line-cell">
-						<view class="tui-title">全部乡镇</view>
-						<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
-							<view class="uni-input">{{array[index]}}</view>
-							<uni-icons type="arrowright" :size="16"></uni-icons>
+						<view class="tui-title">选择乡镇</view>
+						<picker @change="bindXiangChange" :value="index" rangeKey="FullName" :range="xiangList" class="form-right">
+							<view class="uni-input">{{xiangName || '请选择乡镇'}}</view>
+							<uni-icons type="arrowright" :size="18"></uni-icons>
 						</picker>
 					</view>
 				</tui-list-cell>
 				<tui-list-cell :hover="false">
 					<view class="tui-line-cell">
-						<view class="tui-title">全部村</view>
-						<picker @change="bindPickerChange" :value="index" :range="array" class="form-right">
-							<view class="uni-input">{{array[index]}}</view>
-							<uni-icons type="arrowright" :size="16"></uni-icons>
+						<view class="tui-title">选择村庄</view>
+						<picker @change="bindCunChange" :value="index" rangeKey="FullName" :range="cunList" class="form-right">
+							<view class="uni-input">{{cunName || '请选择村'}}</view>
+							<uni-icons type="arrowright" :size="18"></uni-icons>
 						</picker>
 					</view>
 				</tui-list-cell>
 				<tui-list-cell :hover="false">
 					<view class="tui-line-cell">
 						<view class="tui-title">关键字</view>
-						<input placeholder-class="tui-phcolor" class="tui-input" name="title" placeholder="输入关键字搜索" maxlength="50" type="text" />
+						<input placeholder-class="tui-phcolor" @input="changeKeyword" :value="keyword" class="tui-input" name="title" placeholder="输入关键字搜索" maxlength="50" type="text" />
 					</view>
 				</tui-list-cell>
 				<tui-list-cell :hover="false">
@@ -47,6 +47,7 @@
 				</view>
 			</form>
 		</view>
+		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
@@ -58,10 +59,81 @@
 			return {
 				array: ['所有', '美国', '巴西', '日本'],
 				index: 0,
-				searchType: 1
+				searchType: 1,
+				xiangList: [],
+				cunList: [],
+				xiangId: '',
+				xiangName: '',
+				cunId: '',
+				cunName: '',
+				userinfo: {},
+				keyword: '',
+				isLoading: false
 			}
 		},
+		
+		mounted(){
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.listUrl = 'Siji/AFP_RenwuXian/GetPageListJson'
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.listUrl = 'Siji/AFP_RenwuXiang/GetPageListJson'
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+					this.listUrl = 'Siji/AFP_RenwuCun/GetPageListJson'
+					this.jibie = 3
+				}else{ //联户员
+					this.listUrl = 'Siji/AFP_RenWuLianHuYuan/GetPageListJson'
+					this.jibie = 4
+				}
+			}
+			console.log(userinfo)
+			this.getXiangList();
+		},
 		methods: {
+			changeKeyword(e){
+				this.keyword = e.detail.value
+			},
+			bindXiangChange(e){
+				let index = e.target.value;
+				this.xiangId = this.xiangList[index].OrganizeId
+				this.xiangName = this.xiangList[index].FullName
+				this.cunId = ''
+				this.cunName = ''
+				this.getCunList();
+			},
+			bindCunChange(e){
+				let index = e.target.value;
+				this.cunId = this.cunList[index].OrganizeId
+				this.cunName = this.cunList[index].FullName
+			},
+			getCunList(){
+				if(!this.xiangId){
+					return
+				}
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: this.xiangId,
+					nature: 7
+				}).then((res)=>{
+					console.log(res)
+					this.cunList = res || []
+				})
+			},
+			getXiangList(){
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: _this.userinfo.XianCode,
+					nature: 6
+				}).then((res)=>{
+					console.log(res)
+					this.xiangList = res || []
+				})
+			},
 			bindPickerChange(e){
 				console.log('picker发送选择改变，携带值为', e.target.value)
 				this.index = e.target.value
@@ -70,34 +142,16 @@
 				this.searchType = e.detail.value;
 			},
 			formSubmit: function(e) {
-				let val = this.searchType
-				//表单规则
-				let rules = [{
-					name: "title",
-					rule: ["required"], //可使用区间，此处主要测试功能
-					msg: ["请输入关键字"]
-				}];
-				//进行表单检查
-				let formData = e.detail.value;
-				let checkRes = form.validation(formData, rules);
-				if (!checkRes) {
-					
-					if(val == 1){ //搜索户列表
-						uni.navigateTo({
-							url: '../familyList/index'
-						})
-					}else{
-						uni.navigateTo({
-							url: '../peopleList/index'
-						})
-					}
-					
-				} else {
-					uni.showToast({
-						title: checkRes,
-						icon: "none"
-					});
+				let _this = this;
+				let url = ''
+				if(this.searchType == 1){ //户搜索
+					url = `../familyList/index?XiangCode=${this.xiangId}&CunCode=${this.cunId}&Keyword=${this.keyword}`
+				}else{
+					url = `../peopleList/index?XiangCode=${this.xiangId}&CunCode=${this.cunId}&Keyword=${this.keyword}`
 				}
+				uni.navigateTo({
+					url: url
+				})
 			},
 			formReset: function(e) {
 				console.log("清空数据")

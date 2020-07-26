@@ -6,7 +6,7 @@
 const tui = {
 	//接口地址
 	interfaceUrl: function() {
-		return 'http://60.6.198.123:8003/'
+		return 'http://116.131.134.198:9001/'
 		//return 'https://test.thorui.cn'
 		//return 'https://uat.thorui.cn'
 		// return 'https://prod.thorui.cn'

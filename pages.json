@@ -121,6 +121,10 @@
             "path" : "pages/sendCun/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/createQuestion/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,
