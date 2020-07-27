@@ -11,17 +11,18 @@
 				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					<view class="task-desc" v-html="item.Renwu">
 					</view>
 					<view class="task-time">
-						2020-06-07
+						{{item.RenwuQixianDate}}
 					</view>
 				</view>
 			</view>
 		</view>
+		
+		<u-toast ref="uToast" />
 		<!--加载loadding-->
 		<tui-loadmore v-if="loadding"></tui-loadmore>
 		<tui-nomore v-if="!pullUpOn"></tui-nomore>
@@ -35,13 +36,62 @@
 		data() {
 			return {
 				pageIndex: 1,
-				list: [1,2,3,4,1,1,1],
-				loadData: [1,1,1,1],
+				list: [],
+				loadData: [],
 				loadding: false,
-				pullUpOn: true
+				pullUpOn: true,
+				pageIndex: 1,
+				pageSize: 5,
+				userinfo: {}
 			}
 		},
+		onLoad(opt) {
+			this.XiangCode = opt.XiangCode
+			this.CunCode = opt.CunCode
+			this.Keyword = opt.Keyword
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				console.log(userinfo)
+			}
+		},
+		mounted(){
+			this.getListData();
+		},
 		methods: {
+			getListData(){
+				let _this = this;
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						XiangCode: _this.userinfo.XiangCode || '',
+						Keyword: '',
+						StatusCode: '',
+						beginTime: '',
+						endTime: ''
+					})),
+					"rows": '5',
+					"page": '1',
+					"sidx": "CreateDate",
+					"sord": "desc"
+				}
+				this.tui.request('Siji/AFP_DangjianRenwu/GetPageListJson',"GET",resData).then((res)=>{
+					console.log(res)
+					if(_this.pageIndex == 1){
+						_this.list = res.rows;
+					}else{
+						_this.list = [..._this.list,...res.rows]
+					}
+					console.log('总共：' + res.records)
+					if(_this.pageIndex * _this.pageSize >= res.records){
+						_this.pullUpOn = false
+					}else{
+						_this.pullUpOn = true;
+					}
+					_this.loadding = false;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
 			pageBack(){
 				uni.navigateBack()
 			},
@@ -59,30 +109,28 @@
 		//页面相关事件处理函数--监听用户下拉动作
 		onPullDownRefresh: function() {
 			//延时为了看效果
+			this.pageIndex = 1;
+			this.pullUpOn = true;
+			this.getListData()
 			setTimeout(() => {
-				this.list = this.loadData;
-				this.pageIndex = 1;
-				this.pullUpOn = true;
-				this.loadding = false;
+				// this.familyList = this.loadData;
+				// this.pageIndex = 1;
+				// this.pullUpOn = true;
+				// this.loadding = false;
 				uni.stopPullDownRefresh();
 				// uni.showToast({
 				// 	icon: 'none',
 				//     title: '刷新成功'
 				// });
-			}, 200)
+			}, 1000)
 		},
 
 		// 页面上拉触底事件的处理函数
 		onReachBottom: function() {
 			if (!this.pullUpOn) return;
 			this.loadding = true;
-			if (this.pageIndex == 3) {
-				this.loadding = false;
-				this.pullUpOn = false;
-			} else {
-				this.list = this.list.concat(this.loadData);
-				this.pageIndex = this.pageIndex + 1;
-			}
+			this.pageIndex = this.pageIndex + 1;
+			this.getListData();
 		}
 	}
 </script>

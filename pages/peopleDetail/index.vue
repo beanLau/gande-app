@@ -10,7 +10,7 @@
 			<view class="family-item" style="margin-bottom: 20rpx;">
 				<view class="family-top">
 					<view class="top-left">
-						<image src="../../static/default-pic.png" mode="" class="family-pic"></image>
+						<image :src="detailData.HeadImg || '../../static/default-pic.png'" mode="" class="family-pic"></image>
 						<view class="family-info">
 							<view class="info-top">
 								<text class="family-name">{{detailData.Name}}</text>
@@ -18,7 +18,7 @@
 								<text class="family-age">{{detailData.Age}}</text>
 							</view>
 							<view class="info-bottom">
-								<text class="family-area">上贡麻乡 田共村 家庭成员  3</text>
+								<text class="family-area">{{detailData.XiangName}} {{detailData.CunName}} </text>
 							</view>
 						</view>
 					</view>
@@ -26,11 +26,11 @@
 				<view class="family-bottom">
 					<view class="bottom-group">
 						<text class="bottom-label">手机号码</text>
-						<text class="bottom-value">18800000000</text>
+						<text class="bottom-value">{{detailData.Tel}}</text>
 					</view>
 					<view class="bottom-group">
 						<text class="bottom-label">身份证号</text>
-						<text class="bottom-value">110506197804230381</text>
+						<text class="bottom-value">{{detailData.IDCard}}</text>
 					</view>
 				</view>
 			</view>
@@ -40,59 +40,59 @@
 			<view class="report-content">
 				<view class="group">
 					<text class="group-label">残疾</text>
-					<text class="group-value">一级</text>
+					<text class="group-value">{{detailData.CanjiName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">教育程度</text>
-					<text class="group-value">小学</text>
+					<text class="group-value">{{detailData.JiaoyuName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">孤儿及困境儿童</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Guer ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">养老、高龄</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Gaoling ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">参保</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Canbao ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">村干部</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Ganbu ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">党员</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Dangyuan ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">公益性岗位</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Gongyigang ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">重点人员</text>
-					<text class="group-value">有</text>
+					<text class="group-value">{{detailData.Zhongdian ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">四大疾病</text>
-					<text class="group-value">五</text>
+					<text class="group-value">{{detailData.JibingName || '无'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">僧侣</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.Senglv ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">管护员</text>
-					<text class="group-value">湿地管护员</text>
+					<text class="group-value">{{detailData.GuanhuyuanName ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">雨露计划</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.YuluJihua ? '是':'否'}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">技能培训</text>
-					<text class="group-value">是</text>
+					<text class="group-value">{{detailData.JinengPeixun ? '是':'否'}}</text>
 				</view>
 			</view>
 			<view class="group-title" style="margin-top: 40rpx;">
@@ -102,47 +102,39 @@
 				<view class="group">
 					<text class="group-label">身份证正面</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.CardImg1" mode="" class="img-item"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">身份证反面</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.CardImg2" mode="" class="img-item"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">户口本</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.HukouImg" mode="" class="img-item"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">残疾证</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.CanjiImg" mode="" class="img-item"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">低保证</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.DibaoImg" mode="" class="img-item"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">其他证件</text>
 					<view class="group-value img-list">
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
-						<image src="../../static/BasicsBg.png" mode="" class="img-item"></image>
+						<image :src="detailData.QitaImg" mode="" class="img-item"></image>
 					</view>
 				</view>
 			</view>
@@ -179,6 +171,27 @@
 					}
 					if(res.Tel){
 						res.Tel = Decrypt(res.Tel)
+					}
+					if(res.HeadImg){
+						res.HeadImg = '' + res.HeadImg
+					}
+					if(res.CardImg1){
+						res.CardImg1 = '' + res.CardImg1
+					}
+					if(res.CardImg2){
+						res.CardImg2 = '' + res.CardImg2
+					}
+					if(res.HukouImg){
+						res.HukouImg = '' + res.HukouImg
+					}
+					if(res.CanjiImg){
+						res.CanjiImg = '' + res.CanjiImg
+					}
+					if(res.DibaoImg){
+						res.DibaoImg = '' + res.DibaoImg
+					}
+					if(res.QitaImg){
+						res.QitaImg = '' + res.QitaImg
 					}
 					this.detailData = res || {}
 					console.log(res)

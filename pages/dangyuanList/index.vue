@@ -1,12 +1,38 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar right-text="新建任务" @clickLeft="pageBack" left-icon="back" left-text="返回" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
 		<view class="title-wrap">
 			<view class="group-title">
-				党建任务
+				党员会议
+			</view>
+		</view>
+		<view class="search-wrap">
+			<view class="group-item">
+				<uni-icons type="search" color="#ccc" :size="24"></uni-icons>
+				<input class="search-input" type="text" :value="keyword" @input="keywordChange" placeholder="输入关键字搜索"/>
+			</view>
+			<view class="group-item">
+				<view class="begin-time" :class="{'has-value': beginTime != ''}" @click="showBeginTime">
+					{{beginTime ? beginTime : '选择开始时间'}}
+				</view>
+				<tui-datetime ref="beginTime" :type="3" :cancelColor="cancelColor" :color="color"
+				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBeginTime"></tui-datetime>
+				<view class="end-time" :class="{'has-value': endTime != ''}" @click="showEndTime">
+					{{endTime ? endTime : '选择截止时间'}}
+				</view>
+				<tui-datetime ref="endTime" :type="3" :cancelColor="cancelColor" :color="color"
+				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeEndTime"></tui-datetime>
+			</view>
+			
+			<view class="tui-btn-box flex">
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="resetCb">重置</button>
+				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" @click="toSearch">搜索</button>
 			</view>
 		</view>
 		<view class="task-list">
+			<view class="towns-title">
+				全部会议
+			</view>
 			<view class="task-item" v-for="item in list" @click="detail">
 				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
 				<view class="task-right">
@@ -34,55 +60,135 @@
 		components: {uniNavBar},
 		data() {
 			return {
-				pageIndex: 1,
-				list: [1,2,3,4,1,1,1],
-				loadData: [1,1,1,1],
+				cancelColor: '#888',
+				color: '#5677fc',
+				setDateTime: '',
+				result: '',
+				unitTop: false,
+				radius: false, //日期相关参数
+				list: [],
+				loadData: [],
 				loadding: false,
-				pullUpOn: true
+				pullUpOn: true,
+				beginTime: '',
+				endTime: '',
+				keyword: '',
+				
+				pageIndex: 1,
+				pageSize: 5,
+				userinfo: {}
 			}
 		},
+		
+		onLoad(opt) {
+			this.XiangCode = opt.XiangCode
+			this.CunCode = opt.CunCode
+			this.Keyword = opt.Keyword
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				console.log(userinfo)
+			}
+		},
+		mounted(){
+			this.getListData();
+		},
 		methods: {
+			getListData(){
+				let _this = this;
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						XiangCode: _this.userinfo.XiangCode || '',
+						CunCode: _this.userinfo.CunCode || '',
+						Keyword: _this.keyword,
+						beginTime: _this.beginTime,
+						endTime: _this.endTime,
+						ConType: '1'
+					})),
+					"rows": '5',
+					"page": '1',
+					"sidx": "CreateDate",
+					"sord": "desc"
+				}
+				console.log(resData)
+				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
+					console.log(res)
+					if(_this.pageIndex == 1){
+						_this.list = res.rows;
+					}else{
+						_this.list = [..._this.list,...res.rows]
+					}
+					console.log('总共：' + res.records)
+					if(_this.pageIndex * _this.pageSize >= res.records){
+						_this.pullUpOn = false
+					}else{
+						_this.pullUpOn = true;
+					}
+					_this.loadding = false;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
 			pageBack(){
 				uni.navigateBack()
-			},
-			toCreateTask(){
-				uni.navigateTo({
-					url: '../createBuildTask/index'
-				})
 			},
 			detail(){
 				uni.navigateTo({
 					url: '../buildDetail/index'
 				})
+			},
+			keywordChange(e){
+				this.keyword = e.target.value
+			},
+			resetCb(){
+				this.keyword = '';
+				this.beginTime = ''
+				this.endTime = ''
+			},
+			toSearch(){
+				this.pageIndex = 1;
+				this.pullUpOn = true;
+				this.getListData()
+			},
+			showBeginTime(){
+				this.$refs.beginTime.show();
+			},
+			
+			showEndTime(){
+				this.$refs.endTime.show();
+			},
+			changeBeginTime(e){
+				this.beginTime = e.result;
+			},
+			changeEndTime(e){
+				this.endTime = e.result;
 			}
 		},
 		//页面相关事件处理函数--监听用户下拉动作
 		onPullDownRefresh: function() {
 			//延时为了看效果
+			this.pageIndex = 1;
+			this.pullUpOn = true;
+			this.getListData()
 			setTimeout(() => {
-				this.list = this.loadData;
-				this.pageIndex = 1;
-				this.pullUpOn = true;
-				this.loadding = false;
+				// this.familyList = this.loadData;
+				// this.pageIndex = 1;
+				// this.pullUpOn = true;
+				// this.loadding = false;
 				uni.stopPullDownRefresh();
 				// uni.showToast({
 				// 	icon: 'none',
 				//     title: '刷新成功'
 				// });
-			}, 200)
+			}, 1000)
 		},
 
 		// 页面上拉触底事件的处理函数
 		onReachBottom: function() {
 			if (!this.pullUpOn) return;
 			this.loadding = true;
-			if (this.pageIndex == 3) {
-				this.loadding = false;
-				this.pullUpOn = false;
-			} else {
-				this.list = this.list.concat(this.loadData);
-				this.pageIndex = this.pageIndex + 1;
-			}
+			this.pageIndex = this.pageIndex + 1;
+			this.getListData();
 		}
 	}
 </script>
@@ -156,5 +262,66 @@
 	.task-time{
 		color: #aaa;
 		font-size: 24rpx;
+	}
+	
+	.tui-btn-box{
+		margin-top: 40rpx;
+	}
+	
+	.cancel-btn{
+		background: #eee;
+		color: #999;
+		margin: 0 20rpx;
+	}
+	.submit-btn{
+		background: #D4091C;
+		color: #fff;
+		margin: 0 20rpx;
+	}
+	.towns-title{
+		padding: 4upx 0;
+		color: #2E2E2E;
+		font-size: 32upx;
+		font-weight: bold;
+		line-height: 1;
+		position: relative;
+		padding-left: 22upx;
+		margin: 20upx 0;
+	}
+	.towns-title::after{
+		position: absolute;
+		left: 0;
+		top: 3upx;
+		content: "";
+		width: 8upx;
+		height: 30upx;
+		background: #DE1727;
+	}
+	.search-wrap{
+		padding: 50rpx 28rpx;
+	}
+	.group-item{
+		display: flex;
+		align-items: center;
+		height: 86rpx;
+	}
+	.search-input{
+		flex: 1;
+		color: #aaa;
+	}
+	.begin-time{
+		flex: 1;
+		text-align: center;
+		color: #aaa;
+		font-size: 30rpx;
+	}
+	.end-time{
+		flex: 1;
+		text-align: center;
+		color: #aaa;
+		font-size: 30rpx;
+	}
+	.has-value{
+		color: #4E4E4E;
 	}
 </style>

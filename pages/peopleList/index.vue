@@ -10,7 +10,7 @@
 						<image src="../../static/default-pic.png" mode="" class="family-pic"></image>
 						<view class="family-info">
 							<view class="info-top">
-								<text class="family-name">{{item.Huzhu}}</text>
+								<text class="family-name">{{item.Name}}</text>
 							</view>
 							<view class="info-bottom">
 								<text class="family-area">{{item.XiangName}} {{item.CunName}} </text>

@@ -18,7 +18,7 @@
 								<text class="family-age">{{detailData.Age || ''}}</text>
 							</view>
 							<view class="info-bottom">
-								<text class="family-area">{{detailData.XiangName}} {{detailData.CunName}} 家庭成员  </text>
+								<text class="family-area">{{detailData.XiangName}} {{detailData.CunName}} 家庭成员  {{peopleList.length}}</text>
 							</view>
 						</view>
 					</view>
@@ -116,16 +116,16 @@
 			<view class="group-title">
 				家庭成员信息
 			</view>
-			<view class="family-item" v-for="item in familyList" @click="detail">
+			<view class="family-item" v-for="item in peopleList" @click="detail(item)">
 				<view class="family-top">
 					<view class="top-left">
 						<image src="../../static/default-pic.png" mode="" class="family-pic"></image>
 						<view class="family-info">
 							<view class="info-top">
-								<text class="family-name">张伟民</text>
+								<text class="family-name">{{item.Name}}</text>
 							</view>
 							<view class="info-bottom">
-								<text class="family-area">上贡麻乡 田共村 </text>
+								<text class="family-area">{{item.XiangName}} {{item.CunName}} </text>
 							</view>
 						</view>
 					</view>
@@ -136,11 +136,11 @@
 				<view class="family-bottom">
 					<view class="bottom-group">
 						<text class="bottom-label">手机号码</text>
-						<text class="bottom-value">18800000000</text>
+						<text class="bottom-value">{{item.Tel}}</text>
 					</view>
 					<view class="bottom-group">
 						<text class="bottom-label">身份证号</text>
-						<text class="bottom-value">110506197804230381</text>
+						<text class="bottom-value">{{item.IDCard}}</text>
 					</view>
 				</view>
 			</view>
@@ -157,7 +157,8 @@
 				familyList: [1,2,3,4,5],
 				id:'',
 				detailData: {},
-				hudata: {}
+				hudata: {},
+				peopleList: []
 			}
 		},
 		onLoad(opt){
@@ -180,15 +181,26 @@
 					}
 					this.detailData = res.huzhudata || {}
 					this.hudata = res.hudata || {}
+					if(Array.isArray(res.hurenkoudata)){
+						res.hurenkoudata.map(item=>{
+							if(item.IDCard){
+								item.IDCard = Decrypt(item.IDCard)
+							}
+							if(item.Tel){
+								item.Tel = Decrypt(item.Tel)
+							}
+						})
+					}
+					this.peopleList = res.hurenkoudata || []
 					console.log(res)
 				})
 			},
 			pageBack(){
 				uni.navigateBack()
 			},
-			detail(){
+			detail(item){
 				uni.navigateTo({
-					url: '../peopleDetail/index'
+					url: '../peopleDetail/index?id=' + item.ID
 				})
 			}
 		}

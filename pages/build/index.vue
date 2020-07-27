@@ -11,17 +11,16 @@
 			</view>
 		</view>
 		<view class="task-list">
-			<view class="task-item" v-for="item in list" @click="buildDetail">
+			<view class="task-item" v-for="item in productList" @click="buildDetail(item)">
 				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
+					<view class="task-desc" v-html="item.Renwu">
 					</view>
 					<view class="task-time">
-						2020-06-07
+						{{item.RenwuQixianDate}}
 					</view>
 				</view>
 			</view>
@@ -35,18 +34,16 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in list">
+		<view class="task-list" v-for="item in zhibuList">
 			<view class="task-item">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
-					</view>
+					<view class="task-desc" v-html="item.Neirong"></view>
 					<view class="task-time">
-						2020-06-07
+						{{item.CreateDate}}
 					</view>
 				</view>
 			</view>
@@ -60,18 +57,16 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in list">
+		<view class="task-list" v-for="item in dangyuanList">
 			<view class="task-item">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
-					</view>
+					<view class="task-desc" v-html="item.Neirong"></view>
 					<view class="task-time">
-						2020-06-07
+						{{item.CreateDate}}
 					</view>
 				</view>
 			</view>
@@ -85,18 +80,16 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in list">
+		<view class="task-list" v-for="item in dangkeList">
 			<view class="task-item">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
-					</view>
+					<view class="task-desc" v-html="item.Neirong"></view>
 					<view class="task-time">
-						2020-06-07
+						{{item.CreateDate}}
 					</view>
 				</view>
 			</view>
@@ -109,10 +102,179 @@
 		components: {uniNavBar},
 		data() {
 			return {
-				list: [1,2,3,4]
+				list: [1,2,3,4],
+				productList: [],
+				zhibuList: [],
+				dangyuanList: [],
+				dangkeList: []
 			}
 		},
+		mounted: function(options) {
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
+			}
+			this.getDangjianList();
+			this.getZhibuList();
+			this.getDangyuanList();
+			this.getDangkeList();
+		},
 		methods: {
+			getDangjianList(){
+				let _this = this;
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						XiangCode: _this.userinfo.XiangCode || '',
+						Keyword: '',
+						StatusCode: '',
+						beginTime: '',
+						endTime: ''
+					})),
+					"rows": '5',
+					"page": '1',
+					"sidx": "CreateDate",
+					"sord": "desc"
+				}
+				console.log(resData)
+				this.tui.request('Siji/AFP_DangjianRenwu/GetPageListJson',"GET",resData).then((res)=>{
+					_this.productList = res.rows;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getZhibuList(){
+				let _this = this;
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						XiangCode: _this.userinfo.XiangCode || '',
+						CunCode: _this.userinfo.CunCode || '',
+						Keyword: '',
+						beginTime: '',
+						endTime: '',
+						ConType: '0'
+					})),
+					"rows": '5',
+					"page": '1',
+					"sidx": "CreateDate",
+					"sord": "desc"
+				}
+				console.log(resData)
+				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
+					console.log(res)
+					if(res.rows && Array.isArray(res.rows)){
+						res.rows.map(item=>{
+							let srcs = item.Imgs || ''
+							srcs = srcs.split(";")
+							srcs.map(src=>{
+								if(src.indexOf('http') == -1){
+									src = 'http://60.6.198.123:8003/' + src
+								}
+							})
+							item.Imgs = srcs
+							if(srcs.length > 0){
+								item.img = srcs[0]
+							}else{
+								item.img = '../../static/BasicsBg.png'
+							}
+						})
+					}
+					_this.zhibuList = res.rows;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getDangyuanList(){
+				let _this = this;
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						XiangCode: _this.userinfo.XiangCode || '',
+						CunCode: _this.userinfo.CunCode || '',
+						Keyword: '',
+						beginTime: '',
+						endTime: '',
+						ConType: '1'
+					})),
+					"rows": '5',
+					"page": '1',
+					"sidx": "CreateDate",
+					"sord": "desc"
+				}
+				console.log(resData)
+				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
+					if(res.rows && Array.isArray(res.rows)){
+						res.rows.map(item=>{
+							let srcs = item.Imgs || ''
+							srcs = srcs.split(";")
+							srcs.map(src=>{
+								if(src.indexOf('http') == -1){
+									src = 'http://60.6.198.123:8003/' + src
+								}
+							})
+							item.Imgs = srcs
+							if(srcs.length > 0){
+								item.img = srcs[0]
+							}else{
+								item.img = '../../static/BasicsBg.png'
+							}
+						})
+					}
+					_this.dangyuanList = res.rows;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getDangkeList(){
+				let _this = this;
+				let resData = {
+					
+						"queryJson": decodeURIComponent(JSON.stringify({
+							XiangCode: _this.userinfo.XiangCode || '',
+							CunCode: _this.userinfo.CunCode || '',
+							Keyword: '',
+							beginTime: '',
+							endTime: '',
+							ConType: '2'
+						})),
+						"rows": '5',
+						"page": '1',
+						"sidx": "CreateDate",
+						"sord": "desc"
+				}
+				console.log(resData)
+				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
+					console.log(res)
+					if(res.rows && Array.isArray(res.rows)){
+						res.rows.map(item=>{
+							let srcs = item.Imgs || ''
+							srcs = srcs.split(";")
+							srcs.map(src=>{
+								if(src.indexOf('http') == -1){
+									src = 'http://60.6.198.123:8003/' + src
+								}
+							})
+							item.Imgs = srcs
+							if(srcs.length > 0){
+								item.img = srcs[0]
+							}else{
+								item.img = '../../static/BasicsBg.png'
+							}
+						})
+					}
+					_this.dangkeList = res.rows;
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
 			moreBuild(){
 				uni.navigateTo({
 					url: '../buildList/index'
