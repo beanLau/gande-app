@@ -7,8 +7,7 @@
 			</view>
 		</view>
 		<view class="task-list">
-			<view class="task-item" v-for="item in list" @click="detail">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+			<view class="task-item" v-for="item in list" @click="detail(item)">
 				<view class="task-right">
 					<view class="task-title">
 						{{item.Title}}
@@ -20,12 +19,16 @@
 					</view>
 				</view>
 			</view>
+			<view v-if="list && list.length == 0" class="nodata-wrap flex">
+				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+				<text class="nodata-tip">暂无数据</text>
+			</view>
 		</view>
 		
 		<u-toast ref="uToast" />
 		<!--加载loadding-->
 		<tui-loadmore v-if="loadding"></tui-loadmore>
-		<tui-nomore v-if="!pullUpOn"></tui-nomore>
+		<tui-nomore v-if="!pullUpOn && list.length != 0"></tui-nomore>
 		<!--加载loadding-->
 	</view>
 </template>
@@ -100,9 +103,9 @@
 					url: '../createBuildTask/index'
 				})
 			},
-			detail(){
+			detail(item){
 				uni.navigateTo({
-					url: '../buildDetail/index'
+					url: '../buildDetail/index?id=' + item.ID
 				})
 			}
 		},

@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="创建党建任务"></uni-nav-bar>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="创建支部会议"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
 			<tui-list-cell :hover="false">
@@ -17,14 +17,32 @@
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务执行党支部</view>
+					<view class="tui-title">紧急程度</view>
+					<picker @change="bindDegreeChange" :value="index" rangeKey="ItemName" :range="degreeList" class="form-right">
+						<view class="uni-input">{{degreeName || '请选择紧急程度'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker>
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">选择分类</view>
+					<picker @change="bindClassifyChange" :value="index" rangeKey="ItemName" :range="classifyList" class="form-right">
+						<view class="uni-input">{{classifyName || '请选择分类'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker>
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">任务执行人</view>
 					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
 						<u-checkbox 
 							active-color="#DE1727"
 							v-model="item.checked" 
 							v-for="(item, index) in xiangList" :key="index" 
-							:name="item.DzbName"
-						>{{item.DzbName}}</u-checkbox>
+							:name="item.FullName"
+						>{{item.FullName}}</u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -113,11 +131,11 @@
 					return
 				}
 				selectArr = xiangList.filter(item=>{
-					return arr.includes(item.DzbName)
+					return arr.includes(item.FullName)
 				})
 				selectArr.map(item=>{
-					selectNames.push(item.DzbName)
-					selectIds.push(item.DzbID)
+					selectNames.push(item.FullName)
+					selectIds.push(item.OrganizeId)
 				})
 				selectNames = selectNames.join(",")
 				selectIds = selectIds.join(",")
@@ -126,23 +144,12 @@
 			},
 			getXiangList(){
 				let _this = this;
-				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						CunCode: '',
-						Keyword: '',
-						beginTime: '',
-						endTime: '',
-						StatusCode: ''
-					})),
-					"rows": '2000',
-					"page": '1',
-					"sidx": "CreateDate",
-					"sord": "desc"
-				}
-				this.tui.request('/Siji/AFP_DangjianRenwuHuibao/GetPageListJson',"GET", resData).then((res)=>{
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: this.userinfo.XianCode,
+					nature: 6
+				}).then((res)=>{
 					console.log(res)
-					this.xiangList = res.rows || []
+					this.xiangList = res || []
 				})
 			},
 			formSubmit: function(e) {
@@ -152,7 +159,7 @@
 				let _this = this;
 				if(!_this.title){
 					_this.$refs.uToast.show({
-						title: '请输入党建任务标题',
+						title: '请输入任务标题',
 					})
 					return
 				}
@@ -162,9 +169,21 @@
 					})
 					return
 				}
+				if(!_this.degreeId){
+					_this.$refs.uToast.show({
+						title: '请选择紧急程度',
+					})
+					return
+				}
+				if(!_this.classifyId){
+					_this.$refs.uToast.show({
+						title: '请选择分类',
+					})
+					return
+				}
 				if(!_this.selectIds){
 					_this.$refs.uToast.show({
-						title: '请选择执行党支部',
+						title: '请选择下发的乡镇',
 					})
 					return
 				}
@@ -176,19 +195,19 @@
 				}
 				let reqData = {
 					"entity":{
-						XiangCode: _this.userinfo.XiangCode || '',
-						XiangName: _this.userinfo.XiangName || '',
 						"Title": _this.title,
-						"Qixian": parseInt(_this.qixian),
-						"Renwu": _this.content,
-						"DzbNames": _this.selectNames,
-						"DzbIDs": _this.selectIds,
-						"DzbCount": _this.selectIds.split(',').length
+						"JinjiCode": _this.degreeId,
+						"TypeCode": _this.classifyId,
+						"RenWuQiXian": parseInt(_this.qixian),
+						"Neirong": _this.content,
+						"RenWuDuiXiangName": _this.selectNames,
+						"JinjiName": _this.degreeName,
+						"TypeName": _this.classifyName,
+						"RenWuDuiXiangCode": _this.selectIds
 					}
 				}
-				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/AFP_RenwuXian/APPSaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("/Siji/AFP_Dangjian/SaveForm?keyValue=",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){

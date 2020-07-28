@@ -163,7 +163,7 @@
 			getDetail(){
 				console.log(this.id)
 				let _this = this;
-				this.tui.request("Siji/AFP_HuRenkou/GetFormJson?keyValue=1fabcf7c-d5d1-4d86-9202-cf8de7bb49b0"+this.id,"get",{
+				this.tui.request("Siji/AFP_HuRenkou/GetFormJson?keyValue=" + this.id,"get",{
 					keyValue: this.id
 				}).then((res)=>{
 					if(res.IDCard){

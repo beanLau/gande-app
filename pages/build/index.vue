@@ -5,14 +5,13 @@
 			<view class="group-title">
 				党建任务
 			</view>
-			<view class="title-right" @click="moreBuild">
+			<view class="title-right" @click="moreBuild"  v-if="productList.length">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
 		<view class="task-list">
 			<view class="task-item" v-for="item in productList" @click="buildDetail(item)">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
 						{{item.Title}}
@@ -25,11 +24,15 @@
 				</view>
 			</view>
 		</view>
+		<view v-if="list && productList.length == 0" class="nodata-wrap flex">
+			<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+			<text class="nodata-tip">暂无数据</text>
+		</view>
 		<view class="title-wrap">
 			<view class="group-title">
 				党支部会议
 			</view>
-			<view class="title-right" @click="moreZhibu">
+			<view class="title-right" @click="moreZhibu" v-if="zhibuList.length">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -48,11 +51,15 @@
 				</view>
 			</view>
 		</view>
+		<view v-if="list && zhibuList.length == 0" class="nodata-wrap flex">
+			<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+			<text class="nodata-tip">暂无数据</text>
+		</view>
 		<view class="title-wrap">
 			<view class="group-title">
 				党员会议
 			</view>
-			<view class="title-right" @click="moreDangyuan">
+			<view class="title-right" @click="moreDangyuan" v-if="dangyuanList.length">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -71,11 +78,15 @@
 				</view>
 			</view>
 		</view>
+		<view v-if="list && dangyuanList.length == 0" class="nodata-wrap flex">
+			<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+			<text class="nodata-tip">暂无数据</text>
+		</view>
 		<view class="title-wrap">
 			<view class="group-title">
 				党课
 			</view>
-			<view class="title-right" @click="moreDangke">
+			<view class="title-right" @click="moreDangke" v-if="dangkeList.length">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -93,6 +104,10 @@
 					</view>
 				</view>
 			</view>
+		</view>
+		<view v-if="list && dangkeList.length == 0" class="nodata-wrap flex">
+			<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+			<text class="nodata-tip">暂无数据</text>
 		</view>
 	</view>
 </template>
@@ -118,7 +133,7 @@
 					this.jibie = 1
 				}else if(userinfo.Nature == 6){ //乡
 					this.jibie = 2
-				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 					this.jibie = 3
 				}else{ //联户员
 					this.jibie = 4
@@ -295,9 +310,9 @@
 					url: '../dangkeList/index'
 				})
 			},
-			buildDetail(){
+			buildDetail(item){
 				uni.navigateTo({
-					url: '../buildDetail/index'
+					url: '../buildDetail/index?id=' + item.ID
 				})
 			}
 		}
@@ -361,6 +376,8 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+		overflow: hidden;
+		white-space: pre-wrap;
 	}
 	.task-title{
 		color: #4E4E4E;

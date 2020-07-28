@@ -125,6 +125,18 @@
             "path" : "pages/createQuestion/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/createZhibu/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/createDangyuan/index",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/createDangke/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

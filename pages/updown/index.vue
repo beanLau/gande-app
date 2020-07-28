@@ -158,11 +158,15 @@
 				</block>
 			</view>
 			
+			<view v-if="productList && productList.length == 0" class="nodata-wrap flex">
+				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+				<text class="nodata-tip">暂无数据</text>
+			</view>
 		</view>
 		<view class="load-wrap">
 			<!--加载loadding-->
 			<tui-loadmore v-if="loadding" :index="3" type="red"></tui-loadmore>
-			<tui-nomore v-if="!pullUpOn" backgroundColor="#f7f7f7"></tui-nomore>
+			<tui-nomore v-if="!pullUpOn && productList.length != 0" backgroundColor="#f7f7f7"></tui-nomore>
 			<!--加载loadding-->
 		</view>
 		<!--list-->
@@ -272,7 +276,7 @@ export default {
 			}else if(userinfo.Nature == 6){ //乡
 				this.listUrl = 'Siji/AFP_RenwuXiang/GetPageListJson'
 				this.jibie = 2
-			}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+			}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 				this.listUrl = 'Siji/AFP_RenwuCun/GetPageListJson'
 				this.jibie = 3
 			}else{ //联户员

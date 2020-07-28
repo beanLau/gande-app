@@ -1,6 +1,8 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 3" status-bar @clickLeft="pageBack" right-text="创建会议" @clickRight="toCreateTask" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
+		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
+	
 		<view class="title-wrap">
 			<view class="group-title">
 				党支部会议
@@ -45,10 +47,15 @@
 					</view>
 				</view>
 			</view>
+			
+			<view v-if="list && list.length == 0" class="nodata-wrap flex">
+				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+				<text class="nodata-tip">暂无数据</text>
+			</view>
 		</view>
 		<!--加载loadding-->
 		<tui-loadmore v-if="loadding"></tui-loadmore>
-		<tui-nomore v-if="!pullUpOn"></tui-nomore>
+		<tui-nomore v-if="!pullUpOn && list.length != 0"></tui-nomore>
 		<!--加载loadding-->
 	</view>
 </template>
@@ -74,7 +81,8 @@
 				
 				pageIndex: 1,
 				pageSize: 5,
-				userinfo: {}
+				userinfo: {},
+				jibie: 0
 			}
 		},
 		
@@ -85,13 +93,29 @@
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
-				console.log(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
 			}
+			console.log(userinfo)
 		},
 		mounted(){
 			this.getListData();
 		},
 		methods: {
+			
+			toCreateTask(){
+				uni.navigateTo({
+					url: '../createZhibu/index'
+				});
+			},
 			getListData(){
 				let _this = this;
 				let resData = {

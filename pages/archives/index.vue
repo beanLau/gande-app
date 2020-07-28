@@ -83,7 +83,7 @@
 				}else if(userinfo.Nature == 6){ //乡
 					this.listUrl = 'Siji/AFP_RenwuXiang/GetPageListJson'
 					this.jibie = 2
-				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 					this.listUrl = 'Siji/AFP_RenwuCun/GetPageListJson'
 					this.jibie = 3
 				}else{ //联户员

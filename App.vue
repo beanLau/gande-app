@@ -150,5 +150,20 @@
 			transform: translateY(0px);
 		}
 	}
+	.nodata-wrap{
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		justify-content: center;
+	}
+	.nodata-pic{
+		width: 400rpx;
+		height: 300rpx;
+	}
+	.nodata-tip{
+		color: #999;
+		font-size: 12px;
+		margin-top: 20rpx;
+	}
 	/*每个页面公共css */
 </style>

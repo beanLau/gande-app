@@ -166,7 +166,7 @@
 					this.jibie = 1
 				}else if(userinfo.Nature == 6){ //乡
 					this.jibie = 2
-				}else if(userinfo.Nature == 7 && !userinfo.IsWarner){ //村
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 					this.jibie = 3
 				}else{ //联户员
 					this.jibie = 4

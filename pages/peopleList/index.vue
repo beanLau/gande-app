@@ -32,12 +32,16 @@
 					</view>
 				</view>
 			</view>
+			<view v-if="familyList && familyList.length == 0" class="nodata-wrap flex">
+				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+				<text class="nodata-tip">暂无数据</text>
+			</view>
 		</view>
 		
 		<u-toast ref="uToast" />
 		<!--加载loadding-->
 		<tui-loadmore v-if="loadding"></tui-loadmore>
-		<tui-nomore v-if="!pullUpOn"></tui-nomore>
+		<tui-nomore v-if="!pullUpOn && familyList.length != 0"></tui-nomore>
 		<!--加载loadding-->
 	</view>
 </template>
