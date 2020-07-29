@@ -17,10 +17,8 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			
-			<view class="item-desc" v-html="detailData.Renwu">
-				
-			</view>
+			<u-parse :html="detailData.Renwu" class="item-desc"></u-parse>
+			<!-- <rich-text :nodes="detailData.Renwu" class="item-desc"></rich-text> -->
 		</view>
 		<view class="towns-list">
 			<view class="towns-title">
@@ -43,6 +41,10 @@
 				<text class="nodata-tip">暂无数据</text>
 			</view>
 		</view>
+		
+		<view class="bottom-fix" v-if="showReportBtn">
+			<view class="report-btn" @click="toReport">汇报</view>
+		</view>
 	</view>
 </template>
 
@@ -52,7 +54,8 @@
 			return {
 				detailData: {},
 				list: [],
-				id: ''
+				id: '',
+				showReportBtn: false
 			}
 		},
 		
@@ -61,18 +64,41 @@
 			this.id = opt.id
 			// this.detailData = JSON.parse(opt.item)
 			// console.log(this.detailData)
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
+			}
 		},
 		mounted(){
 			this.getList();
 			this.getDetail();
 		},
 		methods: {
+			toReport(){
+				let detailData = this.detailData;
+				uni.navigateTo({
+					url: `../reportBuild/index?RenwuID=${detailData.ID}&id=${this.id}`
+				})
+			},
 			getDetail(){
 				let _this = this;
 				this.tui.request("/Siji/AFP_DangjianRenwu/GetFormJson?keyValue=", "get",{
 					keyValue: this.id
 				}).then((res)=>{
 					console.log(res)
+					if(_this.jibie == 3 &&  res.XiangCode == _this.userinfo.XiangCode){
+						_this.showReportBtn = true
+					}
 					this.detailData = res || []
 				})
 			},
@@ -99,6 +125,32 @@
 
 <style>
 .page-content{
+}
+
+.bottom-fix{
+	position: fixed;
+	background: #DE1727;
+	display: flex;
+	align-items: center;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100rpx;
+}
+.report-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
+	border-right: 1px solid #eee;
+}
+.send-btn{
+	text-align: center;
+	color: #fff;
+	font-size: 36rpx;
+	line-height: 100rpx;
+	flex: 1;
 }
 .navbar-wrap{
 	position: relative;
@@ -141,6 +193,7 @@
 	font-weight: bold;
 }
 .item-desc{
+	width: 100%;
 	margin-top: 27upx;
 	margin-bottom: 42upx;
 	color: #aaa;

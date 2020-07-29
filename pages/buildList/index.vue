@@ -55,7 +55,18 @@
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
-				console.log(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+					this.url = 'Siji/AFP_DangjianRenwu/GetPageListJson'
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+					this.url = 'Siji/AFP_DangjianRenwuHuibao/GetPageListJson'
+				}else{ //联户员
+					this.jibie = 4
+				}
 			}
 		},
 		mounted(){
@@ -77,7 +88,7 @@
 					"sidx": "CreateDate",
 					"sord": "desc"
 				}
-				this.tui.request('Siji/AFP_DangjianRenwu/GetPageListJson',"GET",resData).then((res)=>{
+				this.tui.request(_this.url,"GET",resData).then((res)=>{
 					console.log(res)
 					if(_this.pageIndex == 1){
 						_this.list = res.rows;

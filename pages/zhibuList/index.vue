@@ -148,7 +148,7 @@
 							if(srcs.length > 0){
 								item.img = srcs[0]
 							}else{
-								item.img = '../../static/BasicsBg.png'
+								item.img = '../../static/task_defult.png'
 							}
 						})
 					}

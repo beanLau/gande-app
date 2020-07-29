@@ -10,13 +10,27 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list">
+		<view class="task-list" v-if="jibie == 2">
 			<view class="task-item" v-for="item in productList" @click="buildDetail(item)">
 				<view class="task-right">
 					<view class="task-title">
 						{{item.Title}}
 					</view>
 					<view class="task-desc" v-html="item.Renwu">
+					</view>
+					<view class="task-time">
+						{{item.RenwuQixianDate}}
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="task-list" v-if="jibie == 3">
+			<view class="task-item" v-for="item in productList" @click="buildDetail(item)">
+				<view class="task-right">
+					<view class="task-title">
+						{{item.RenwuTitle}}
+					</view>
+					<view class="task-desc" v-html="item.Huibao">
 					</view>
 					<view class="task-time">
 						{{item.RenwuQixianDate}}
@@ -121,7 +135,8 @@
 				productList: [],
 				zhibuList: [],
 				dangyuanList: [],
-				dangkeList: []
+				dangkeList: [],
+				jibie: 0
 			}
 		},
 		mounted: function(options) {
@@ -133,8 +148,10 @@
 					this.jibie = 1
 				}else if(userinfo.Nature == 6){ //乡
 					this.jibie = 2
+					this.url = 'Siji/AFP_DangjianRenwu/GetPageListJson'
 				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 					this.jibie = 3
+					this.url = 'Siji/AFP_DangjianRenwuHuibao/GetPageListJson'
 				}else{ //联户员
 					this.jibie = 4
 				}
@@ -161,7 +178,8 @@
 					"sord": "desc"
 				}
 				console.log(resData)
-				this.tui.request('Siji/AFP_DangjianRenwu/GetPageListJson',"GET",resData).then((res)=>{
+				this.tui.request(_this.url,"GET",resData).then((res)=>{
+					console.log(res.rows)
 					_this.productList = res.rows;
 				}).catch(e=>{
 					console.log(e)
@@ -199,7 +217,7 @@
 							if(srcs.length > 0){
 								item.img = srcs[0]
 							}else{
-								item.img = '../../static/BasicsBg.png'
+								item.img = '../../static/task_defult.png'
 							}
 						})
 					}
@@ -239,7 +257,7 @@
 							if(srcs.length > 0){
 								item.img = srcs[0]
 							}else{
-								item.img = '../../static/BasicsBg.png'
+								item.img = '../../static/task_defult.png'
 							}
 						})
 					}
@@ -281,7 +299,7 @@
 							if(srcs.length > 0){
 								item.img = srcs[0]
 							}else{
-								item.img = '../../static/BasicsBg.png'
+								item.img = '../../static/task_defult.png'
 							}
 						})
 					}
@@ -312,7 +330,7 @@
 			},
 			buildDetail(item){
 				uni.navigateTo({
-					url: '../buildDetail/index?id=' + item.ID
+					url: '../buildDetail/index?id=' + item.ID + '&RenwuID='+ item.RenwuID
 				})
 			}
 		}

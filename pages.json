@@ -137,6 +137,10 @@
             "path" : "pages/createDangke/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/reportBuild/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,
