@@ -5,56 +5,50 @@
 		<form @submit="formSubmit" @reset="formReset">
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务标题</view>
+					<view class="tui-title">会议标题</view>
 					<input placeholder-class="tui-phcolor" @input="changeTitle" :value="title" class="tui-input" name="title" placeholder="请输入任务标题" maxlength="50" type="text" />
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务期限（天）</view>
-					<input placeholder-class="tui-phcolor" type="number" min="0" @input="changeQixian" :value="qixian" class="tui-input" name="title" placeholder="请输入任务期限天数"/>
+					<view class="tui-title">会议日期</view>
+					<view class="begin-time" @click="showBeginTime" style="text-align: right;">
+						{{beginTime ? beginTime : '选择会议日期'}}
+					</view>
+					<tui-datetime ref="beginTime" :type="2" :cancelColor="cancelColor" :color="color"
+					 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBeginTime"></tui-datetime>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">紧急程度</view>
-					<picker @change="bindDegreeChange" :value="index" rangeKey="ItemName" :range="degreeList" class="form-right">
-						<view class="uni-input">{{degreeName || '请选择紧急程度'}}</view>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
-					</picker>
+					<view class="tui-title">会议地点</view>
+					<input placeholder-class="tui-phcolor" @input="changeAddress" :value="address" class="tui-input" name="title" placeholder="请输入会议地点" maxlength="50" type="text" />
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">选择分类</view>
-					<picker @change="bindClassifyChange" :value="index" rangeKey="ItemName" :range="classifyList" class="form-right">
-						<view class="uni-input">{{classifyName || '请选择分类'}}</view>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
-					</picker>
-				</view>
-			</tui-list-cell>
-			<tui-list-cell :hover="false">
-				<view class="tui-line-cell">
-					<view class="tui-title">任务执行人</view>
+					<view class="tui-title">参会人员</view>
 					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
 						<u-checkbox 
 							active-color="#DE1727"
 							v-model="item.checked" 
 							v-for="(item, index) in xiangList" :key="index" 
-							:name="item.FullName"
-						>{{item.FullName}}</u-checkbox>
+							:name="item.name"
+						>{{item.name}}</u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
+			<u-upload :action="action" :file-list="fileList" :auto-upload="true" :header="header" @on-remove="removeCb" @on-success="uploadCb" @on-change="uploadChange"></u-upload>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">任务内容</view>
+					<view class="tui-title">会议内容</view>
 				</view>
 				
 			</tui-list-cell>
 			<view class="textarea-wrap">
-				<textarea placeholder-style="color:#999" placeholder="请输入任务内容" @input="changeContent" :value="content"/>
+				<textarea placeholder-style="color:#999" placeholder="请输入会议内容" @input="changeContent" :value="content"/>
 			</view>
+			
 			<view class="tui-btn-box flex">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
@@ -70,6 +64,7 @@
 		components: {uniNavBar},
 		data() {
 			return {
+				action: 'http://116.131.134.198:9001/PublicInfoManage/ResourceFile/UploadFolderFile',
 				array: ['中国', '美国', '巴西', '日本'],
 				index: 0,
 				xiangList: [],
@@ -84,7 +79,20 @@
 				title: '',
 				content: "",
 				qixian: '',
-				isLoading: false
+				isLoading: false,
+				cancelColor: '#888',
+				color: '#5677fc',
+				setDateTime: '',
+				result: '',
+				beginTime: '',
+				unitTop: false,
+				radius: false, //日期相关参数
+				address: '',
+				fileList: [],
+				imgs: [],
+				header: {
+					"token": uni.getStorageSync("token")
+				}
 			}
 		},
 		mounted() {
@@ -93,19 +101,42 @@
 				userinfo = JSON.parse(userinfo)
 				this.userinfo = userinfo
 			}
-			let dataItem = uni.getStorageSync('dataItem');
-			this.classifyList = dataItem.renwufenlei || [];
-			this.degreeList = dataItem.jinjichengdu || [];
-			console.log(this.classifyList)
-			console.log(this.degreeList)
 			this.getXiangList();
 		},
 		methods: {
+			uploadChange(res){
+				try{
+					let data = JSON.parse(res.data)
+					if(data.type == 1){
+						data.resultdata = data.resultdata.replace(";","")
+						this.imgs.push(data.resultdata)
+					}
+				}catch(e){
+					console.log(e)
+					//TODO handle the exception
+				}
+			},
+			uploadCb(data, index, lists){
+				
+			},
+			removeCb(index){
+				this.imgs.splice(index, 1)
+				console.log(this.imgs)
+			},
+			showBeginTime(){
+				this.$refs.beginTime.show();
+			},
+			changeBeginTime(e){
+				this.beginTime = e.result;
+			},
 			changeQixian(e){
 				this.qixian = e.detail.value
 			},
 			changeTitle(e){
 				this.title = e.detail.value
+			},
+			changeAddress(e){
+				this.address = e.detail.value
 			},
 			changeContent(e){
 				this.content = e.detail.value
@@ -131,11 +162,11 @@
 					return
 				}
 				selectArr = xiangList.filter(item=>{
-					return arr.includes(item.FullName)
+					return arr.includes(item.name)
 				})
 				selectArr.map(item=>{
-					selectNames.push(item.FullName)
-					selectIds.push(item.OrganizeId)
+					selectNames.push(item.name)
+					selectIds.push(item.name)
 				})
 				selectNames = selectNames.join(",")
 				selectIds = selectIds.join(",")
@@ -144,75 +175,81 @@
 			},
 			getXiangList(){
 				let _this = this;
-				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
-					parentId: this.userinfo.XianCode,
-					nature: 6
+				this.tui.request('Siji/AFP_Dangzhibu/GetDzbBy',"GET",{
+					cunCode: this.userinfo.CunCode
 				}).then((res)=>{
-					console.log(res)
-					this.xiangList = res || []
+					let list = res.UserNames.split(',')
+					let xiangList = []
+					list.map(item=>{
+						xiangList.push({
+							name: item
+						})
+					})
+					console.log(xiangList)
+					this.xiangList = xiangList
 				})
 			},
 			formSubmit: function(e) {
+				console.log(this.imgs)
 				if(this.isLoading){
 					return
 				}
 				let _this = this;
 				if(!_this.title){
 					_this.$refs.uToast.show({
-						title: '请输入任务标题',
+						title: '请输入会议标题',
 					})
 					return
 				}
-				if(!_this.qixian){
+				if(!_this.beginTime){
 					_this.$refs.uToast.show({
-						title: '请输入任务期限',
+						title: '请选择会议时间',
 					})
 					return
 				}
-				if(!_this.degreeId){
+				if(!_this.address){
 					_this.$refs.uToast.show({
-						title: '请选择紧急程度',
-					})
-					return
-				}
-				if(!_this.classifyId){
-					_this.$refs.uToast.show({
-						title: '请选择分类',
+						title: '请输入会议地点',
 					})
 					return
 				}
 				if(!_this.selectIds){
 					_this.$refs.uToast.show({
-						title: '请选择下发的乡镇',
+						title: '请选择参会人员',
 					})
 					return
 				}
 				if(!_this.content){
 					_this.$refs.uToast.show({
-						title: '请输入下发内容',
+						title: '请输入会议内容',
 					})
 					return
 				}
+				let imgs = []
+				
 				let reqData = {
 					"entity":{
+						"XiangCode": _this.userinfo.XiangCode,
+						"XiangName": _this.userinfo.XiangName,
+						"CunCode": _this.userinfo.CunCode,
+						"CunName": _this.userinfo.CunName, 
+						"ConType": 0,
 						"Title": _this.title,
-						"JinjiCode": _this.degreeId,
-						"TypeCode": _this.classifyId,
-						"RenWuQiXian": parseInt(_this.qixian),
+						"Riqi": _this.beginTime,
+						"Didian": _this.address,
 						"Neirong": _this.content,
-						"RenWuDuiXiangName": _this.selectNames,
-						"JinjiName": _this.degreeName,
-						"TypeName": _this.classifyName,
-						"RenWuDuiXiangCode": _this.selectIds
+						"Renyuan": _this.selectNames,
+						"Renshu": _this.selectNames.split(',').length,
+						Imgs: imgs
 					}
 				}
 				_this.isLoading = true
-				_this.tui.request("/AFP_RenwuXian/APPSaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("/Siji/AFP_Dangjian/SaveForm?keyValue=",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){
 						_this.$refs.uToast.show({
-							title: '任务创建成功~',
+							title: '会议创建成功~',
 							back: true
 						})
 					}else{
@@ -351,5 +388,12 @@
 	.checkbox-group{
 		justify-content: flex-end;
 		padding-left: 20rpx;
+	}
+	
+	.begin-time{
+		flex: 1;
+		text-align: right;
+		color: #aaa;
+		font-size: 30rpx;
 	}
 </style>

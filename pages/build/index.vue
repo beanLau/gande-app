@@ -11,7 +11,7 @@
 			</view>
 		</view>
 		<view class="task-list" v-if="jibie == 2">
-			<view class="task-item" v-for="item in productList" @click="buildDetail(item)">
+			<view class="task-item" v-for="item in productList" @click="buildDetail2(item)">
 				<view class="task-right">
 					<view class="task-title">
 						{{item.Title}}
@@ -331,6 +331,11 @@
 			buildDetail(item){
 				uni.navigateTo({
 					url: '../buildDetail/index?id=' + item.ID + '&RenwuID='+ item.RenwuID
+				})
+			},
+			buildDetail2(item){
+				uni.navigateTo({
+					url: '../buildDetail/index?RenwuID=' + item.ID
 				})
 			}
 		}

@@ -1,21 +1,38 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar right-text="新建任务" @clickLeft="pageBack" left-icon="back" left-text="返回" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 2" status-bar right-text="新建任务" @clickLeft="pageBack" left-icon="back" left-text="返回" @clickRight="toCreateTask" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
+		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
 		<view class="title-wrap">
 			<view class="group-title">
 				党建任务
 			</view>
 		</view>
 		<view class="task-list">
-			<view class="task-item" v-for="item in list" @click="detail(item)">
-				<view class="task-right">
-					<view class="task-title">
-						{{item.Title}}
+			<view class="task-list" v-if="jibie == 2">
+				<view class="task-item" v-for="item in list" @click="buildDetail2(item)">
+					<view class="task-right">
+						<view class="task-title">
+							{{item.Title}}
+						</view>
+						<view class="task-desc" v-html="item.Renwu">
+						</view>
+						<view class="task-time">
+							{{item.RenwuQixianDate}}
+						</view>
 					</view>
-					<view class="task-desc" v-html="item.Renwu">
-					</view>
-					<view class="task-time">
-						{{item.RenwuQixianDate}}
+				</view>
+			</view>
+			<view class="task-list" v-if="jibie == 3">
+				<view class="task-item" v-for="item in list" @click="detail(item)">
+					<view class="task-right">
+						<view class="task-title">
+							{{item.RenwuTitle}}
+						</view>
+						<view class="task-desc" v-html="item.Huibao">
+						</view>
+						<view class="task-time">
+							{{item.RenwuQixianDate}}
+						</view>
 					</view>
 				</view>
 			</view>
@@ -116,7 +133,12 @@
 			},
 			detail(item){
 				uni.navigateTo({
-					url: '../buildDetail/index?id=' + item.ID
+					url: '../buildDetail/index?id=' + item.ID + '&RenwuID='+ item.RenwuID
+				})
+			},
+			buildDetail2(item){
+				uni.navigateTo({
+					url: '../buildDetail/index?RenwuID=' + item.ID
 				})
 			}
 		},

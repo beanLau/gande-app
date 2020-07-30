@@ -97,8 +97,9 @@
 					},
 					"keyValue": _this.id
 				}
+				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("Siji/AFP_DangjianRenwu/SaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("Siji/AFP_DangjianRenwuHuibao/SaveForm",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){

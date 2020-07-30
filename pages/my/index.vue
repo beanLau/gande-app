@@ -7,8 +7,8 @@
 				<view class="top-left">
 					<image src="../../static/tabbar/my-cur.png" mode="" class="user-pic"></image>
 					<view class="user-info">
-						<text class="user-name">张丽丽</text>
-						<text class="user-phone">1828383838383</text>
+						<text class="user-name">{{userinfo.UserName}}</text>
+						<!-- <text class="user-phone">{{userinfo.UserName}}</text> -->
 					</view>
 				</view>
 				<uni-icons type="arrowright" :size="18"></uni-icons>
@@ -64,11 +64,21 @@
 	export default {
 		data() {
 			return {
-				hideQuick: true
+				hideQuick: true,
+				userinfo: {
+					
+				}
 			};
 		},
 		onLoad() {
 			
+		},
+		mounted() {
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+			}
 		},
 		methods: {
 			detail(){

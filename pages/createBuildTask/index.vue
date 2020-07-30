@@ -23,8 +23,8 @@
 							active-color="#DE1727"
 							v-model="item.checked" 
 							v-for="(item, index) in xiangList" :key="index" 
-							:name="item.DzbName"
-						>{{item.DzbName}}</u-checkbox>
+							:name="item.DangzhibuName"
+						>{{item.DangzhibuName}}</u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -113,11 +113,11 @@
 					return
 				}
 				selectArr = xiangList.filter(item=>{
-					return arr.includes(item.DzbName)
+					return arr.includes(item.DangzhibuName)
 				})
 				selectArr.map(item=>{
-					selectNames.push(item.DzbName)
-					selectIds.push(item.DzbID)
+					selectNames.push(item.DangzhibuName)
+					selectIds.push(item.ID)
 				})
 				selectNames = selectNames.join(",")
 				selectIds = selectIds.join(",")
@@ -128,21 +128,12 @@
 				let _this = this;
 				let resData = {
 					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						CunCode: '',
-						Keyword: '',
-						beginTime: '',
-						endTime: '',
-						StatusCode: ''
-					})),
-					"rows": '2000',
-					"page": '1',
-					"sidx": "CreateDate",
-					"sord": "desc"
+						XiangCode: _this.userinfo.XiangCode || ''
+					}))
 				}
-				this.tui.request('/Siji/AFP_DangjianRenwuHuibao/GetPageListJson',"GET", resData).then((res)=>{
+				this.tui.request('/Siji/AFP_Dangzhibu/GetListJson',"GET", resData).then((res)=>{
 					console.log(res)
-					this.xiangList = res.rows || []
+					this.xiangList = res || []
 				})
 			},
 			formSubmit: function(e) {
@@ -188,7 +179,7 @@
 				}
 				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/AFP_RenwuXian/APPSaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("Siji/AFP_DangjianRenwu/SaveForm",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){

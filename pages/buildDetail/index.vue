@@ -62,6 +62,7 @@
 		onLoad(opt){
 			console.log(opt)
 			this.id = opt.id
+			this.RenwuID = opt.RenwuID
 			// this.detailData = JSON.parse(opt.item)
 			// console.log(this.detailData)
 			let userinfo = uni.getStorageSync("userinfo")
@@ -85,15 +86,14 @@
 		},
 		methods: {
 			toReport(){
-				let detailData = this.detailData;
 				uni.navigateTo({
-					url: `../reportBuild/index?RenwuID=${detailData.ID}&id=${this.id}`
+					url: `../reportBuild/index?RenwuID=${this.RenwuID}&id=${this.id}`
 				})
 			},
 			getDetail(){
 				let _this = this;
-				this.tui.request("/Siji/AFP_DangjianRenwu/GetFormJson?keyValue=", "get",{
-					keyValue: this.id
+				this.tui.request("/Siji/AFP_DangjianRenwu/GetFormJson?keyValue="+_this.RenwuID, "get",{
+					keyValue: _this.RenwuID
 				}).then((res)=>{
 					console.log(res)
 					if(_this.jibie == 3 &&  res.XiangCode == _this.userinfo.XiangCode){
@@ -105,7 +105,7 @@
 			getList(){
 				let _this = this;
 				this.tui.request("/Siji/AFP_DangjianRenwuHuibao/GetListJson", "get",{
-					RenwuID: this.id
+					RenwuID: this.RenwuID
 				}).then((res)=>{
 					this.list = res || []
 					console.log(res)
