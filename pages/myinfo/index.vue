@@ -1,70 +1,79 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="创建党员会议"></uni-nav-bar>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="个人信息"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
 			<tui-list-cell :hover="false">
-				<view class="tui-line-cell">
-					<view class="tui-title">会议标题</view>
-					<input placeholder-class="tui-phcolor" @input="changeTitle" :value="title" class="tui-input" name="title" placeholder="请输入会议标题" maxlength="50" type="text" />
-				</view>
-			</tui-list-cell>
-			<tui-list-cell :hover="false">
-				<view class="tui-line-cell">
-					<view class="tui-title">会议日期</view>
-					<view class="begin-time" @click="showBeginTime" style="text-align: right;">
-						{{beginTime ? beginTime : '选择会议日期'}}
+				<view class="tui-line-cell"> 
+					<view class="tui-title">头像</view>
+					<view class="form-right">
+						<image :src="img || '../../static/default-pic.png'" class="slot-btn" mode=""></image>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+						<u-upload ref="upload" class="upload-wrap" :show-upload-list="false" :custom-btn="true" max-count="1" :action="action" :file-list="fileList"  :auto-upload="true" :header="header" @on-change="uploadChange">
+							<view slot="addBtn" class="custom-upload">
+								
+							</view>
+						</u-upload>
 					</view>
-					<tui-datetime ref="beginTime" :type="2" :cancelColor="cancelColor" :color="color"
-					 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBeginTime"></tui-datetime>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">会议地点</view>
-					<input placeholder-class="tui-phcolor" @input="changeAddress" :value="address" class="tui-input" name="title" placeholder="请输入会议地点" maxlength="50" type="text" />
+					<view class="tui-title">名称</view>
+					<view class="right-wrap">
+						<input class="search-input" type="text" :value="userinfo.RealName" @input="nameChange"/>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</view>
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">参会人员</view>
-					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
-						<u-checkbox 
-							active-color="#DE1727"
-							v-model="item.checked" 
-							v-for="(item, index) in xiangList" :key="index" 
-							:name="item.Name"
-						>{{item.Name}}</u-checkbox>
-					</u-checkbox-group>
+					<view class="tui-title">性别</view>
+					<radio-group class="right-wrap radio-group flex" @change="radioChange">
+						<label class="tui-radio">
+							<radio value="1" color="#D4091C" :checked="userinfo.Gender == 1"/>男
+						</label>
+						<label class="tui-radio">
+							<radio value="2" color="#D4091C" :checked="userinfo.Gender == 2"/>女
+						</label>
+					</radio-group>
 				</view>
 			</tui-list-cell>
-			<u-upload :action="action" :file-list="fileList" :auto-upload="true" :header="header" @on-remove="removeCb" @on-success="uploadCb" @on-change="uploadChange"></u-upload>
 			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">会议内容</view>
+					<view class="tui-title">手机号</view>
+					<view class="right-wrap">
+						<input class="search-input" type="text" :value="userinfo.Mobile" @input="mobileChange"/>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</view>
 				</view>
-				
 			</tui-list-cell>
-			<view class="textarea-wrap">
-				<textarea placeholder-style="color:#999" placeholder="请输入会议内容" @input="changeContent" :value="content"/>
-			</view>
-			
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">邮箱</view>
+					<view class="right-wrap">
+						<input class="search-input" type="text" :value="userinfo.Email" @input="emailChange"/>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</view>
+				</view>
+			</tui-list-cell>
 			<view class="tui-btn-box flex">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
-				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
+				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">保存</button>
 			</view>
 		</form>
 		<u-toast ref="uToast" />
 	</view>
 </template>
 <script>
+	import md5 from '../../static/md5.js'
+	import Decrypt from '@/common/decript.js'
 	import uniNavBar from "@/components/uni-nav-bar/uni-nav-bar.vue"
 	const form = require("@/components/common/tui-validation/tui-validation.js")
 	export default {
 		components: {uniNavBar},
 		data() {
 			return {
-				action: 'http://116.131.134.198:9001/PublicInfoManage/ResourceFile/UploadFolderFile',
 				array: ['中国', '美国', '巴西', '日本'],
 				index: 0,
 				xiangList: [],
@@ -80,63 +89,94 @@
 				content: "",
 				qixian: '',
 				isLoading: false,
-				cancelColor: '#888',
-				color: '#5677fc',
-				setDateTime: '',
-				result: '',
-				beginTime: '',
-				unitTop: false,
-				radius: false, //日期相关参数
-				address: '',
+				UserId: "",
+				userinfo: {
+					HeadIcon: ""
+				},
+				action: 'http://110.166.84.163:8002/PersonCenter/UploadFile',
 				fileList: [],
-				imgs: [],
+				img: '',
+				sex: 1,
 				header: {
 					"token": uni.getStorageSync("token")
 				}
+				
 			}
 		},
 		mounted() {
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
-				this.userinfo = userinfo
+				this.UserId = userinfo.UserId
 			}
-			this.getXiangList();
+			this.getUserInfo();
 		},
 		methods: {
+			nameChange(e){
+				this.userinfo.RealName = e.target.value
+			},
+			mobileChange(e){
+				this.userinfo.Mobile = e.target.value
+			},
+			emailChange(e){
+				this.userinfo.Email = e.target.value
+			},
 			uploadChange(res){
+				let _this = this;
+				//this.updatePic()
 				try{
+					_this.$refs.upload.remove(0)
+					_this.fileList = []
+					console.log(res)
 					let data = JSON.parse(res.data)
 					if(data.type == 1){
 						data.resultdata = data.resultdata.replace(";","")
-						this.imgs.push(data.resultdata)
+						let img = 'http://110.166.84.163:8002/' + data.resultdata
+						_this.img = `${img}?time=${new Date().getTime()}`
+						console.log(_this.img)
+						_this.$forceUpdate()
 					}
 				}catch(e){
 					console.log(e)
 					//TODO handle the exception
 				}
 			},
-			uploadCb(data, index, lists){
-				
-			},
 			removeCb(index){
 				this.imgs.splice(index, 1)
 				console.log(this.imgs)
 			},
-			showBeginTime(){
-				this.$refs.beginTime.show();
+			radioChange(e){
+				this.userinfo.Gender = e.detail.value;
 			},
-			changeBeginTime(e){
-				this.beginTime = e.result;
+			updatePic(){
+				let _this = this;
+				this.tui.request('/BaseManage/User/GetFormJson',"GET",{
+					keyValue: this.UserId
+				}).then((res)=>{
+					if(res.HeadIcon){
+						res.HeadIcon = 'http://110.166.84.163:8002/' + res.HeadIcon
+					}
+					_this.img = res.HeadIcon
+				})
+			},
+			getUserInfo(){
+				let _this = this;
+				this.tui.request('/BaseManage/User/GetFormJson',"GET",{
+					keyValue: this.UserId
+				}).then((res)=>{
+					console.log(res)
+					_this.userinfo = res || {}
+					if(_this.userinfo.HeadIcon){
+						_this.img = 'http://110.166.84.163:8002/' + _this.userinfo.HeadIcon
+					}
+					console.log(_this.userinfo)
+				})
 			},
 			changeQixian(e){
 				this.qixian = e.detail.value
 			},
 			changeTitle(e){
 				this.title = e.detail.value
-			},
-			changeAddress(e){
-				this.address = e.detail.value
 			},
 			changeContent(e){
 				this.content = e.detail.value
@@ -152,7 +192,6 @@
 				this.classifyName = this.classifyList[index].ItemName
 			},
 			bindPickerChange(arr){
-				console.log(arr)
 				let xiangList = this.xiangList;
 				let selectArr;
 				let selectNames = [];
@@ -163,11 +202,11 @@
 					return
 				}
 				selectArr = xiangList.filter(item=>{
-					return arr.includes(item.Name)
+					return arr.includes(item.FullName)
 				})
 				selectArr.map(item=>{
-					selectNames.push(item.Name)
-					selectIds.push(item.ID)
+					selectNames.push(item.FullName)
+					selectIds.push(item.OrganizeId)
 				})
 				selectNames = selectNames.join(",")
 				selectIds = selectIds.join(",")
@@ -176,87 +215,55 @@
 			},
 			getXiangList(){
 				let _this = this;
-				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode,
-						CunCode: _this.userinfo.CunCode,
-						Keyword: '',
-						Dangyuan: '是'
-					})),
-					"pagination":{
-					    "rows": "3000",
-					    "page": "1",
-					    "sidx": "CreateDate",
-					    "sord": "desc"
-					}
-				}
-				this.tui.request('Siji/AFP_HuRenkou/GetListJson',"GET",resData).then((res)=>{
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: this.userinfo.XianCode,
+					nature: 6
+				}).then((res)=>{
 					console.log(res)
 					this.xiangList = res || []
 				})
 			},
 			formSubmit: function(e) {
-				console.log(this.imgs)
+				let _this = this;
 				if(this.isLoading){
 					return
 				}
-				let _this = this;
-				if(!_this.title){
+				if(!_this.userinfo.Mobile){
 					_this.$refs.uToast.show({
-						title: '请输入会议标题',
+						title: '请输入手机号码',
 					})
 					return
 				}
-				if(!_this.beginTime){
+				if(!/^1\d{10}/.test(_this.userinfo.Mobile)){
 					_this.$refs.uToast.show({
-						title: '请选择会议时间',
+						title: '手机号码格式错误',
 					})
 					return
 				}
-				if(!_this.address){
+				let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+				if(_this.userinfo.Email && !reg.test(_this.userinfo.Email)){
 					_this.$refs.uToast.show({
-						title: '请输入会议地点',
+						title: '邮箱格式错误',
 					})
 					return
 				}
-				if(!_this.selectIds){
-					_this.$refs.uToast.show({
-						title: '请选择参会人员',
-					})
-					return
-				}
-				if(!_this.content){
-					_this.$refs.uToast.show({
-						title: '请输入会议内容',
-					})
-					return
-				}
-				let imgs = []
-				
+				console.log(_this.userinfo.Mobile)
 				let reqData = {
+					"keyValue": _this.userinfo.UserId,
 					"entity":{
-						"XiangCode": _this.userinfo.XiangCode,
-						"XiangName": _this.userinfo.XiangName,
-						"CunCode": _this.userinfo.CunCode,
-						"CunName": _this.userinfo.CunName, 
-						"ConType": 1,
-						"Title": _this.title,
-						"Riqi": _this.beginTime,
-						"Didian": _this.address,
-						"Neirong": _this.content,
-						"Renyuan": _this.selectNames,
-						"Renshu": _this.selectNames.split(',').length,
-						Imgs: imgs
-					}
+						"RealName": _this.userinfo.RealName,
+						"Mobile": _this.userinfo.Mobile,
+						"Gender": _this.userinfo.Gender,
+						"Email": _this.userinfo.Email
+						}
 				}
 				_this.isLoading = true
-				_this.tui.request("/Siji/AFP_Dangjian/SaveForm?keyValue=",'POST',reqData).then((res)=>{
+				_this.tui.request("BaseManage/User/UpdateUserInfo",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){
 						_this.$refs.uToast.show({
-							title: '会议创建成功~',
-							back: true
+							title: '个人信息修改成功~'
 						})
 					}else{
 						_this.$refs.uToast.show({
@@ -287,6 +294,7 @@
 	}
 	.radio-group{
 		display: flex;
+		justify-content: flex-end;
 	}
 	.uni-radio-input{
 		width: 18px;
@@ -298,6 +306,7 @@
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 	}
 
 	.tui-title {
@@ -395,11 +404,42 @@
 		justify-content: flex-end;
 		padding-left: 20rpx;
 	}
-	
-	.begin-time{
+	.right-wrap{
+		position: relative;
+		display: flex;
+		align-items: center;
+		flex-grow: 1;
+		text-align: right;
+	}
+	.slot-btn{
+		z-index: 0;
+		width: 100rpx;
+		height: 100rpx;
+	}
+	.custom-upload{
+		display: inline-block;
+		position: absolute;
+		right: 0;
+		top: 0;
+		height: 100%;
+		width: 300rpx;
+		z-index: 1;
+		background: #ccc;
+		opacity: 0;
+	}
+	.tui-radio {
+		display: flex;
+		font-size: 19px;
+		vertical-align: middle;
+		align-items: center;
+		margin-right: 30upx;
+	}
+	.search-input{
+		display: inline-block;
 		flex: 1;
 		text-align: right;
-		color: #aaa;
-		font-size: 30rpx;
+	}
+	.u-preview-wrap{
+		display: none;
 	}
 </style>

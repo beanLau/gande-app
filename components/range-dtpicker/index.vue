@@ -113,6 +113,12 @@
 			}
 		},
 		methods:{
+			// hide(){
+			// 	this.showPicker = false
+			// },
+			// show(){
+			// 	this.showPicker = true
+			// },
 			returnHandle(){},
 			init(){
 				var that = this;
@@ -168,8 +174,7 @@
 				this.$emit("showchange",false);
 			},
 			pickerCancel(){
-				this.$emit("cancel");
-				this.$emit("showchange",false);
+				this.$emit("showchange",true);
 			},
 			changeDateType(dateType){
 				var that = this;

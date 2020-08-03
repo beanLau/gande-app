@@ -1,56 +1,44 @@
 <template>
 	<view class="container">
-		<uni-nav-bar v-if="jibie == 3" status-bar @clickLeft="pageBack" right-text="创建会议" @clickRight="toCreateTask" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
-		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
-	
-		<view class="title-wrap">
-			<view class="group-title">
-				党支部会议
-			</view>
-		</view>
-		<view class="search-wrap">
-			<view class="group-item">
-				<uni-icons type="search" color="#ccc" :size="24"></uni-icons>
-				<input class="search-input" type="text" :value="keyword" @input="keywordChange" placeholder="输入关键字搜索"/>
-			</view>
-			<view class="group-item">
-				<view class="begin-time" :class="{'has-value': beginTime != ''}" @click="showBeginTime">
-					{{beginTime ? beginTime : '选择开始时间'}}
-				</view>
-				<tui-datetime ref="beginTime" :type="3" :cancelColor="cancelColor" :color="color"
-				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBeginTime"></tui-datetime>
-				<view class="end-time" :class="{'has-value': endTime != ''}" @click="showEndTime">
-					{{endTime ? endTime : '选择截止时间'}}
-				</view>
-				<tui-datetime ref="endTime" :type="3" :cancelColor="cancelColor" :color="color"
-				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeEndTime"></tui-datetime>
-			</view>
-			
-			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="resetCb">重置</button>
-				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" @click="toSearch">搜索</button>
-			</view>
-		</view>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="我的党建"></uni-nav-bar>
+		
 		<view class="task-list">
 			<view class="towns-title">
-				全部会议
+				党建列表
 			</view>
-			<view class="task-item" v-for="item in list" @click="detail">
-				<image :src="item.img" mode="" class="task-pic"></image>
-				<view class="task-right">
-					<view class="task-title">
-						{{item.Title}}
-					</view>
-					<view class="task-desc" v-html="item.Neirong"></view>
-					<view class="task-time">
-						{{item.CreateDate}}
+			<view class="task-list">
+				<view class="task-list" v-if="jibie == 2">
+					<view class="task-item" v-for="item in list" @click="buildDetail2(item)">
+						<view class="task-right">
+							<view class="task-title">
+								{{item.Title}}
+							</view>
+							<view class="task-desc" v-html="item.Renwu">
+							</view>
+							<view class="task-time">
+								{{item.RenwuQixianDate}}
+							</view>
+						</view>
 					</view>
 				</view>
-			</view>
-			
-			<view v-if="list && list.length == 0" class="nodata-wrap flex">
-				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
-				<text class="nodata-tip">暂无数据</text>
+				<view class="task-list" v-if="jibie == 3">
+					<view class="task-item" v-for="item in list" @click="detail(item)">
+						<view class="task-right">
+							<view class="task-title">
+								{{item.RenwuTitle}}
+							</view>
+							<view class="task-desc" v-html="item.Huibao">
+							</view>
+							<view class="task-time">
+								{{item.RenwuQixianDate}}
+							</view>
+						</view>
+					</view>
+				</view>
+				<view v-if="list && list.length == 0" class="nodata-wrap flex">
+					<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+					<text class="nodata-tip">暂无数据</text>
+				</view>
 			</view>
 		</view>
 		<!--加载loadding-->
@@ -98,8 +86,10 @@
 					this.jibie = 1
 				}else if(userinfo.Nature == 6){ //乡
 					this.jibie = 2
+					this.url = 'Siji/AFP_DangjianRenwu/GetPageListJson'
 				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
 					this.jibie = 3
+					this.url = 'Siji/AFP_DangjianRenwuHuibao/GetPageListJson'
 				}else{ //联户员
 					this.jibie = 4
 				}
@@ -107,6 +97,7 @@
 			console.log(userinfo)
 		},
 		mounted(){
+			
 		},
 		
 		onShow(){
@@ -116,6 +107,16 @@
 		},
 		methods: {
 			
+			detail(item){
+				uni.navigateTo({
+					url: '../buildDetail/index?id=' + item.ID + '&RenwuID='+ item.RenwuID
+				})
+			},
+			buildDetail2(item){
+				uni.navigateTo({
+					url: '../buildDetail/index?RenwuID=' + item.ID
+				})
+			},
 			toCreateTask(){
 				uni.navigateTo({
 					url: '../createZhibu/index'
@@ -126,37 +127,18 @@
 				let resData = {
 					"queryJson": decodeURIComponent(JSON.stringify({
 						XiangCode: _this.userinfo.XiangCode || '',
-						CunCode: _this.userinfo.CunCode || '',
-						Keyword: _this.keyword,
-						beginTime: _this.beginTime,
-						endTime: _this.endTime,
-						ConType: '0'
+						Keyword: '',
+						StatusCode: '',
+						beginTime: '',
+						endTime: ''
 					})),
 					"rows": '5',
 					"page": '1',
 					"sidx": "CreateDate",
 					"sord": "desc"
 				}
-				console.log(resData)
-				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
+				this.tui.request(_this.url,"GET",resData).then((res)=>{
 					console.log(res)
-					if(res.rows && Array.isArray(res.rows)){
-						res.rows.map(item=>{
-							let srcs = item.Imgs || ''
-							srcs = srcs.split(";")
-							srcs.map(src=>{
-								if(src.indexOf('http') == -1){
-									src = 'http://60.6.198.123:8003/' + src
-								}
-							})
-							item.Imgs = srcs
-							if(srcs.length > 0){
-								item.img = srcs[0]
-							}else{
-								item.img = '../../static/task_defult.png'
-							}
-						})
-					}
 					if(_this.pageIndex == 1){
 						_this.list = res.rows;
 					}else{
@@ -175,11 +157,6 @@
 			},
 			pageBack(){
 				uni.navigateBack()
-			},
-			detail(){
-				uni.navigateTo({
-					url: '../buildDetail/index'
-				})
 			},
 			keywordChange(e){
 				this.keyword = e.target.value
@@ -367,5 +344,123 @@
 	}
 	.has-value{
 		color: #4E4E4E;
+	}
+	
+	tui-product-list {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		flex-direction: row;
+		flex-wrap: wrap;
+		box-sizing: border-box;
+		padding: 270upx 30upx 30upx 30upx;
+		background: #FBFAFA;
+	}
+	
+	.tui-product-container {
+		flex: 1;
+		margin-right: 10rpx;
+	}
+	
+	.tui-product-container:last-child {
+		margin-right: 0;
+	}
+	
+	.tui-pro-item {
+		width: 100%;
+		margin-bottom: 30rpx;
+		background: #fff;
+		box-sizing: border-box;
+		border-radius: 10rpx;
+		overflow: hidden;
+		transition: all 0.15s ease-in-out;
+	}
+	
+	.tui-flex-list {
+		display: flex;
+		flex-direction: column;
+	}
+	.tui-pro-item{
+		padding: 38upx 20upx;
+	}
+	.item-top{
+		display: flex;
+		align-items: center;
+	}
+	.top-tag{
+	
+	}
+	.item-title{
+		margin-left: 15px;
+		color: #4E4E4E;
+		font-size: 32upx;
+		font-weight: bold;
+	}
+	.item-desc{
+		margin-top: 27upx;
+		margin-bottom: 42upx;
+		max-height: 100rpx;
+		color: #aaa;
+		font-size: 24upx;
+		line-height: 36upx;
+		overflow: hidden;
+	}
+	.bottom-wrap{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.bottom-left{
+		display: flex;
+		align-items: center;
+	}
+	.bottom-tag{
+	
+	}
+	.bottom-time{
+		color: #bbb;
+		font-size: 24upx;
+	}
+	.item-status{
+		color: #DE1727;
+		font-size: 24upx;
+	}
+	
+	
+	.task-list{
+		padding: 25rpx 30rpx;
+	}
+	.task-item{
+		display: flex;
+		align-items: center;
+		margin-bottom: 40rpx;
+	}
+	.task-item:last-of-type{
+		margin-bottom: 0;
+	}
+	.task-pic{
+		width: 160rpx;
+		height: 160rpx;
+		flex-shrink: 0;
+	}
+	.task-right{
+		height: 160rpx;
+		padding-left: 25rpx;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	.task-title{
+		color: #4E4E4E;
+		font-size: 32rpx;
+	}
+	.task-desc{
+		color: #aaa;
+		font-size: 24rpx;
+	}
+	.task-time{
+		color: #aaa;
+		font-size: 24rpx;
 	}
 </style>

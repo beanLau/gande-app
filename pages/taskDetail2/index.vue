@@ -173,9 +173,11 @@
 				}
 			}
 		},
+		onShow() {
+			this.getDetail();
+		},
 		mounted() {
 			this.initAudioContext()
-			this.getDetail();
 		},
 		onUnload: function (option) {
 			uni.hideLoading();
@@ -334,6 +336,7 @@
 				this.tui.request("/Siji/AFP_RenwuXiang/GetAppXiangRenWuDetail?keyValue="+this.id,"get",{
 					keyValue: this.id
 				}).then((res)=>{
+					console.log(res)
 					if(_this.jibie == 2 &&  res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
 						_this.showReportBtn = true
 					}
@@ -353,10 +356,13 @@
 						let audioList = item.audioList.split(";");
 						let audios = []
 						audioList.map((audio,index)=>{
-							let url = 'http://60.6.198.123:8003/' + audio
-							audios[index] = {
-								src: url
+							if(audio.indexOf('http') == -1){
+								let url = 'http://60.6.198.123:8003/' + audio
+								audios[index] = {
+									src: url
+								}
 							}
+							
 						})
 						item.audios = audios
 					})

@@ -68,7 +68,7 @@
 				</view>
 			</view>
 			<view class="no-data" v-else>
-				<image src="../../static/e256b4ce-d9a4-488b-8da2-032747213982.png" mode="" class="no-data-pic"></image>
+				<image src="../../static/nodata.png" mode="" class="no-data-pic"></image>
 				<text class="no-data-tip">暂无解决报告</text>
 			</view>
 		</view>

@@ -1,17 +1,16 @@
 <template>
 	<view class="page-content">
 		<view class="status_bar"></view>
-		<view class="top-wrap">
+		<view class="top-wrap" v-if="swiperList.length > 0">
 			<image src="../../static/home-top.png" mode="scaleToFill" class="top-bg"></image>
 			<swiper class="screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="true" :circular="true"
 			 :autoplay="true" interval="5000" duration="500">
-				<swiper-item v-for="(item,index) in swiperList" :key="index">
-					<image :src="item.url" mode="aspectFill" v-if="item.type=='image'"></image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
+				<swiper-item v-for="(item,index) in swiperList" :key="index" @tap="toNewsDetail(item)">
+					<image :src="item.CoverImg" mode="aspectFill"></image>
 				</swiper-item>
 			</swiper>
 		</view>
-		<view class="qiun-columns">
+		<view class="qiun-columns" v-if="showTask">
 			<view class="group-wrap">
 				<view class="group-title">任务完成率</view>
 				<view class="select-month" @click="showTaskMonth()">
@@ -23,40 +22,31 @@
 			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeTaskMonth"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
-				<canvas canvas-id="taskCanva" id="taskCanva" class="charts"  @touchstart="touchTaskCanva"></canvas>
+				<canvas canvas-id="taskCanva" id="taskCanva" class="charts" :width="cWidth" :height="cHeight" :style="{'width':cWidth+'px','height':cHeight+'px'}" disable-scroll=true @touchstart="touchTaskCanva" @touchmove="moveTaskColumn" @touchend="touchEndTaskColumn"></canvas>
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding bottom-border">
+		<view class="bg-white padding bottom-border" v-if="showTask">
 			<view class="cu-list grid col-4">
-				<view class="cu-item table-title">乡镇</view>
+				<view v-if="jibie == 1" class="cu-item table-title">乡镇</view>
+				<view v-else-if="jibie == 2" class="cu-item table-title">村庄</view>
+				<view v-else-if="jibie == 3" class="cu-item table-title">联户员</view>
 				<view class="cu-item table-title">已完成</view>
 				<view class="cu-item table-title">未完成</view>
 				<view class="cu-item table-title">总数</view>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
+				<block v-for="(item,index) in taskList" :key="index">
+					<view class="cu-item">{{item.fullname}}</view>
+					<view class="cu-item">{{item.yiwancheng}}</view>
+					<view class="cu-item" :class="{'text-red': item.weiwancheng > 0}">{{item.weiwancheng}}</view>
+					<view class="cu-item">{{item.zongshu}}</view>
+				</block>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
 			</view>
 		</view>
 		
-		<view class="qiun-columns">
+		<view class="qiun-columns" v-if="showWork">
 			<view class="group-wrap">
 				<view class="group-title">170工作解决机制</view>
 				<view class="select-month" @click="showWorkMonth()">
@@ -68,39 +58,38 @@
 			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeWorkMonth"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
-				<canvas canvas-id="workCanva" id="workCanva" class="charts"  @touchstart="touchWorkCanva"></canvas>
+				<canvas canvas-id="workCanva" id="workCanva" class="charts" :width="cWidth" :height="cHeight" :style="{'width':cWidth+'px','height':cHeight+'px'}" disable-scroll=true @touchstart="touchWorkCanva" @touchmove="moveWorkColumn" @touchend="touchEndWorkColumn"></canvas>
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding bottom-border">
+		<view class="bg-white padding bottom-border" v-if="showWork">
 			<view class="cu-list grid col-4">
-				<view class="cu-item table-title">乡镇</view>
+				<view v-if="jibie == 1" class="cu-item table-title">乡镇</view>
+				<view v-else-if="jibie == 2" class="cu-item table-title">类别</view>
+				<view v-else-if="jibie == 3" class="cu-item table-title">类别</view>
 				<view class="cu-item table-title">已完成</view>
 				<view class="cu-item table-title">未完成</view>
 				<view class="cu-item table-title">总数</view>
+				<template v-if="jibie == 1">
+					<block v-for="(item,index) in wrokList">
+						<view class="cu-item">{{item.fullname}}</view>
+						<view class="cu-item">{{item.jiejuezhanbi}}</view>
+						<view class="cu-item" :class="{'text-red': item.weijiejuezhanbi > 0}">{{item.weijiejuezhanbi}}</view>
+						<view class="cu-item">{{item.zongshu}}</view>
+					</block>
+				</template>
+				<template v-if="jibie == 2">
+					<block v-for="(item,index) in wrokList">
+						<view class="cu-item">{{item.itemname}}</view>
+						<view class="cu-item">{{item.yijiejue}}</view>
+						<view class="cu-item" :class="{'text-red': item.weijiejue > 0}">{{item.weijiejue}}</view>
+						<view class="cu-item">{{item.zongshu}}</view>
+					</block>
+				</template>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
 			</view>
 		</view>
-		<view class="qiun-columns">
+		<view class="qiun-columns" v-if="showHuiyi">
 			<view class="group-wrap">
 				<view class="group-title">党建任务完成进度</view>
 				<view class="select-month" @click="showProgressMonth()">
@@ -112,11 +101,11 @@
 			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeProgressMonth"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
-				<canvas canvas-id="progressCanva" id="progressCanva" class="charts"  @touchstart="touchProgressCanva"></canvas>
+				<canvas canvas-id="progressCanva" id="progressCanva" class="charts" :width="cWidth" :height="cHeight" :style="{'width':cWidth+'px','height':cHeight+'px'}" disable-scroll=true @touchstart="touchProgressCanva" @touchmove="moveProgressColumn" @touchend="touchEndProgressColumn"></canvas>
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding bottom-border">
+		<view class="bg-white padding bottom-border" v-if="showHuiyi">
 			<view class="cu-list grid col-5">
 				<view class="cu-item table-title font-24">乡镇</view>
 				<view class="cu-item table-title font-24">党支部会议</view>
@@ -124,32 +113,16 @@
 				<view class="cu-item table-title font-24">党课</view>
 				<view class="cu-item table-title font-24">状态</view>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
-				<view class="cu-item">5</view>
+				<block v-for="(item,index) in huiyiList">
+					<view class="cu-item">{{item.name}}</view>
+					<view class="cu-item" :class="{'text-red': item.dzb < item.dzbnum}">{{item.dzb}}</view>
+					<view class="cu-item" :class="{'text-red': item.dy < item.dynum}">{{item.dy}}</view>
+					<view class="cu-item" :class="{'text-red': item.dk < item.dknum}">{{item.dk}}</view>
+					<view class="cu-item">{{item.stateName}}</view>
+				</block>
 			</view>
 		</view>
-		<view class="qiun-columns">
+		<view class="qiun-columns" v-if="showBuild">
 			<view class="group-wrap">
 				<view class="group-title">党建任务完成率</view>
 				<view class="select-month" @click="showBuildMonth()">
@@ -161,36 +134,27 @@
 			 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBuildMonth"></tui-datetime>
 			<view class="qiun-charts" >
 				<!--#ifndef MP-ALIPAY -->
-				<canvas canvas-id="buildCanva" id="buildCanva" class="charts"  @touchstart="touchBuildCanva"></canvas>
+				<canvas canvas-id="buildCanva" id="buildCanva" class="charts"  :width="cWidth" :height="cHeight" :style="{'width':cWidth+'px','height':cHeight+'px'}" disable-scroll=true @touchstart="touchBuildCanva" @touchmove="moveBuildColumn" @touchend="touchEndBuildColumn"></canvas>
 				<!--#endif-->
 			</view>
 		</view>
-		<view class="bg-white padding bottom-border">
+		<view class="bg-white padding bottom-border" v-if="showBuild">
 			<view class="cu-list grid col-4">
-				<view class="cu-item table-title">乡镇</view>
+				<view v-if="jibie == 1" class="cu-item table-title">乡镇</view>
+				<view v-else-if="jibie == 2" class="cu-item table-title">村庄</view>
+				<view v-else-if="jibie == 3" class="cu-item table-title">联户员</view>
 				<view class="cu-item table-title">已完成</view>
 				<view class="cu-item table-title">未完成</view>
 				<view class="cu-item table-title">总数</view>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
+				<block v-for="(item,index) in buildList" :key="index">
+					<view class="cu-item">{{item.name}}</view>
+					<view class="cu-item">{{item.wc}}</view>
+					<view class="cu-item" :class="{'text-red': item.wwc > 0}">{{item.wwc}}</view>
+					<view class="cu-item">{{item.zs}}</view>
+				</block>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
 				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item text-red">2</view>
-				<view class="cu-item">5</view>
-				
-				<view class="cu-item">柯庄镇</view>
-				<view class="cu-item">3</view>
-				<view class="cu-item">-</view>
-				<view class="cu-item">5</view>
 			</view>
 		</view>
 		
@@ -240,31 +204,76 @@
 				setDateTime: '',
 				result: '',
 				unitTop: false,
-				radius: false
+				radius: false,
+				taskUrl: 'Siji/AFP_RenwuXiang/GetCunRenWuTongJi',
+				taskList: [],
+				questionUrl: 'Siji/AFP_WenTi/GetXiangWenTiTongJi',
+				wrokList: [],
+				buildUrl: '',
+				buildList: [],
+				huiyiUrl: 'Siji/AFP_DangjianNum/GetXiangData',
+				huiyiList: [],
+				jibie: 0,
+				showTask: false,
+				showWork: false,
+				showBuild: false,
+				showHuiyi: false
 			}
 		},
+		
 		mounted() {
 			_self = this;
-			//#ifdef MP-ALIPAY
-			uni.getSystemInfo({
-				success: function (res) {
-					if(res.pixelRatio>1){
-						//正常这里给2就行，如果pixelRatio=3性能会降低一点
-						//_self.pixelRatio =res.pixelRatio;
-						_self.pixelRatio =2;
-					}
-				}
-			});
-			//#endif
 			this.cWidth=uni.upx2px(750);
 			this.cHeight=uni.upx2px(500);
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+				console.log(this.userinfo)
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+					this.taskUrl = 'Siji/AFP_RenwuXian/GetXiangRenWuTongJi'
+					this.questionUrl = 'Siji/AFP_WenTi/GetXiangWenTiTongJi'
+					this.buildUrl = 'Siji/AFP_DangjianNum/GetXiangRenwuData'
+					this.huiyiUrl = 'Siji/AFP_DangjianNum/GetXiangData'
+					this.showTask = true
+					this.showWork = true
+					this.showBuild = true
+					this.showHuiyi = true
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+					this.taskUrl = 'Siji/AFP_RenwuXiang/GetCunRenWuTongJi'
+					this.questionUrl = 'Siji/AFP_WenTi/GetCunWenTiTongJi'
+					this.buildUrl = 'Siji/AFP_DangjianNum/GetCunRenwuData'
+					this.huiyiUrl = 'Siji/AFP_DangjianNum/GetCunData'
+					this.showTask = true
+					this.showWork = true
+					this.showBuild = true
+					this.showHuiyi = true
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+					this.taskUrl = 'Siji/AFP_RenwuCun/GetLianHuYuanRenWuTongJi'
+					this.questionUrl = 'Siji/AFP_WenTi/GetCunWenTiTongJi'
+					this.showTask = true
+					this.showWork = true
+				}else{ //联户员
+					this.jibie = 4
+				}
+				console.log(this.jibie)
+			}
 			//初始化当前年月
 			let currentMonth = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+			let date = new Date();
+			let prevMonth = date.setMonth(date.getMonth() - 1);
 			this.taskMonth = currentMonth;
-			this.workMonth = currentMonth;
+			this.workMonth = date.getFullYear() + '-' + (date.getMonth() + 1);
 			this.progressMonth = currentMonth;
 			this.buildMonth = currentMonth;
-			this.getServerData();
+			this.getSwiperData();
+			this.getTaskData();
+			this.getQuestionData();
+			this.getBuildProgress();
+			this.getBuildData();
 		},
 		methods: {
 			showTaskMonth(){
@@ -285,121 +294,312 @@
 			},
 			changeTaskMonth(e){
 				this.taskMonth = e.result;
-				//获取数据，更新任务完成了图表
-				taskCanva.updateData({
-					"categories": ["任城镇", "新店镇", "邢湾镇"],
-					"series": [{
-						"name": "已完成",
-						"data": [20, 30, 50],
-						"color": "#EE9FA5",
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}, {
-						"name": "未完成",
-						"data": [80,70, 50],
-						"color": '#FAFAFA',
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}]
-				});
+				this.getTaskData();
 			},
 			changeWorkMonth(e){
 				this.workMonth = e.result;
 				//获取数据，更新任务完成了图表
-				workCanva.updateData({
-					"categories": ["任城镇", "新店镇", "邢湾镇"],
-					"series": [{
-						"name": "已完成",
-						"data": [20, 30, 50],
-						"color": "#EE9FA5",
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}, {
-						"name": "未完成",
-						"data": [80,70, 50],
-						"color": '#FAFAFA',
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}]
-				});
+				this.getQuestionData();
 			},
 			changeProgressMonth(e){
 				this.progressMonth = e.result;
-				//获取数据，更新任务完成了图表
-				progressCanva.updateData({
-					"categories": ["任城镇", "新店镇", "邢湾镇"],
-					"series": [{
-						"name": "已完成",
-						"data": [20, 30, 50],
-						"color": "#EE9FA5",
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}, {
-						"name": "未完成",
-						"data": [80,70, 50],
-						"color": '#FAFAFA',
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}]
-				});
+				
+				this.getBuildProgress();
 			},
 			changeBuildMonth(e){
 				this.buildMonth = e.result;
 				//获取数据，更新任务完成了图表
-				buildCanva.updateData({
-					"categories": ["任城镇", "新店镇", "邢湾镇"],
-					"series": [{
-						"name": "已完成",
-						"data": [20, 30, 50],
-						"color": "#EE9FA5",
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}, {
-						"name": "未完成",
-						"data": [80,70, 50],
-						"color": '#FAFAFA',
-						format:(val)=>{return val.toFixed(0)+'%'}
-					}]
-				});
+				
+				this.getBuildData();
 			},
-			getServerData(){
-				uni.request({
-					url: 'https://www.ucharts.cn/data.json',
-					data:{
-					},
-					success: function(res) {
-						let ColumnStack={
-							"categories": ["任城镇", "新店镇", "邢湾镇"],
-							"series": [{
-								"name": "已完成",
-								"data": [50, 20, 70],
-								"color": "#EE9FA5",
-								format:(val)=>{return val.toFixed(0)+'%'}
-							}, {
-								"name": "未完成",
-								"data": [50, 80, 30],
-								"color": '#FAFAFA',
-								format:(val)=>{return val.toFixed(0)+'%'}
-							}]
-						};
-						_self.showTaskCanva(ColumnStack);
-						_self.showWorkCanva(ColumnStack);
-						_self.showProgressCanva({
-							"categories": ["柯曲镇", "上贡麻乡", "下贡麻乡", "岗龙乡", "青珍乡", "江千乡", "下藏科乡"],
-							      "series": [{
-							        "name": "党支部会议",
-							        "data": [35, 36, 31, 33, 13, 34, 30],
-									"color": '#FCC5C5'
-							      }, {
-							        "name": "党员会议",
-							        "data": [18, 27, 21, 24, 6, 28, 30],
-									"color": '#FD6A76'
-							      }, {
-							        "name": "党课",
-							        "data": [18, 27, 21, 24, 6, 28, 30],
-									"color": '#DE1727'
-							      }]
-						});
-						_self.showBuildCanva(ColumnStack)
-					},
-					fail: () => {
-						_self.tips="网络错误，小程序端请检查合法域名";
-					},
-				});
+			getTaskData(){
+				let _this = this;
+				let reqData = {
+					yuefen: _this.taskMonth
+				}
+				if(_this.jibie == 2){
+					reqData.XiangCode = _this.userinfo.XiangCode
+				}else if(_this.jibie == 3){
+					reqData.XiangCode = _this.userinfo.XiangCode
+					reqData.CunCode = _this.userinfo.CunCode
+				}
+				if(!_this.taskUrl){
+					return
+				}
+				console.log(_this.taskUrl)
+				this.tui.request(_this.taskUrl,"GET",reqData).then((list)=>{
+					console.log(list)
+					this.taskList = list;
+					let categories = [];
+					let complete = []
+					let uncomplete = []
+					if(Array.isArray(list)){
+						list.map(item=>{
+							categories.push(item.fullname);
+							complete.push(item.wanchengzhanbi)
+							uncomplete.push(item.weiwanchengzhanbi)
+						})
+					}
+					_self.showTaskCanva({
+						"categories": categories,
+						enableScroll: true,//开启图表拖拽功能
+						xAxis: {
+							disableGrid: true,
+							itemCount: 4,
+							scrollShow: true
+						},
+						"series": [{
+							"name": "已完成",
+							"data": complete,
+							"color": "#EE9FA5",
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}, {
+							"name": "未完成",
+							"data": uncomplete,
+							"color": '#FAFAFA',
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}]
+					});
+				}).catch(e=>{
+					console.log(e)
+				})
 			},
+			getQuestionData(){
+				let _this = this;
+				let reqData = {
+					yuefen: _this.taskMonth
+				}
+				if(_this.jibie == 2){
+					reqData.XiangCode = _this.userinfo.XiangCode
+				}else if(_this.jibie == 3){
+					reqData.XiangCode = _this.userinfo.XiangCode
+					reqData.CunCode = _this.userinfo.CunCode
+				}
+				if(!_this.questionUrl){
+					return
+				}
+				console.log(_this.questionUrl)
+				this.tui.request(_this.questionUrl,"GET",reqData).then((list)=>{
+					this.wrokList = list;
+					let categories = [];
+					let complete = []
+					let uncomplete = []
+					if(Array.isArray(list)){
+						list.map(item=>{
+							if(_this.jibie == 1){
+								categories.push(item.fullname);
+								complete.push(item.jiejuezhanbi)
+								uncomplete.push(item.weijiejuezhanbi)
+							}else{
+								categories.push(item.itemname);
+								complete.push(item.jiejuelv)
+								uncomplete.push(item.weijiejuelv)
+							}
+							
+							
+						})
+					}
+				
+					_self.showWorkCanva({
+						"categories": categories,
+						enableScroll: true,//开启图表拖拽功能
+						xAxis: {
+							disableGrid: true,
+							itemCount: 4,
+							scrollShow: true
+						},
+						"series": [{
+							"name": "已完成",
+							"data": complete,
+							"color": "#EE9FA5",
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}, {
+							"name": "未完成",
+							"data": uncomplete,
+							"color": '#FAFAFA',
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}]
+					});
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getBuildData(){
+				let _this = this;
+				let reqData = {
+					yuefen: _this.taskMonth
+				}
+				if(_this.jibie == 2){
+					reqData.XiangCode = _this.userinfo.XiangCode
+				}else if(_this.jibie == 3){
+					reqData.XiangCode = _this.userinfo.XiangCode
+					reqData.CunCode = _this.userinfo.CunCode
+				}
+				if(!_this.buildUrl){
+					return
+				}
+				console.log(_this.buildUrl)
+				this.tui.request(_this.buildUrl,"GET",reqData).then((list)=>{
+					console.log(list)
+					this.buildList = list;
+					let categories = [];
+					let complete = []
+					let uncomplete = []
+					if(Array.isArray(list)){
+						list.map(item=>{
+							categories.push(item.name);
+							complete.push(item.wc)
+							uncomplete.push(item.wwc)
+						})
+					}
+				
+					_self.showBuildCanva({
+						"categories": categories,
+						enableScroll: true,//开启图表拖拽功能
+						xAxis: {
+							disableGrid: true,
+							itemCount: 4,
+							scrollShow: true
+						},
+						"series": [{
+							"name": "已完成",
+							"data": complete,
+							"color": "#EE9FA5",
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}, {
+							"name": "未完成",
+							"data": uncomplete,
+							"color": '#FAFAFA',
+							format:(val)=>{return val.toFixed(0)+'%'}
+						}]
+					});
+					
+					
+					
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getBuildProgress(){
+				let _this = this;
+				let reqData = {
+					yuefen: _this.progressMonth
+				}
+				if(_this.jibie == 2){
+					reqData.XiangCode = _this.userinfo.XiangCode
+				}
+				if(!_this.huiyiUrl){
+					return
+				}
+				console.log(_this.huiyiUrl)
+				this.tui.request(_this.huiyiUrl,"GET",reqData).then((list)=>{
+					let categories = [];
+					let zhibu = []
+					let dangyuan = []
+					let dangke = []
+					if(Array.isArray(list)){
+						list.map(item=>{
+							if(item.dzb >= item.dzbnum && item.dy >= item.dynum && item.dk >= item.dknum){
+								item.stateName = '已完成'
+							}else{
+								item.stateName = '未完成'
+							}
+							categories.push(item.name)
+							zhibu.push(item.dzb)
+							dangyuan.push(item.dy)
+							dangke.push(item.dk)
+						})
+						this.huiyiList = list;
+					}
+					_self.showProgressCanva({
+						"categories": categories,
+						      "series": [{
+						        "name": "党支部会议",
+						        "data": zhibu,
+								"color": '#FCC5C5'
+						      }, {
+						        "name": "党员会议",
+						        "data": dangyuan,
+								"color": '#FD6A76'
+						      }, {
+						        "name": "党课",
+						        "data": dangke,
+								"color": '#DE1727'
+						      }]
+					});
+					
+					
+					
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			getSwiperData(){
+				let _this = this;
+				this.tui.request('PublicInfoManage/News/GetNewsListJson',"GET",{
+					"pagination":{
+						"rows": "30",
+						"page": "1",
+						"sidx": "CreateDate",
+						"sord": "desc"
+					   }
+				}).then((res)=>{
+					if(Array.isArray(res.rows)){
+						res.rows.map(item=>{
+							item.CoverImg = item.CoverImg.replace(';','')
+							item.CoverImg = 'http://110.166.84.163:8002/' + item.CoverImg
+							console.log(item.CoverImg)
+						})
+					}
+					_this.swiperList = res.rows || []
+					console.log(res)
+					
+				}).catch(e=>{
+					console.log(e)
+				})
+			},
+			// getServerData(){
+			// 	uni.request({
+			// 		url: 'https://www.ucharts.cn/data.json',
+			// 		data:{
+			// 		},
+			// 		success: function(res) {
+			// 			let ColumnStack={
+			// 				"categories": ["任城镇", "新店镇", "邢湾镇"],
+			// 				"series": [{
+			// 					"name": "已完成",
+			// 					"data": [50, 20, 70],
+			// 					"color": "#EE9FA5",
+			// 					format:(val)=>{return val.toFixed(0)+'%'}
+			// 				}, {
+			// 					"name": "未完成",
+			// 					"data": [50, 80, 30],
+			// 					"color": '#FAFAFA',
+			// 					format:(val)=>{return val.toFixed(0)+'%'}
+			// 				}]
+			// 			};
+			// 			_self.showProgressCanva({
+			// 				"categories": ["柯曲镇", "上贡麻乡", "下贡麻乡", "岗龙乡", "青珍乡", "江千乡", "下藏科乡"],
+			// 				      "series": [{
+			// 				        "name": "党支部会议",
+			// 				        "data": [35, 36, 31, 33, 13, 34, 30],
+			// 						"color": '#FCC5C5'
+			// 				      }, {
+			// 				        "name": "党员会议",
+			// 				        "data": [18, 27, 21, 24, 6, 28, 30],
+			// 						"color": '#FD6A76'
+			// 				      }, {
+			// 				        "name": "党课",
+			// 				        "data": [18, 27, 21, 24, 6, 28, 30],
+			// 						"color": '#DE1727'
+			// 				      }]
+			// 			});
+			// 		},
+			// 		fail: () => {
+			// 			_self.tips="网络错误，小程序端请检查合法域名";
+			// 		},
+			// 	});
+			// },
 			//初始化任务进度图表
 			showTaskCanva(chartData){
 				taskCanva = new uCharts({
@@ -419,8 +619,11 @@
 					animation: true,
 					categories: chartData.categories,
 					series: chartData.series,
+					enableScroll: true,//开启图表拖拽功能
 					xAxis: {
-						disableGrid:true,
+						disableGrid: true,
+						itemCount: 4,
+						scrollShow: true
 					},
 					yAxis: {
 						min: 0,
@@ -458,8 +661,11 @@
 					animation: true,
 					categories: chartData.categories,
 					series: chartData.series,
+					enableScroll: true,//开启图表拖拽功能
 					xAxis: {
-						disableGrid:true,
+						disableGrid: true,
+						itemCount: 4,
+						scrollShow: true
 					},
 					yAxis: {
 						min: 0,
@@ -497,8 +703,11 @@
 					animation: true,
 					categories: chartData.categories,
 					series: chartData.series,
+					enableScroll: true,//开启图表拖拽功能
 					xAxis: {
-						disableGrid:true,
+						disableGrid: true,
+						itemCount: 4,
+						scrollShow: true
 					},
 					yAxis: {
 						min: 0
@@ -532,8 +741,11 @@
 					animation: true,
 					categories: chartData.categories,
 					series: chartData.series,
+					enableScroll: true,//开启图表拖拽功能
 					xAxis: {
-						disableGrid:true,
+						disableGrid: true,
+						itemCount: 4,
+						scrollShow: true
 					},
 					yAxis: {
 						min: 0,
@@ -553,31 +765,70 @@
 				});
 			},
 			touchTaskCanva(e){
-				taskCanva.touchLegend(e);
+				taskCanva.scrollStart(e);
+			},
+			moveTaskColumn(e) {
+				taskCanva.scroll(e);
+			},
+			touchEndTaskColumn(e) {
+				taskCanva.scrollEnd(e);
+				taskCanva.touchLegend(e, {
+					animation:true,
+				});
 				taskCanva.showToolTip(e, {
 					format: function (item, category) {
 						return category + ' ' + item.name + ':' + item.data 
 					}
 				});
 			},
+			
 			touchWorkCanva(e){
-				workCanva.touchLegend(e);
+				workCanva.scrollStart(e);
+			},
+			moveWorkColumn(e) {
+				workCanva.scroll(e);
+			},
+			touchEndWorkColumn(e) {
+				workCanva.scrollEnd(e);
+				workCanva.touchLegend(e, {
+					animation:true,
+				});
 				workCanva.showToolTip(e, {
 					format: function (item, category) {
 						return category + ' ' + item.name + ':' + item.data 
 					}
 				});
 			},
+			
 			touchProgressCanva(e){
-				progressCanva.touchLegend(e);
+				progressCanva.scrollStart(e);
+			},
+			moveProgressColumn(e) {
+				progressCanva.scroll(e);
+			},
+			touchEndProgressColumn(e) {
+				progressCanva.scrollEnd(e);
+				progressCanva.touchLegend(e, {
+					animation:true,
+				});
 				progressCanva.showToolTip(e, {
 					format: function (item, category) {
 						return category + ' ' + item.name + ':' + item.data 
 					}
 				});
 			},
+			
 			touchBuildCanva(e){
-				buildCanva.touchLegend(e);
+				buildCanva.scrollStart(e);
+			},
+			moveBuildColumn(e) {
+				buildCanva.scroll(e);
+			},
+			touchEndBuildColumn(e) {
+				buildCanva.scrollEnd(e);
+				buildCanva.touchLegend(e, {
+					animation:true,
+				});
 				buildCanva.showToolTip(e, {
 					format: function (item, category) {
 						return category + ' ' + item.name + ':' + item.data 
@@ -597,6 +848,11 @@
 						image:'../../../static/images/alert-warning.png'
 					})
 				}
+			},
+			toNewsDetail(item){
+				uni.navigateTo({
+					url: '../newsdetail/index?id='+item.NewsId
+				})
 			}
 		}
 	}
@@ -616,6 +872,7 @@
 		width: 750upx;
 		height: 500upx;
 		background-color: #FFFFFF;
+		overflow: auto;
 	}
 	
 	.charts {

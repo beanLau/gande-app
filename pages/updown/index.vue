@@ -12,7 +12,8 @@
 					<view>日期</view>
 					<tui-icon name="arrowdown" :size="14" color="#444"></tui-icon>
 				</view>
-				<rangeDatePick 
+				<rangeDatePick
+					ref="range"
 					:show="isShow"
 					@showchange="showchange"
 					:start="startDate"
@@ -21,7 +22,7 @@
 					@change="bindChange"
 					@cancel="bindCancel"
 					themeColor="#4C83D6"
-					fields="month"
+					fields="day"
 				></rangeDatePick>
 				
 				<!-- <tui-datetime ref="filterTime" :type="3" :cancelColor="cancelColor" :color="color"
@@ -303,11 +304,18 @@ export default {
 		this.getListData();
 	},
 	methods: {
-		showchange(){
+		update(){
+			this.refresh();
+		},
+		showchange(value){
+			if(value){
+				this.isShow = !this.isShow; 
+				return
+			}
 			if(this.isShow){
 				this.refresh()
 			}
-			this.isShow=!this.isShow; 
+			this.isShow = !this.isShow; 
 		},
 		bindChange(list){
 			if(list.length > 1){
@@ -316,7 +324,7 @@ export default {
 			}
 		},
 		bindCancel(){
-			this.isShow = false
+			this.isShow = !this.isShow; 
 		},
 		// getStatusData(){
 		// 	let _this = this;
@@ -1153,4 +1161,7 @@ page {
 	font-size: 24upx;
 }
 /* 商品列表*/
+.nodata-wrap{
+	width: 750rpx;
+}
 </style>

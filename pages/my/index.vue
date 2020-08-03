@@ -3,17 +3,17 @@
 		<uni-nav-bar status-bar color="#fff" :border="false" background-color="#DE1727" title="我的"></uni-nav-bar>
 		<view class="top-bg" :class="{ 'top-bg-show': hideQuick }"></view>
 		<view class="info-wrap" :class="{ 'info-wrap-show': hideQuick }">
-			<view class="info-top"  :class="{ 'info-top-border': hideQuick }">
+			<view class="info-top"  :class="{ 'info-top-border': hideQuick }" @click="toInfo">
 				<view class="top-left">
-					<image src="../../static/tabbar/my-cur.png" mode="" class="user-pic"></image>
+					<image :src="img || '../../static/default-pic.png'" mode="" class="user-pic"></image>
 					<view class="user-info">
-						<text class="user-name">{{userinfo.UserName}}</text>
+						<text class="user-name">{{userinfo.RealName}}</text>
 						<!-- <text class="user-phone">{{userinfo.UserName}}</text> -->
 					</view>
 				</view>
 				<uni-icons type="arrowright" :size="18"></uni-icons>
 			</view>
-			<view class="quick-btns" v-if="!hideQuick">
+			<!-- <view class="quick-btns" v-if="!hideQuick">
 				<view class="quick-item">
 					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
 					<text class="quick-name">我的问题</text>
@@ -22,22 +22,40 @@
 					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
 					<text class="quick-name">我的任务</text>
 				</view>
-				<view class="quick-item">
+				<view class="quick-item" v-if="jibie == 2 || jibie == 3">
 					<image src="../../static/tabbar/build-cur.png" mode="" class="quick-icon"></image>
 					<text class="quick-name">我的党建</text>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		
 		<view class="menu-wrap">
 			<tui-list-view>
-				<tui-list-cell @click="detail" :arrow="true">
+				<tui-list-cell @click="toInfo" :arrow="true">
 					<view class="tui-item-box">
 						<tui-icon name="people" :size="24" color="#2E2E2E"></tui-icon>
 						<text class="tui-list-cell_name">我的信息</text>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="detail" :arrow="true">
+				<tui-list-cell @click="toTask" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">我的任务</view>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="toDangjian" :arrow="true"  v-if="jibie == 2 || jibie == 3">
+					<view class="tui-item-box">
+						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">我的党建</view>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="toQuestion" :arrow="true">
+					<view class="tui-item-box">
+						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
+						<view class="tui-list-cell_name">我的问题</view>
+					</view>
+				</tui-list-cell>
+				<tui-list-cell @click="toEditPassword" :arrow="true">
 					<view class="tui-item-box">
 						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">修改密码</view>
@@ -57,6 +75,8 @@
 				</tui-list-cell>
 			</tui-list-view>
 		</view>
+		
+		<u-toast ref="uToast" />
 	</view>
 </template>
 
@@ -67,7 +87,9 @@
 				hideQuick: true,
 				userinfo: {
 					
-				}
+				},
+				img: '',
+				jibie: 0
 			};
 		},
 		onLoad() {
@@ -78,9 +100,61 @@
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
 				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+					this.url = 'Siji/AFP_DangjianRenwu/GetPageListJson'
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+					this.url = 'Siji/AFP_DangjianRenwuHuibao/GetPageListJson'
+				}else{ //联户员
+					this.jibie = 4
+				}
 			}
+			this.getUserInfo();
 		},
 		methods: {
+			update(){
+				this.getUserInfo();
+			},
+			getUserInfo(){
+				let _this = this;
+				this.tui.request('/BaseManage/User/GetFormJson',"GET",{
+					keyValue: this.userinfo.UserId
+				}).then((res)=>{
+					if(res.HeadIcon){
+						res.HeadIcon = 'http://110.166.84.163:8002/' + res.HeadIcon
+					}
+					_this.userinfo.RealName = res.RealName
+					_this.img = `${res.HeadIcon}?time=${new Date().getTime()}`
+				})
+			},
+			toInfo(){
+				uni.navigateTo({
+					url: '../myinfo/index'
+				})
+			},
+			toTask(){
+				uni.navigateTo({
+					url: '../mytask/index'
+				})
+			},
+			toDangjian(){
+				uni.navigateTo({
+					url: '../mydangjian/index'
+				})
+			},
+			toQuestion(){
+				uni.navigateTo({
+					url: '../myquestion/index'
+				})
+			},
+			toEditPassword(){
+				uni.navigateTo({
+					url: '../editpassword/index'
+				})
+			},
 			detail(){
 				
 			},
@@ -89,9 +163,13 @@
 				uni.removeStorageSync("authorizeMenu")
 				uni.removeStorageSync("userinfo")
 				uni.removeStorageSync("token")
-				
-				uni.navigateTo({
-					url: '../login/index'
+				this.$refs.uToast.show({
+					title: '已退出登录！',
+					callback : ()=>{
+						uni.navigateTo({
+							url: '../login/index'
+						})
+					}
 				})
 			}
 		}

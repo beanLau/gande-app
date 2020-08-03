@@ -1,6 +1,8 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党员会议"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 3" status-bar @clickLeft="pageBack" right-text="创建会议" @clickRight="toCreateTask" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党员会议"></uni-nav-bar>
+		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党员会议"></uni-nav-bar>
+	
 		<view class="title-wrap">
 			<view class="group-title">
 				党员会议
@@ -34,16 +36,14 @@
 				全部会议
 			</view>
 			<view class="task-item" v-for="item in list" @click="detail">
-				<image src="../../static/BasicsBg.png" mode="" class="task-pic"></image>
+				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
-						岗龙乡党风建设进展情况
+						{{item.Title}}
 					</view>
-					<view class="task-desc">
-						具体工作内容：甘德县政府报告准时发布甘德县政府报告准时发
-					</view>
+					<view class="task-desc" v-html="item.Neirong"></view>
 					<view class="task-time">
-						2020-06-07
+						{{item.CreateDate}}
 					</view>
 				</view>
 			</view>
@@ -81,7 +81,8 @@
 				
 				pageIndex: 1,
 				pageSize: 5,
-				userinfo: {}
+				userinfo: {},
+				jibie: 0
 			}
 		},
 		
@@ -92,13 +93,35 @@
 			let userinfo = uni.getStorageSync("userinfo")
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
-				console.log(userinfo)
+				this.userinfo = userinfo
+				if(userinfo.Nature == 3){ //县
+					this.jibie = 1
+				}else if(userinfo.Nature == 6){ //乡
+					this.jibie = 2
+				}else if(userinfo.Nature == 7 && userinfo.IsWarner == 0){ //村
+					this.jibie = 3
+				}else{ //联户员
+					this.jibie = 4
+				}
 			}
+			console.log(userinfo)
 		},
 		mounted(){
+			
+		},
+		
+		onShow(){
+			this.pageIndex = 1;
+			this.pullUpOn = true;
 			this.getListData();
 		},
 		methods: {
+			
+			toCreateTask(){
+				uni.navigateTo({
+					url: '../createDangyuan/index'
+				});
+			},
 			getListData(){
 				let _this = this;
 				let resData = {
@@ -118,6 +141,23 @@
 				console.log(resData)
 				this.tui.request('Siji/AFP_Dangjian/GetPageListJson',"GET",resData).then((res)=>{
 					console.log(res)
+					if(res.rows && Array.isArray(res.rows)){
+						res.rows.map(item=>{
+							let srcs = item.Imgs || ''
+							srcs = srcs.split(";")
+							srcs.map(src=>{
+								if(src.indexOf('http') == -1){
+									src = 'http://60.6.198.123:8003/' + src
+								}
+							})
+							item.Imgs = srcs
+							if(srcs.length > 0){
+								item.img = srcs[0]
+							}else{
+								item.img = '../../static/task_defult.png'
+							}
+						})
+					}
 					if(_this.pageIndex == 1){
 						_this.list = res.rows;
 					}else{

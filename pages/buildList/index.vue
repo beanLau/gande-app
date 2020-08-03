@@ -87,6 +87,11 @@
 			}
 		},
 		mounted(){
+		},
+		
+		onShow(){
+			this.pageIndex = 1;
+			this.pullUpOn = true;
 			this.getListData();
 		},
 		methods: {

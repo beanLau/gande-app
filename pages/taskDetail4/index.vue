@@ -136,9 +136,11 @@
 				}
 			}
 		},
+		onShow() {
+			this.getDetail();
+		},
 		mounted() {
 			this.initAudioContext()
-			this.getDetail();
 		},
 		onUnload: function (option) {
 			uni.hideLoading();
@@ -339,7 +341,7 @@
 						res.xiangXiaFaData.map(item=>{
 							let url = item.XiaFaRadioUrl
 							if(url.indexOf('http') == -1){
-								url = 'http://116.131.134.198:9001/' + url
+								url = 'http://60.6.198.123:8003/' + url
 							}
 							xiangAudios.push({
 								src: url
@@ -348,7 +350,7 @@
 						res.cunXiaFaData.map(item=>{
 							let url = item.XiaFaRadioUrl
 							if(url.indexOf('http') == -1){
-								url = 'http://116.131.134.198:9001/' + url
+								url = 'http://60.6.198.123:8003/' + url
 							}
 							cunAudios.push({
 								src: url

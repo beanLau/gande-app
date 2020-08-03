@@ -5,7 +5,7 @@
 			<view class="group-title">
 				党建任务
 			</view>
-			<view class="title-right" @click="moreBuild"  v-if="productList.length">
+			<view class="title-right" @click="moreBuild">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -46,7 +46,7 @@
 			<view class="group-title">
 				党支部会议
 			</view>
-			<view class="title-right" @click="moreZhibu" v-if="zhibuList.length">
+			<view class="title-right" @click="moreZhibu">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -73,7 +73,7 @@
 			<view class="group-title">
 				党员会议
 			</view>
-			<view class="title-right" @click="moreDangyuan" v-if="dangyuanList.length">
+			<view class="title-right" @click="moreDangyuan">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -100,7 +100,7 @@
 			<view class="group-title">
 				党课
 			</view>
-			<view class="title-right" @click="moreDangke" v-if="dangkeList.length">
+			<view class="title-right" @click="moreDangke">
 				<text>更多</text>
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
@@ -162,6 +162,13 @@
 			this.getDangkeList();
 		},
 		methods: {
+			update(){
+				console.log('更新呢')
+				this.getDangjianList();
+				this.getZhibuList();
+				this.getDangyuanList();
+				this.getDangkeList();
+			},
 			getDangjianList(){
 				let _this = this;
 				let resData = {
@@ -179,7 +186,7 @@
 				}
 				console.log(resData)
 				this.tui.request(_this.url,"GET",resData).then((res)=>{
-					console.log(res.rows)
+					console.log(res)
 					_this.productList = res.rows;
 				}).catch(e=>{
 					console.log(e)

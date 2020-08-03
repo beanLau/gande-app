@@ -22,7 +22,7 @@
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
-			<tui-list-cell :hover="false">
+			<!-- <tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">下发内容</view>
 				</view>
@@ -30,7 +30,7 @@
 			</tui-list-cell>
 			<view class="textarea-wrap">
 				<textarea placeholder-style="color:#999" name="content" @input="changeContent" :value="content" placeholder="请输入汇报内容"/>
-			</view>
+			</view> -->
 			<tui-list-cell :hover="false">
 				<view class="group">
 					<text class="group-label">语音内容</text>
@@ -218,12 +218,12 @@
 					})
 					return
 				}
-				if(!_this.content){
-					_this.$refs.uToast.show({
-						title: '请输入下发内容',
-					})
-					return
-				}
+				// if(!_this.content){
+				// 	_this.$refs.uToast.show({
+				// 		title: '请输入下发内容',
+				// 	})
+				// 	return
+				// }
 				let audioUrlList = []
 				_this.audios.map(item=>{
 					audioUrlList.push(item.src)

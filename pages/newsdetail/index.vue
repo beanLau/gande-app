@@ -1,51 +1,22 @@
 <template>
 	<view class="page-content">
 		<view class="navbar-wrap">
-			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务详情"></uni-nav-bar>
+			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="新闻详情"></uni-nav-bar>
 		</view>
 		<view class="tui-pro-item tui-flex-list" hover-class="hover" :hover-start-time="150">
 			<view class="item-top">
-				<tui-tag margin="0 15upx 0 0" padding="8rpx" type="danger" size="24rpx">任务</tui-tag>
-				<view>{{detailData.Title}}</view>
+				<view>{{detailData.FullHead}}</view>
 			</view>
 			<view class="bottom-wrap">
 				<view class="bottom-left">
-					<tui-tag padding="8rpx" size="24rpx" :type="detailData.jinjiClass" v-if="detailData.JinjiName">
-						<!-- <tui-icon name="about" :size="10" :color="detailData.jinjiColor"></tui-icon> -->
-						<text>{{detailData.JinjiName}}</text>
-					</tui-tag>
-					<tui-tag margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{detailData.TypeName}}</tui-tag>
 					<view class="bottom-time">
-						{{detailData.CreateUserName}}  {{detailData.RenWuDaoQiRiQi}}
+						{{detailData.AuthorName}}  {{detailData.CreateDate}}
 					</view>
 				</view>
-				<view class="item-status">
-					{{detailData.StatusName}}
-				</view>
 			</view>
-			
-			<view class="item-desc">
-				{{detailData.Neirong}}
-			</view>
+			<u-parse class="item-desc" :html="detailData.NewsContent"></u-parse>
 		</view>
-		<view class="towns-list" v-if="xiangRenWu.length != 0">
-			<view class="towns-title">
-				完成情况
-			</view>
-			<view class="towns-item" v-for="item in xiangRenWu" :key="item.ID" @click="toDetail(item)">
-				<view class="towns-top">
-					<text class="towns-name">{{item.XiangName}}</text>
-					<text class="towns-status">{{item.StatusName}}</text>
-				</view>
-				<view class="towns-content">
-					具体工作内容：{{item.Neirong}}
-				</view>
-				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.CompDate || ' 无'}}</text>
-					<text class="towns-btn">查看详情</text>
-				</view>
-			</view>
-		</view>
+		
 	</view>
 </template>
 
@@ -79,23 +50,9 @@
 				})
 			},
 			getDetail(){
-				this.tui.request("/Siji/AFP_RenwuXian/GetXianRenWuDetail?keyValue="+this.id,"get",{
-					keyValue: this.id
-				}).then((res)=>{
+				this.tui.request("PublicInfoManage/Notice/GetFormJson?keyValue="+this.id,"get").then((res)=>{
 					console.log(res)
-					let jinjicode = res.xianRenWuData.JinjiCode
-					if(jinjicode == 1){
-						res.xianRenWuData.jinjiColor = '#4B8AFC'
-						res.xianRenWuData.jinjiClass = 'green'
-					}else if(jinjicode == 2){
-						res.xianRenWuData.jinjiColor = '#4B8AFC'
-						res.xianRenWuData.jinjiClass = 'warning'
-					}else  if(jinjicode == 3){
-						res.xianRenWuData.jinjiColor = '#4B8AFC'
-						res.xianRenWuData.jinjiClass = 'danger'
-					}
-					this.detailData = res.xianRenWuData;
-					this.xiangRenWu = res.xiangRenWu || [];
+					this.detailData = res || {};
 				})
 			}
 		}

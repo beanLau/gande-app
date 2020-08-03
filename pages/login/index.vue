@@ -74,9 +74,21 @@
 			},
 			getPower(){
 				this.tui.request("/ClientData/GetAppClientDataJson","POST").then((res)=>{
+					let authorizeMenu = {}
+					let authorizeButton = res.authorizeButton;
+					res.authorizeMenu.map(item=>{
+						let ModuleId = item.ModuleId;
+						let itemPower = Object.assign({},item)
+						let childList = authorizeButton[ModuleId] || []
+						childList.map(item=>{	
+							itemPower[item.EnCode] = true
+						})
+						authorizeMenu[item.EnCode] = itemPower
+					})
 					//console.log(res)
 					uni.setStorageSync('dataItem', res.dataItem); //字典项
-					uni.setStorageSync('authorizeMenu', res.authorizeMenu); //权限信息
+					console.log(authorizeMenu)
+					uni.setStorageSync('authorizeMenu', authorizeMenu); //权限信息
 					uni.navigateTo({
 						url: '../index/index'
 					})
@@ -101,6 +113,10 @@
 					this.tui.toast('请阅读并同意用户协议！');
 					return
 				}
+				console.log(JSON.stringify({
+					username: _this.username,
+					password: md5(_this.password),
+				}))
 				if (!checkRes) {
 					this.tui.request("/Login/AppLogin","POST",{
 						username: _this.username,
@@ -153,7 +169,9 @@
 						} else {
 							this.tui.toast(res.message);
 						}
-					}).catch((res)=>{})
+					}).catch((res)=>{
+						console.log(res)
+					})
 					
 				} else {
 					uni.showToast({
