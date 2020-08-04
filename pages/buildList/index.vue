@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<uni-nav-bar v-if="jibie == 2" status-bar right-text="新建任务" @clickLeft="pageBack" left-icon="back" left-text="返回" @clickRight="toCreateTask" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 2 && authorizeMenu.dangjian.xinjianrenwu" status-bar right-text="新建任务" @clickLeft="pageBack" left-icon="back" left-text="返回" @clickRight="toCreateTask" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
 		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党建任务"></uni-nav-bar>
 		<view class="title-wrap">
 			<view class="group-title">
@@ -62,7 +62,9 @@
 				pullUpOn: true,
 				pageIndex: 1,
 				pageSize: 5,
-				userinfo: {}
+				userinfo: {},
+				authorizeMenu: {},
+				url: ''
 			}
 		},
 		onLoad(opt) {
@@ -85,6 +87,9 @@
 					this.jibie = 4
 				}
 			}
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		mounted(){
 		},
@@ -97,16 +102,20 @@
 		methods: {
 			getListData(){
 				let _this = this;
+				let queryJson = {
+					XiangCode: _this.userinfo.XiangCode || '',
+					Keyword: '',
+					StatusCode: '',
+					beginTime: '',
+					endTime: ''
+				}
+				if(_this.jibie == 3){
+					queryJson.CunCode = _this.userinfo.CunCode || ''
+				}
 				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						Keyword: '',
-						StatusCode: '',
-						beginTime: '',
-						endTime: ''
-					})),
+					"queryJson": decodeURIComponent(JSON.stringify(queryJson)),
 					"rows": '5',
-					"page": '1',
+					"page": _this.pageIndex,
 					"sidx": "CreateDate",
 					"sord": "desc"
 				}

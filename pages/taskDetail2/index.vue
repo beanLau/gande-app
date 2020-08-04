@@ -86,7 +86,7 @@
 			<view class="towns-title">
 				完成情况
 			</view>
-			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
+			<view class="towns-item" v-if="renWuCun.length > 0" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
 					<text class="towns-name">{{item.cunData.CunName}}</text>
 					<text class="towns-btn">详情</text>
@@ -103,10 +103,14 @@
 					<text class="towns-person">汇报人 {{item.cunData.CreateUserName}}</text>
 				</view>
 			</view>
+			<view v-if="renWuCun && renWuCun.length == 0" class="nodata-wrap flex">
+				<image src="../../static/nodata.png" mode="" class="nodata-pic"></image>
+				<text class="nodata-tip">暂无数据</text>
+			</view>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport">汇报</view>
-			<view class="send-btn" @click="toIssue">下发</view>
+			<view class="report-btn" @click="toReport"  v-if="authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
@@ -132,7 +136,8 @@
 				recordIndex: -1,
 				recordBeginTime: '',
 				recordLen: 0,
-				showReportBtn: false
+				showReportBtn: false,
+				authorizeMenu: {}
 			}
 		},
 		onLoad(opt) {
@@ -172,6 +177,9 @@
 					this.jibie = 4
 				}
 			}
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		onShow() {
 			this.getDetail();
@@ -337,8 +345,10 @@
 					keyValue: this.id
 				}).then((res)=>{
 					console.log(res)
-					if(_this.jibie == 2 &&  res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
-						_this.showReportBtn = true
+					if(_this.jibie == 2 && res.xiangRenWuData.StatusCode != 4 && res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode && _this.authorizeMenu.shangchuanxiada){
+						if((_this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu) || (_this.detailData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu)){
+							_this.showReportBtn = true
+						}
 					}
 					let jinjicode = res.xiangRenWuData.JinjiCode
 					if(jinjicode == 1){

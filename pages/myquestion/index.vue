@@ -73,7 +73,8 @@
 				pageIndex: 1,
 				pageSize: 5,
 				userinfo: {},
-				jibie: 0
+				jibie: 0,
+				productList: []
 			}
 		},
 		

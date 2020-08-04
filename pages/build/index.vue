@@ -136,7 +136,8 @@
 				zhibuList: [],
 				dangyuanList: [],
 				dangkeList: [],
-				jibie: 0
+				jibie: 0,
+				url: ''
 			}
 		},
 		mounted: function(options) {
@@ -171,14 +172,18 @@
 			},
 			getDangjianList(){
 				let _this = this;
+				let queryJson = {
+					XiangCode: _this.userinfo.XiangCode || '',
+					Keyword: '',
+					StatusCode: '',
+					beginTime: '',
+					endTime: ''
+				}
+				if(_this.jibie == 3){
+					queryJson.CunCode = _this.userinfo.CunCode || ''
+				}
 				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						Keyword: '',
-						StatusCode: '',
-						beginTime: '',
-						endTime: ''
-					})),
+					"queryJson": decodeURIComponent(JSON.stringify(queryJson)),
 					"rows": '5',
 					"page": '1',
 					"sidx": "CreateDate",

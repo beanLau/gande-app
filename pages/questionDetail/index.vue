@@ -73,9 +73,9 @@
 			</view>
 		</view>
 		<u-toast ref="uToast" />
-		<u-modal v-model="showModule" content="确认提交改问题吗?" @confirm="confirm"></u-modal>
-		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport">汇报</view>
+		<u-modal v-model="showModule" :show-cancel-button="true" content="确认提交该问题吗?" @confirm="confirm"></u-modal>
+		<view class="bottom-fix" v-if="showReportBtn && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.wentitijiao">
+			<view class="report-btn" @click="toReport">问题提交</view>
 		</view>
 	</view>
 </template>
@@ -96,7 +96,8 @@
 				showReportBtn: false,
 				showModule: false,
 				isLoading: false,
-				userinfo: {}
+				userinfo: {},
+				authorizeMenu: {}
 			}
 		},
 		onLoad(opt) {
@@ -137,6 +138,9 @@
 				}
 			}
 			console.log(userinfo)
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		mounted() {
 			this.initAudioContext()
@@ -201,7 +205,7 @@
 					try{
 						let jinjicode = res.JinjiCode
 						
-						if(_this.jibie == 3 &&  res.CunCode == _this.userinfo.CunCode){
+						if(_this.jibie == 3 &&  res.CunCode == _this.userinfo.CunCode && res.StatusCode == 1){
 							_this.showReportBtn = true
 						}
 						if(jinjicode == 1){

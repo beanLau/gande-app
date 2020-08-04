@@ -76,6 +76,7 @@
 				this.tui.request("/ClientData/GetAppClientDataJson","POST").then((res)=>{
 					let authorizeMenu = {}
 					let authorizeButton = res.authorizeButton;
+					console.log(authorizeButton)
 					res.authorizeMenu.map(item=>{
 						let ModuleId = item.ModuleId;
 						let itemPower = Object.assign({},item)

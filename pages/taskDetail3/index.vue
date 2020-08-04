@@ -105,8 +105,8 @@
 			</view>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport">汇报</view>
-			<view class="send-btn" @click="toIssue">下发</view>
+			<view class="report-btn" @click="toReport" v-if="authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
@@ -132,7 +132,8 @@
 				recordIndex: -1,
 				recordBeginTime: '',
 				recordLen: 0,
-				showReportBtn: false
+				showReportBtn: false,
+				authorizeMenu: {}
 			}
 		},
 		onLoad(opt) {
@@ -172,6 +173,9 @@
 					this.jibie = 4
 				}
 			}
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		onShow() {
 			this.getDetail();
@@ -339,8 +343,10 @@
 				}).then((res)=>{
 					console.log(res)
 					try{
-						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode){
-							_this.showReportBtn = true
+						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode && _this.authorizeMenu.shangchuanxiada){
+							if(_this.authorizeMenu.shangchuanxiada.shangbaorenwu || _this.authorizeMenu.shangchuanxiada.xiafarenwu){
+								_this.showReportBtn = true
+							}
 						}
 						let jinjicode = res.cunRenWuData.JinjiCode
 						if(jinjicode == 1){

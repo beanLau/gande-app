@@ -67,7 +67,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="bottom-fix" v-if="showReportBtn">
+		<view class="bottom-fix" v-if="showReportBtn && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">
 			<view class="report-btn" @click="toReport">汇报</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
@@ -95,7 +95,8 @@
 				recordIndex: -1,
 				recordBeginTime: '',
 				recordLen: 0,
-				showReportBtn: false
+				showReportBtn: false,
+				authorizeMenu: {}
 			}
 		},
 		onLoad(opt) {
@@ -135,6 +136,9 @@
 					this.jibie = 4
 				}
 			}
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		onShow() {
 			this.getDetail();

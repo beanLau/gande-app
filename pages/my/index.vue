@@ -37,19 +37,19 @@
 						<text class="tui-list-cell_name">我的信息</text>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="toTask" :arrow="true">
+				<tui-list-cell @click="toTask" :arrow="true" v-if="authorizeMenu.wode && authorizeMenu.wode.woderenwu">
 					<view class="tui-item-box">
 						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">我的任务</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="toDangjian" :arrow="true"  v-if="jibie == 2 || jibie == 3">
+				<tui-list-cell @click="toDangjian" :arrow="true" v-if="(jibie == 2 || jibie == 3) && authorizeMenu.wode && authorizeMenu.wode.wodedangjian">
 					<view class="tui-item-box">
 						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">我的党建</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="toQuestion" :arrow="true">
+				<tui-list-cell @click="toQuestion" :arrow="true" v-if="authorizeMenu.wode && authorizeMenu.wode.wodewenti">
 					<view class="tui-item-box">
 						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">我的问题</view>
@@ -75,7 +75,7 @@
 				</tui-list-cell>
 			</tui-list-view>
 		</view>
-		
+		<u-modal v-model="showModule" :show-cancel-button="true" content="确认退出登录吗?" cancel-text="取消" @confirm="confirm"></u-modal>
 		<u-toast ref="uToast" />
 	</view>
 </template>
@@ -89,7 +89,9 @@
 					
 				},
 				img: '',
-				jibie: 0
+				jibie: 0,
+				showModule: false,
+				authorizeMenu: {}
 			};
 		},
 		onLoad() {
@@ -112,6 +114,9 @@
 					this.jibie = 4
 				}
 			}
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 			this.getUserInfo();
 		},
 		methods: {
@@ -158,7 +163,7 @@
 			detail(){
 				
 			},
-			loginout(){
+			confirm(){
 				uni.removeStorageSync("dataItem")
 				uni.removeStorageSync("authorizeMenu")
 				uni.removeStorageSync("userinfo")
@@ -166,11 +171,15 @@
 				this.$refs.uToast.show({
 					title: '已退出登录！',
 					callback : ()=>{
-						uni.navigateTo({
+						uni.reLaunch({
 							url: '../login/index'
 						})
 					}
 				})
+			},
+			loginout(){
+				let _this = this;
+				this.showModule = true
 			}
 		}
 	}

@@ -3,8 +3,8 @@
 		
 		<!--screen-->
 		<view class="tui-header-screen">
-			<uni-nav-bar v-if="jibie == 1" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
-			<uni-nav-bar v-else-if="jibie == 4" status-bar right-text="问题反馈" @clickRight="toCreateQuestion"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-if="jibie == 1 && authorizeMenu.shangchuanxiada.faburenwu" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-else-if="jibie == 4 && authorizeMenu.shangchuanxiada.wentifankui" status-bar right-text="问题反馈" @clickRight="toCreateQuestion"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			<uni-nav-bar v-else status-bar color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			
 			<view class="tui-screen-top">
@@ -252,7 +252,8 @@ export default {
 			loadding: false,
 			pullUpOn: true,
 			listUrl: '',
-			jibie: ''
+			jibie: '',
+			authorizeMenu: {}
 		};
 	},
 	mounted: function(options) {
@@ -287,6 +288,11 @@ export default {
 		}
 		console.log(userinfo)
 		console.log(this.jibie)
+		
+		let authorizeMenu = uni.getStorageSync("authorizeMenu");
+		console.log(authorizeMenu)
+		this.authorizeMenu = authorizeMenu
+		
 		let date = new Date()
 		let month = date.getMonth() + 1
 		if(month < 10){
@@ -565,26 +571,29 @@ export default {
 		},
 		getListData(){
 			let _this = this;
+			let queryJson = {
+				XiangCode: _this.userinfo.XiangCode || '',
+				CunCode: _this.userinfo.CunCode || '',
+				LianHuYuanID: '',
+				beginTime: _this.beginTime,
+				endTime: _this.endTime,
+				Title: "",
+				JinjiCode: _this.degreeId,
+				TypeCode: _this.classifyId,
+				StatusCode: _this.statusId,
+				leixing: _this.typeId,
+				jibie: _this.jibie
+			}
+			if(_this.jibie == 4){
+				queryJson.LianHuYuanID = _this.userinfo.UserId;
+			}
 			let resData = {
-				"queryJson": decodeURIComponent(JSON.stringify({
-					XiangCode: _this.userinfo.XiangCode || '',
-					CunCode: _this.userinfo.CunCode || '',
-					LianHuYuanID: _this.userinfo.LianHuYuanID || '',
-					beginTime: _this.beginTime,
-					endTime: _this.endTime,
-					Title: "",
-					JinjiCode: _this.degreeId,
-					TypeCode: _this.classifyId,
-					StatusCode: _this.statusId,
-					leixing: _this.typeId,
-					jibie: _this.jibie
-				})),
+				"queryJson": decodeURIComponent(JSON.stringify(queryJson)),
 				"rows": _this.pageSize,
 				"page": _this.pageIndex,
 				"sidx": "CreateDate",
 				"sord": "desc"
 			}
-			console.log(resData)
 			this.tui.request('Siji/AFP_WenTi/GetUpDownList',"GET",resData).then((res)=>{
 				res.resultdata.rows.map(item=>{
 					if(item.leixing == 'wenti'){

@@ -55,6 +55,8 @@
 				this.$refs.build.update()
 			}else if(this.PageCur == 'my'){
 				this.$refs.my.update()
+			}else if(this.PageCur == 'updown'){
+				this.$refs.updown.refresh()
 			}
 		},
 		mounted() {
@@ -81,7 +83,7 @@
 					this.PageCur = 'home'
 				}else if(this.jibie == 2 && this.authorizeMenu.aizhinengdanganku){
 					this.PageCur = 'archives'
-				}else if((this.jibie == 1 || this.jibie == 2) && this.authorizeMenu.shangchuanxiada){
+				}else if(this.authorizeMenu.shangchuanxiada){
 					this.PageCur = 'updown'
 				}else if(this.jibie == 2 && this.authorizeMenu.dangjian){
 					this.PageCur = 'build'

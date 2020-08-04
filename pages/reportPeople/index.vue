@@ -239,7 +239,7 @@
 				}
 				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/Siji/AFP_RenWuCunHuiBao/SaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("/Siji/AFP_RenWuLianHuYuanHuiBao/SaveForm",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){

@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<uni-nav-bar v-if="jibie == 3" status-bar @clickLeft="pageBack" right-text="创建会议" @clickRight="toCreateTask" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 3 && authorizeMenu.dangjian.xinjianzhibuhuiyi" status-bar @clickLeft="pageBack" right-text="创建会议" @clickRight="toCreateTask" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
 		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="党支部会议"></uni-nav-bar>
 	
 		<view class="title-wrap">
@@ -82,7 +82,8 @@
 				pageIndex: 1,
 				pageSize: 5,
 				userinfo: {},
-				jibie: 0
+				jibie: 0,
+				authorizeMenu: {}
 			}
 		},
 		
@@ -105,6 +106,9 @@
 				}
 			}
 			console.log(userinfo)
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		mounted(){
 		},
@@ -133,7 +137,7 @@
 						ConType: '0'
 					})),
 					"rows": '5',
-					"page": '1',
+					"page": _this.pageIndex,
 					"sidx": "CreateDate",
 					"sord": "desc"
 				}

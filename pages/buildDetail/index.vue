@@ -80,9 +80,11 @@
 				}
 			}
 		},
-		mounted(){
+		onShow() {
 			this.getList();
 			this.getDetail();
+		},
+		mounted(){
 		},
 		methods: {
 			toReport(){
