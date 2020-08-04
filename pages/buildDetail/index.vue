@@ -106,9 +106,12 @@
 			},
 			getList(){
 				let _this = this;
-				this.tui.request("/Siji/AFP_DangjianRenwuHuibao/GetListJson", "get",{
-					RenwuID: this.RenwuID
-				}).then((res)=>{
+				let resData = {
+					"queryJson": decodeURIComponent(JSON.stringify({
+						RenwuID: this.RenwuID
+					}))
+				}
+				this.tui.request("/Siji/AFP_DangjianRenwuHuibao/GetListJson", "get",resData).then((res)=>{
 					this.list = res || []
 					console.log(res)
 				})
