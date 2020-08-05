@@ -92,7 +92,7 @@
 			</view>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport"  v-if="(detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+			<view class="report-btn" @click="toReport"  v-if="canReport && (detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
 			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
@@ -121,7 +121,8 @@
 				recordLen: 0,
 				showReportBtn: false,
 				authorizeMenu: {},
-				huibaoData: []
+				huibaoData: [],
+				canReport: false
 			}
 		},
 		onLoad(opt) {
@@ -329,8 +330,13 @@
 					keyValue: this.id
 				}).then((res)=>{
 					console.log(res)
+					if(res.renWuCun.length && res.renWuCun.every(item=>{
+							return item.cunData.StatusCode == 4
+						})){
+						_this.canReport = true
+					}
 					if(_this.jibie == 2 && res.xiangRenWuData.StatusCode != 4 && res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode && _this.authorizeMenu.shangchuanxiada){
-						if((_this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu) || (_this.detailData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu)){
+						if((_this.canReport && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu) || (_this.detailData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu)){
 							_this.showReportBtn = true
 						}
 					}

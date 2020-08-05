@@ -95,6 +95,8 @@
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
 			<view class="report-btn" @click="toReport" v-if="canReport && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+			<!-- 完成后还可以汇报用上面，不可以汇报用下面 -->
+			<!-- <view class="report-btn" @click="toReport" v-if="canReport && (detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view> -->
 			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
