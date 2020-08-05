@@ -81,7 +81,7 @@ export default {
 				'folder': self.userinfo.UserId
 			}
 			uni.uploadFile({
-				url: 'http://116.131.134.198:9001/PublicInfoManage/ResourceFile/UploadFolderFile',
+				url: 'http://110.166.84.163:8002//PublicInfoManage/ResourceFile/UploadFolderFile',
 				filePath: res.tempFilePath,
 				name: 'File',
 				formData: formData,

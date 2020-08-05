@@ -64,7 +64,7 @@
 		components: {uniNavBar},
 		data() {
 			return {
-				action: 'http://116.131.134.198:9001/PublicInfoManage/ResourceFile/UploadFolderFile',
+				action: 'http://110.166.84.163:8002/PublicInfoManage/ResourceFile/UploadFolderFile',
 				array: ['中国', '美国', '巴西', '日本'],
 				index: 0,
 				xiangList: [],

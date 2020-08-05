@@ -28,59 +28,42 @@
 				{{detailData.Neirong}}
 			</view>
 		</view>
-		<view class="report-content">
+		<view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
-			<view class="group">
-				<text class="group-label">汇报时间</text>
-				<text class="group-value">{{detailData.CreateDate}}</text>
-			</view>
-			<view class="group">
-				<text class="group-label">汇报人</text>
-				<text class="group-value">{{detailData.CreateUserName}}</text>
-			</view>
-			<view class="group" v-if="!showReport">
-				<text class="group-label">完成状态</text>
-				<text class="group-value light-hight">{{detailData.StatusName}}</text>
-			</view>
-			<view class="group" v-else>
-				<text class="group-label">完成状态</text>
-				<radio-group class="radio-group group-value" name="chengdu">
-					<label class="tui-radio">
-						<radio value="1" color="#5677fc" />未完结
-					</label>
-					<label class="tui-radio">
-						<radio value="2" color="#5677fc" checked/>已完结
-					</label>
-				</radio-group>
-			</view>
-			
-			<view class="group" v-if="!showReport">
-				<text class="group-label">汇报内容</text>
-				<text class="group-value">{{detailData.Neirong}}</text>
-			</view>
-			<view class="group" v-if="showReport">
-				<text class="group-label">汇报内容</text>
-				<view class="record-audios">
-					<view class="audio-item-wrap" v-for="(audio,index) in audios">
-						<view class="audio-item" :data-index="index" @click="playRecordAudio">
-							<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-							<text class="audio-len">{{audio.len}}</text>
-						</view>
-						<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
-							<tui-icon name="delete" :size="18" ></tui-icon>
+			<block v-for="huibao in huibaoData">
+				<view class="group">
+					<text class="group-label">汇报时间</text>
+					<text class="group-value">{{detailData.CreateDate}}</text>
+				</view>
+				<view class="group">
+					<text class="group-label">汇报人</text>
+					<text class="group-value">{{detailData.CreateUserName}}</text>
+				</view>
+				<view class="group">
+					<text class="group-label">完成状态</text>
+					<text class="group-value light-hight">{{detailData.StatusName}}</text>
+				</view>
+				
+				<view class="group">
+					<text class="group-label">汇报内容</text>
+					<text class="group-value">{{detailData.Neirong}}</text>
+				</view>
+				<view class="group">
+					<text class="group-label">汇报内容</text>
+					<view class="record-audios">
+						<view class="audio-item-wrap" v-for="(audio,index) in audios">
+							<view class="audio-item" :data-index="index" @click="playRecordAudio">
+								<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+								<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+								<text class="audio-len">{{audio.len}}</text>
+							</view>
+							<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
+								<tui-icon name="delete" :size="18" ></tui-icon>
+							</view>
 						</view>
 					</view>
 				</view>
-			</view>
-			<view class="textarea-wrap" v-if="showReport">
-				<textarea placeholder-style="color:#999" placeholder="请输入汇报内容"/>
-			</view>
-			<view class="tui-btn-box flex" v-if="showReport">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
-				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" @click="submit">提交</button>
-			</view>
-			
+			</block>
 		</view>
 		<view class="towns-list" v-if="!showReport">
 			<view class="towns-title">
@@ -109,7 +92,7 @@
 			</view>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport"  v-if="authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+			<view class="report-btn" @click="toReport"  v-if="(detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
 			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
@@ -137,7 +120,8 @@
 				recordBeginTime: '',
 				recordLen: 0,
 				showReportBtn: false,
-				authorizeMenu: {}
+				authorizeMenu: {},
+				huibaoData: []
 			}
 		},
 		onLoad(opt) {
@@ -362,6 +346,7 @@
 						res.xiangRenWuData.jinjiClass = 'danger'
 					}
 					_this.detailData = res.xiangRenWuData;
+					_this.huibaoData = res.xiangHuiBaoData || [];
 					res.renWuCun.map(item=>{
 						let audioList = item.audioList.split(";");
 						let audios = []

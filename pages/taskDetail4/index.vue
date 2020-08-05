@@ -28,44 +28,34 @@
 				{{detailData.Neirong}}
 			</view>
 		</view>
-		<view class="report-content">
+		<view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.CunName}}任务汇报</view>
-			<view class="group">
-				<text class="group-label">汇报时间</text>
-				<text class="group-value">{{detailData.CreateDate}}</text>
-			</view>
-			<view class="group">
-				<text class="group-label">汇报人</text>
-				<text class="group-value">{{detailData.CreateUserName}}</text>
-			</view>
-			<view class="group">
-				<text class="group-label">完成状态</text>
-				<text class="group-value light-hight">{{detailData.StatusName}}</text>
-			</view>
-		</view>
-		<view class="towns-list" v-if="!showReport">
-			<view class="towns-title">
-				{{detailData.XiangName}}下发语音
-			</view>
-			<view class="towns-audios">
-				<view class="audio-item" v-for="(audio,index) in xiangAudios" :data-index="index" @click.stop="playAudio">
-					<image v-if="currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-					<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-					<text class="audio-len">{{audio.len}}</text>
+			<block v-for="(huibao,huibaoIndex) in huibaoData">
+				<view class="group">
+					<text class="group-label">汇报时间</text>
+					<text class="group-value">{{huibao.CreateDate}}</text>
 				</view>
-			</view>
-		</view>
-		<view class="towns-list" v-if="!showReport">
-			<view class="towns-title">
-				{{detailData.CunName}}下发语音
-			</view>
-			<view class="towns-audios">
-				<view class="audio-item" v-for="(audio,index) in cunAudios" :data-index="index" @click.stop="playCunAudio">
-					<image v-if="currentVillage == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-					<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-					<text class="audio-len">{{audio.len}}</text>
+				<view class="group">
+					<text class="group-label">汇报人</text>
+					<text class="group-value">{{huibao.CreateUserName}}</text>
 				</view>
-			</view>
+				<view class="group">
+					<text class="group-label">完成状态</text>
+					<text class="group-value light-hight">{{huibao.StatusName}}</text>
+				</view>
+				<view class="group">
+					<text class="group-label">汇报内容</text>
+					<view class="record-audios">
+						<view class="audio-item-wrap" v-for="(audio,index) in huibao.audios">
+							<view class="audio-item" :data-index="index" @click="playAudio(huibaoIndex,index)">
+								<image v-if="currentIndex == huibaoIndex && currentAudioIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+								<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+								<text class="audio-len">{{audio.len}}</text>
+							</view>
+						</view>
+					</view>
+				</view>
+			</block>
 		</view>
 		<view class="bottom-fix" v-if="showReportBtn && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">
 			<view class="report-btn" @click="toReport">汇报</view>
@@ -86,7 +76,7 @@
 				detailData: {},
 				id: '',
 				showReport: false, //是否显示提交汇报信息
-				currentVillage: -1,
+				currentIndex: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
 				renWuCun: [],
@@ -96,7 +86,8 @@
 				recordBeginTime: '',
 				recordLen: 0,
 				showReportBtn: false,
-				authorizeMenu: {}
+				authorizeMenu: {},
+				huibaoData: []
 			}
 		},
 		onLoad(opt) {
@@ -173,8 +164,10 @@
 					this.innerAudioContext.stop();
 				}
 			},
-			playRecordAudio(e){
-				let index = e.currentTarget.dataset.index;
+			playRecordAudio(idx,index){
+				console.log(idx,index)
+				return
+				//let index = e.currentTarget.dataset.index;
 				let audios = this.audios;
 				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
 					this.innerAudioContext.stop();
@@ -228,37 +221,37 @@
 				if(this.innerAudioContext.stop){
 					this.innerAudioContext.stop();
 				}
-				this.currentVillage = -1;
+				this.currentIndex = -1;
 				this.currentAudioIndex = -1;
 				this.recordIndex = -1;
 				uni.hideLoading();
 			},
-			playAudio(e){
-				this.currentVillage = -1;
-				let index = e.currentTarget.dataset.index;
+			playAudio(idx,index){
+				let currentIndex = this.currentIndex;
 				let currentAudioIndex = this.currentAudioIndex;
-				let list = this.xiangAudios;
+				let list = this.huibaoData;
 				let src;
 				//如果当前正在播放
-				if(this.innerAudioContext && !this.innerAudioContext.paused && index == currentAudioIndex){
+				if(this.innerAudioContext && !this.innerAudioContext.paused && idx == currentIndex && index == currentAudioIndex){
 					//如果点击的是当前在播放的，暂停播放
 					this.innerAudioContext.stop();
 					this.currentAudioIndex = -1;
 					//设置字段isPlay = flase
-					list[index].isPlay = false;
+					list[idx]['audios'][index].isPlay = false;
 					return
 				}else{
-					if(currentAudioIndex != -1){
-						list[index].isPlay = false;
+					if(currentIndex != -1 && currentAudioIndex != -1){
+						list[currentIndex]['audios'][currentAudioIndex].isPlay = false;
 					}
-					list[index].isPlay = true;
+					list[idx]['audios'][index].isPlay = true;
+					this.currentIndex = idx;
 					this.currentAudioIndex = index;
 					if(this.innerAudioContext){
 						this.innerAudioContext.destroy();
 						this.innerAudioContext = null
 					}
 					this.initAudioContext()
-					src = list[index].src;
+					src = list[idx]['audios'][index].src;
 					if(!this.innerAudioContext){
 						this.initAudioContext()
 					}
@@ -274,23 +267,23 @@
 			playCunAudio(e){
 				this.currentAudioIndex = -1;
 				let index = e.currentTarget.dataset.index;
-				let currentVillage = this.currentVillage;
+				let currentIndex = this.currentIndex;
 				let list = this.cunAudios;
 				let src;
 				//如果当前正在播放
-				if(this.innerAudioContext && !this.innerAudioContext.paused && index == currentVillage){
+				if(this.innerAudioContext && !this.innerAudioContext.paused && index == currentIndex){
 					//如果点击的是当前在播放的，暂停播放
 					this.innerAudioContext.stop();
-					this.currentVillage = -1;
+					this.currentIndex = -1;
 					//设置字段isPlay = flase
 					list[index].isPlay = false;
 					return
 				}else{
-					if(currentVillage != -1){
+					if(currentIndex != -1){
 						list[index].isPlay = false;
 					}
 					list[index].isPlay = true;
-					this.currentVillage = index;
+					this.currentIndex = index;
 					if(this.innerAudioContext){
 						this.innerAudioContext.destroy();
 						this.innerAudioContext = null
@@ -334,34 +327,27 @@
 				}).then((res)=>{
 					console.log(res)
 					try{
-						if(_this.jibie == 4 &&  res.lianHuYuanRenWuData.CunCode == _this.userinfo.CunCode){
+						if(_this.jibie == 4 &&  res.lianHuYuanRenWuData.CunCode == _this.userinfo.CunCode && res.lianHuYuanRenWuData.StatusCode != 4){
 							_this.showReportBtn = true
 						}
 						_this.detailData = res.lianHuYuanRenWuData
+						res.lianHuYuanHuiBaoData.map(item=>{
+							let HuibaoRadioUrl = item.HuibaoRadioUrl.split(",")
+							let audios = []
+							HuibaoRadioUrl.map(radio=>{
+								let url = radio
+								if(url.indexOf('http') == -1){
+									radio = 'http://60.6.198.123:8003/' + url
+								}
+								audios.push({
+									src: url
+								})
+							})
+							item.audios = audios;
+						})
+						_this.huibaoData = res.lianHuYuanHuiBaoData
 						let jinjicode = res.lianHuYuanRenWuData.JinjiCode;
 						let currentXiang,currentCun;
-						let xiangAudios = [];
-						let cunAudios = []
-						res.xiangXiaFaData.map(item=>{
-							let url = item.XiaFaRadioUrl
-							if(url.indexOf('http') == -1){
-								url = 'http://60.6.198.123:8003/' + url
-							}
-							xiangAudios.push({
-								src: url
-							})
-						})
-						res.cunXiaFaData.map(item=>{
-							let url = item.XiaFaRadioUrl
-							if(url.indexOf('http') == -1){
-								url = 'http://60.6.198.123:8003/' + url
-							}
-							cunAudios.push({
-								src: url
-							})
-						})
-						_this.xiangAudios = xiangAudios || [];
-						_this.cunAudios = cunAudios || [];
 					}catch(e){
 						console.log(e)
 						//TODO handle the exception

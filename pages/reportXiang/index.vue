@@ -93,6 +93,7 @@
 					// });
 					return
 				}
+				console.log(_this.selectId,_this.ItemName)
 				let entity = {
 					"RenwuID": _this.RenwuID,
 					"XiangCode": _this.XiangCode,

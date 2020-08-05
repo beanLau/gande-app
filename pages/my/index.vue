@@ -61,7 +61,7 @@
 						<view class="tui-list-cell_name">修改密码</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="detail" :arrow="true">
+				<tui-list-cell @click="toUpdate" :arrow="true">
 					<view class="tui-item-box">
 						<tui-icon name="search" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">检测更新</view>
@@ -135,6 +135,28 @@
 					_this.img = `${res.HeadIcon}?time=${new Date().getTime()}`
 				})
 			},
+			toUpdate(){
+				let _this = this;
+				this.tui.request('/Login/CheckVersion',"GET",{
+					version: '1.0.0'
+				}).then((res)=>{
+					console.log(res.resultdata.status)
+					if(res.resultdata.status == 0){
+						uni.downloadFile({
+							header: {
+								"token": uni.getStorageSync("token")
+							},
+							url: res.resultdata.url,
+							success: (res) => {
+								if (res.statusCode === 200) {
+									console.log('下载成功');
+								}
+							}
+						})
+					}
+					console.log(res)
+				})
+			},	
 			toInfo(){
 				uni.navigateTo({
 					url: '../myinfo/index'

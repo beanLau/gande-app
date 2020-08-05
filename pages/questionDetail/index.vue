@@ -223,7 +223,7 @@
 						YuanShiRadioUrl = YuanShiRadioUrl.split(';');
 						YuanShiRadioUrl.map(item=>{
 							if(item.indexOf('http') == -1){
-								item = 'http://116.131.134.198:9001/' + item
+								item = 'http://110.166.84.163:8002/' + item
 							}
 							audios.push({
 								src: item
