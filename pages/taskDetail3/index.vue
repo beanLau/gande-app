@@ -23,12 +23,23 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			
-			<view class="item-desc">
-				{{detailData.Neirong}}
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
+		</view>
+		<view class="report-content">
+			<view class="report-title">{{detailData.XiangName}}语音记录</view>
+			<view class="group">
+				<view class="record-audios">
+					<view class="audio-item-wrap" v-for="(audio,index) in audios">
+						<view class="audio-item" :data-index="index" @click="playRecordAudio(index)">
+							<image v-if="xiafaIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+							<text class="audio-len">{{audio.len}}</text>
+						</view>
+					</view>
+				</view>
 			</view>
 		</view>
-		<view class="report-content" v-if="huibaoData.length > 0">
+		<!-- <view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.CunName}}任务汇报</view>
 			<block v-for="huibao in huibaoData">
 				<view class="group">
@@ -64,16 +75,16 @@
 					</view>
 				</view>
 			</block>
-		</view>
-		<view class="towns-list" v-if="!showReport">
+		</view> -->
+		<view class="towns-list">
 			<view class="towns-title">
 				完成情况
 			</view>
 			<view class="towns-item" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
 					<text class="towns-name">{{item.lianHuYuanRenwuData.LianHuYuanName}}</text>
-					<!-- <text class="towns-status">{{item.StatusName}}</text> -->
-					<text class="towns-btn">详情</text>
+					<text class="towns-status">{{item.lianHuYuanRenwuData.StatusName}}</text>
+					<!-- <text class="towns-btn">详情</text> -->
 				</view>
 				<view class="towns-audios">
 					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
@@ -83,8 +94,8 @@
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.lianHuYuanRenwuData.CreateDate}}</text>
-					<text class="towns-person">汇报人 {{item.lianHuYuanRenwuData.CreateUserName}}</text>
+					<text class="towns-time">汇报时间 {{item.lianHuYuanRenwuData.CompDate}}</text>
+					<text class="towns-person">汇报人 {{item.lianHuYuanRenwuData.LianHuYuanName}}</text>
 				</view>
 			</view>
 			
@@ -93,11 +104,11 @@
 				<text class="nodata-tip">暂无数据</text>
 			</view>
 		</view>
-		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport" v-if="canReport && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
+		<view class="bottom-fix" v-if="showReport || showIssue">
+			<view class="report-btn" @click="toReport" v-if="showReport">汇报</view>
 			<!-- 完成后还可以汇报用上面，不可以汇报用下面 -->
 			<!-- <view class="report-btn" @click="toReport" v-if="canReport && (detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view> -->
-			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
+			<view class="send-btn" @click="toIssue" v-if="showIssue">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
@@ -114,19 +125,21 @@
 			return {
 				detailData: {},
 				id: '',
-				showReport: false, //是否显示提交汇报信息
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
 				renWuCun: [],
 				audios: [],
 				recordIndex: -1,
+				xiafaIndex: -1,
 				recordBeginTime: '',
 				recordLen: 0,
 				showReportBtn: false,
 				authorizeMenu: {},
 				huibaoData: [],
-				canReport: false
+				canReport: false,
+				showReport: false,
+				showIssue: false
 			}
 		},
 		onLoad(opt) {
@@ -203,14 +216,14 @@
 					this.innerAudioContext.stop();
 				}
 			},
-			playRecordAudio(e){
-				let index = e.currentTarget.dataset.index;
+			playRecordAudio(index){
+				console.log(index)
 				let audios = this.audios;
-				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.xiafaIndex == index){
 					this.innerAudioContext.stop();
 					return
 				}
-				this.recordIndex = index
+				this.xiafaIndex = index
 				if(this.innerAudioContext){
 					this.innerAudioContext.destroy();
 					this.innerAudioContext = null
@@ -261,6 +274,7 @@
 				this.currentVillage = -1;
 				this.currentAudioIndex = -1;
 				this.recordIndex = -1;
+				this.xiafaIndex = -1;
 				uni.hideLoading();
 			},
 			playAudio(e){
@@ -341,9 +355,17 @@
 							})){
 							_this.canReport = true
 						}
-						if(_this.jibie == 3 &&  res.cunRenWuData.CunCode == _this.userinfo.CunCode && _this.authorizeMenu.shangchuanxiada){
-							if((_this.authorizeMenu.shangchuanxiada.shangbaorenwu && _this.canReport) || (res.cunRenWuData.StatusCode == 1  && _this.authorizeMenu.shangchuanxiada.xiafarenwu)){
-								_this.showReportBtn = true
+						//当前用户
+						if(_this.jibie == 3 && res.cunRenWuData.CunCode == _this.userinfo.CunCode){
+							if(_this.canReport && res.cunRenWuData.StatusCode != 4 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
+								_this.showReport = true;
+							}else{
+								_this.showReport = false;
+							}
+							if(res.cunRenWuData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu){
+								_this.showIssue = true
+							}else{
+								_this.showIssue = false;
 							}
 						}
 						let jinjicode = res.cunRenWuData.JinjiCode
@@ -359,7 +381,27 @@
 						}
 						_this.detailData = res.cunRenWuData;
 						_this.huibaoData = res.cunHuiBaoData || [];
+						let audios = [];
+						res.xiangXiaFaData.map(item=>{
+							let audioList = item.XiaFaRadioUrl.split(",");
+							audioList.map((audio,index)=>{
+								if(audio.indexOf('http') == -1){
+									let url = 'http://110.166.84.163:8002/' + audio
+									audios.push({
+										src: url
+									})
+								}else{
+									audios.push({
+										src: audio
+									})
+								}
+							})
+						})
+						_this.audios = audios
 						res.renWuLianHuYuanData.map(item=>{
+							if(!item.audioList){
+								return
+							}
 							let audioList = item.audioList.split(";");
 							let audios = []
 							audioList.map((audio,index)=>{
@@ -388,6 +430,8 @@
 
 <style>
 .page-content{
+	height: 100vh;
+	z-index: 10;
 	background: #FAFAFA;
 	padding-bottom: 100rpx;
 }

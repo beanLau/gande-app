@@ -136,18 +136,16 @@
 							<tui-tag margin="0 15upx 0 0" padding="8rpx" :type="item.leixingType" size="24rpx">{{item.leixingName}}</tui-tag>
 							<view>{{item.title}}</view>
 						</view>
-						<view class="item-desc">
-							具体工作内容：{{item.neirong}}
-						</view>
+						<u-parse class="item-desc" :html="item.neirong"></u-parse>
 						<view class="bottom-wrap">
 							<view class="bottom-left">
 								<tui-tag padding="8rpx" size="24rpx" :type="item.jinjiClass" v-if="item.jinjiname">
 									<!-- <tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon> -->
-									<text>{{item.jinjiname}}</text>
+									<text>{{item.jinjiname || ''}}</text>
 								</tui-tag>
-								<tui-tag v-if="item.typename" margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{item.typename}}</tui-tag>
+								<tui-tag v-if="item.typename" margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{item.typename || ''}}</tui-tag>
 								<view class="bottom-time">
-									{{item.createusername + '  '}}  {{item.createdate}}
+									{{(item.createusername || '') + '  '}}  {{item.createdate}}
 								</view>
 							</view>
 							<view class="item-status">

@@ -61,7 +61,7 @@
 						<view class="tui-list-cell_name">修改密码</view>
 					</view>
 				</tui-list-cell>
-				<tui-list-cell @click="toUpdate" :arrow="true">
+				<tui-list-cell @click="checkUpdate" :arrow="true">
 					<view class="tui-item-box">
 						<tui-icon name="search" :size="24" color="#2E2E2E"></tui-icon>
 						<view class="tui-list-cell_name">检测更新</view>
@@ -76,6 +76,8 @@
 			</tui-list-view>
 		</view>
 		<u-modal v-model="showModule" :show-cancel-button="true" content="确认退出登录吗?" cancel-text="取消" @confirm="confirm"></u-modal>
+		<u-modal v-model="showUpdate" :show-cancel-button="true" content="检测到新版本是否下载?" cancel-text="取消" @confirm="toUpdate"></u-modal>
+		
 		<u-toast ref="uToast" />
 	</view>
 </template>
@@ -91,7 +93,9 @@
 				img: '',
 				jibie: 0,
 				showModule: false,
-				authorizeMenu: {}
+				showUpdate: false,
+				authorizeMenu: {},
+				apkUrl: ''
 			};
 		},
 		onLoad() {
@@ -135,28 +139,22 @@
 					_this.img = `${res.HeadIcon}?time=${new Date().getTime()}`
 				})
 			},
-			toUpdate(){
+			checkUpdate(){
 				let _this = this;
+				console.log(plus.runtime.version)
 				this.tui.request('/Login/CheckVersion',"GET",{
-					version: '1.0.0'
+					version: plus.runtime.version
 				}).then((res)=>{
-					console.log(res.resultdata.status)
-					if(res.resultdata.status == 0){
-						uni.downloadFile({
-							header: {
-								"token": uni.getStorageSync("token")
-							},
-							url: res.resultdata.url,
-							success: (res) => {
-								if (res.statusCode === 200) {
-									console.log('下载成功');
-								}
-							}
-						})
-					}
 					console.log(res)
+					if(res.resultdata.status == 1){
+						_this.apkUrl = res.resultdata.url
+						_this.showUpdate = true
+					}
 				})
-			},	
+			},
+			toUpdate(){
+				plus.runtime.openURL(this.apkUrl);
+			},
 			toInfo(){
 				uni.navigateTo({
 					url: '../myinfo/index'

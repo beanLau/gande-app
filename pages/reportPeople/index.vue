@@ -92,7 +92,20 @@
 				this.userinfo = userinfo
 			}
 		},
+		onUnload: function (option) {
+			uni.hideLoading();
+			this.playEnd();
+		},
 		methods: {
+			playEnd(){
+				if(this.innerAudioContext.stop){
+					this.innerAudioContext.stop();
+				}
+				this.currentVillage = -1;
+				this.currentAudioIndex = -1;
+				this.recordIndex = -1;
+				uni.hideLoading();
+			},
 			deleteRecordAudio(e){
 				let index = e.currentTarget.dataset.index;
 				let audios = this.audios;

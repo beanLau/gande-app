@@ -23,9 +23,20 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			
-			<view class="item-desc">
-				{{detailData.Neirong}}
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
+		</view>
+		<view class="report-content">
+			<view class="report-title">{{detailData.CunName}}语音记录</view>
+			<view class="group">
+				<view class="record-audios">
+					<view class="audio-item-wrap" v-for="(audio,index) in audios">
+						<view class="audio-item" :data-index="index" @click="playRecordAudio(index)">
+							<image v-if="xiafaIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
+							<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
+							<text class="audio-len">{{audio.len}}</text>
+						</view>
+					</view>
+				</view>
 			</view>
 		</view>
 		<view class="report-content" v-if="huibaoData.length > 0">
@@ -87,7 +98,8 @@
 				recordLen: 0,
 				showReportBtn: false,
 				authorizeMenu: {},
-				huibaoData: []
+				huibaoData: [],
+				xiafaIndex: -1
 			}
 		},
 		onLoad(opt) {
@@ -164,16 +176,14 @@
 					this.innerAudioContext.stop();
 				}
 			},
-			playRecordAudio(idx,index){
-				console.log(idx,index)
-				return
+			playRecordAudio(index){
 				//let index = e.currentTarget.dataset.index;
 				let audios = this.audios;
-				if(this.innerAudioContext && !this.innerAudioContext.paused && this.recordIndex == index){
+				if(this.innerAudioContext && !this.innerAudioContext.paused && this.xiafaIndex == index){
 					this.innerAudioContext.stop();
 					return
 				}
-				this.recordIndex = index
+				this.xiafaIndex = index
 				if(this.innerAudioContext){
 					this.innerAudioContext.destroy();
 					this.innerAudioContext = null
@@ -224,6 +234,7 @@
 				this.currentIndex = -1;
 				this.currentAudioIndex = -1;
 				this.recordIndex = -1;
+				this.xiafaIndex = -1;
 				uni.hideLoading();
 			},
 			playAudio(idx,index){
@@ -329,8 +340,27 @@
 					try{
 						if(_this.jibie == 4 &&  res.lianHuYuanRenWuData.CunCode == _this.userinfo.CunCode && res.lianHuYuanRenWuData.StatusCode != 4){
 							_this.showReportBtn = true
+						}else{
+							_this.showReportBtn = false
 						}
 						_this.detailData = res.lianHuYuanRenWuData
+						let audios = [];
+						res.cunXiaFaData.map(item=>{
+							let audioList = item.XiaFaRadioUrl.split(",");
+							audioList.map((audio,index)=>{
+								if(audio.indexOf('http') == -1){
+									let url = 'http://110.166.84.163:8002/' + audio
+									audios.push({
+										src: url
+									})
+								}else{
+									audios.push({
+										src: audio
+									})
+								}
+							})
+						})
+						_this.audios = audios
 						res.lianHuYuanHuiBaoData.map(item=>{
 							let HuibaoRadioUrl = item.HuibaoRadioUrl.split(",")
 							let audios = []

@@ -23,12 +23,9 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			
-			<view class="item-desc">
-				{{detailData.Neirong}}
-			</view>
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
-		<view class="report-content" v-if="huibaoData.length > 0">
+		<!-- <view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
 			<block v-for="huibao in huibaoData">
 				<view class="group">
@@ -64,15 +61,16 @@
 					</view>
 				</view>
 			</block>
-		</view>
-		<view class="towns-list" v-if="!showReport">
+		</view> -->
+		<view class="towns-list">
 			<view class="towns-title">
 				完成情况
 			</view>
 			<view class="towns-item" v-if="renWuCun.length > 0" v-for="(item,idx) in renWuCun" :key="item.name" @click="toDetail(item)">
 				<view class="towns-top">
 					<text class="towns-name">{{item.cunData.CunName}}</text>
-					<text class="towns-btn">详情</text>
+					<text class="towns-status">{{item.cunData.StatusName}}</text>
+					<!-- <text class="towns-btn">详情</text> -->
 				</view>
 				<view class="towns-audios">
 					<view class="audio-item" v-for="(audio,index) in item.audios" :data-idx="idx" :data-index="index" @click.stop="playAudio">
@@ -82,8 +80,8 @@
 					</view>
 				</view>
 				<view class="towns-bottom">
-					<text class="towns-time">汇报时间 {{item.cunData.CreateDate}}</text>
-					<text class="towns-person">汇报人 {{item.cunData.CreateUserName}}</text>
+					<text class="towns-time">汇报时间 {{item.cunData.CompDate || ''}}</text>
+					<text class="towns-person">汇报人 {{item.cunData.CunName}}</text>
 				</view>
 			</view>
 			<view v-if="renWuCun && renWuCun.length == 0" class="nodata-wrap flex">
@@ -91,9 +89,9 @@
 				<text class="nodata-tip">暂无数据</text>
 			</view>
 		</view>
-		<view class="bottom-fix" v-if="showReportBtn">
-			<view class="report-btn" @click="toReport"  v-if="canReport && (detailData.StatusCode == 2 || detailData.StatusCode == 3) && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.shangbaorenwu">汇报</view>
-			<view class="send-btn" @click="toIssue" v-if="detailData.StatusCode == 1 && authorizeMenu.shangchuanxiada && authorizeMenu.shangchuanxiada.xiafarenwu">下发</view>
+		<view class="bottom-fix" v-if="showReport || showIssue">
+			<view class="report-btn" @click="toReport"  v-if="showReport">汇报</view>
+			<view class="send-btn" @click="toIssue" v-if="showIssue">下发</view>
 		</view>
 		<!-- <view class="bottom-fix" v-if="showReport">
 			<view class="report-btn" @touchend="endRecord" @touchstart="beginRecord">长按开始语音汇报</view>
@@ -110,7 +108,6 @@
 			return {
 				detailData: {},
 				id: '',
-				showReport: false, //是否显示提交汇报信息
 				currentVillage: -1,
 				currentAudioIndex: -1,
 				hasPlay: false, //当前是否有音频在播放
@@ -122,7 +119,9 @@
 				showReportBtn: false,
 				authorizeMenu: {},
 				huibaoData: [],
-				canReport: false
+				canReport: false,
+				showReport: false,
+				showIssue: false
 			}
 		},
 		onLoad(opt) {
@@ -335,9 +334,17 @@
 						})){
 						_this.canReport = true
 					}
-					if(_this.jibie == 2 && res.xiangRenWuData.StatusCode != 4 && res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode && _this.authorizeMenu.shangchuanxiada){
-						if((_this.canReport && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu) || (_this.detailData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu)){
-							_this.showReportBtn = true
+					//当前用户
+					if(_this.jibie == 2 && res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
+						if(_this.canReport && res.xiangRenWuData.StatusCode != 4 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
+							_this.showReport = true;
+						}else{
+							_this.showReport = false;
+						}
+						if(res.xiangRenWuData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu){
+							_this.showIssue = true
+						}else{
+							_this.showIssue = false;
 						}
 					}
 					let jinjicode = res.xiangRenWuData.JinjiCode
@@ -354,7 +361,10 @@
 					_this.detailData = res.xiangRenWuData;
 					_this.huibaoData = res.xiangHuiBaoData || [];
 					res.renWuCun.map(item=>{
-						let audioList = item.audioList.split(";");
+						if(!item.audioList){
+							return
+						}
+						let audioList = item.audioList.split(",");
 						let audios = []
 						audioList.map((audio,index)=>{
 							if(audio.indexOf('http') == -1){
@@ -367,6 +377,7 @@
 						})
 						item.audios = audios
 					})
+					console.log(res.renWuCun)
 					_this.renWuCun = res.renWuCun || [];
 					
 				})

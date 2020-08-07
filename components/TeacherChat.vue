@@ -20,6 +20,7 @@
 				</view>
             </div>
         </div>
+		<u-toast ref="uToast" />
     </div>
 </template>
 
@@ -46,7 +47,8 @@ export default {
 			currentTop: 0,
 			userinfo: {
 				
-			}
+			},
+			canRecord: false
         }
     },
     created() {
@@ -81,7 +83,7 @@ export default {
 				'folder': self.userinfo.UserId
 			}
 			uni.uploadFile({
-				url: 'http://110.166.84.163:8002//PublicInfoManage/ResourceFile/UploadFolderFile',
+				url: 'http://110.166.84.163:8002/PublicInfoManage/ResourceFile/UploadFolderFile',
 				filePath: res.tempFilePath,
 				name: 'File',
 				formData: formData,
@@ -93,7 +95,8 @@ export default {
 						let data,url;
 						if (uploadFileRes.statusCode === 200) {
 							data = JSON.parse(uploadFileRes.data)
-							url = 'http://116.131.134.198:9001/' + data.resultdata
+							console.log(data)
+							url = 'http://110.166.84.163:8002/' + data.resultdata
 							url = url.replace(';','')
 							self.$emit("sendData", {
 								src: url,
@@ -114,7 +117,6 @@ export default {
 		});
     },
     mounted() {
-		
     },
     methods: {
         sendMsg() {
@@ -153,7 +155,7 @@ export default {
             }
         },
         /**结束录音**/
-        recStop() {
+        recStop() { 
             let _this = this
             this.isRecording = false
             recorderManager.stop();
