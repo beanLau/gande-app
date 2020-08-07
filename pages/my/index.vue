@@ -141,15 +141,18 @@
 			},
 			checkUpdate(){
 				let _this = this;
-				console.log(plus.runtime.version)
 				this.tui.request('/Login/CheckVersion',"GET",{
-					version: plus.runtime.version
+					version: '1.1.1'
 				}).then((res)=>{
 					console.log(res)
 					if(res.resultdata.status == 1){
 						_this.apkUrl = res.resultdata.url
 						_this.showUpdate = true
+						return
 					}
+					_this.$refs.uToast.show({
+						title: '当前已是最新版本！'
+					})
 				})
 			},
 			toUpdate(){

@@ -11,14 +11,14 @@
 						<uni-icons type="arrowright" :size="18"></uni-icons>
 					</picker> -->
 					
-					<u-checkbox-group @change="bindPickerChange">
+					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
 						<u-checkbox 
 							active-color="#DE1727"
 							@change="checkboxChange" 
 							v-model="item.checked" 
 							v-for="(item, index) in statusList" :key="index" 
 							:name="item.FullName"
-						>{{item.FullName}}</u-checkbox>
+						><text class="checkbox-item">{{item.FullName}}</text></u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -400,5 +400,16 @@
 	.delete-icon{
 		margin-left: 30rpx;
 		margin-bottom: 30rpx;
+	}
+	.checkbox-group{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		justify-content: flex-end;
+		padding-left: 20rpx;
+	}
+	.checkbox-item{
+		display: inline-block;
+		min-width: 200rpx;
 	}
 </style>

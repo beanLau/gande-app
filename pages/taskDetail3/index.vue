@@ -26,7 +26,7 @@
 			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="report-content">
-			<view class="report-title">{{detailData.XiangName}}语音记录</view>
+			<view class="report-title">{{detailData.XiangName}}下发语音记录</view>
 			<view class="group">
 				<view class="record-audios">
 					<view class="audio-item-wrap" v-for="(audio,index) in audios">

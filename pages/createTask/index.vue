@@ -37,12 +37,14 @@
 				<view class="tui-line-cell">
 					<view class="tui-title">任务执行人</view>
 					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
-						<u-checkbox 
+						<u-checkbox
+							width="200rpx"
 							active-color="#DE1727"
 							v-model="item.checked" 
 							v-for="(item, index) in xiangList" :key="index" 
 							:name="item.FullName"
-						>{{item.FullName}}</u-checkbox>
+						><text class="checkbox-item">{{item.FullName}}</text></u-checkbox>
+						
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -349,7 +351,14 @@
 		text-align: right;
 	}
 	.checkbox-group{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
 		justify-content: flex-end;
 		padding-left: 20rpx;
+	}
+	.checkbox-item{
+		display: inline-block;
+		min-width: 200rpx;
 	}
 </style>

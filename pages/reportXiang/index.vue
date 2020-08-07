@@ -97,9 +97,9 @@
 				let entity = {
 					"RenwuID": _this.RenwuID,
 					"XiangCode": _this.XiangCode,
-					"XiangName": _this.selectName,
+					"XiangName": _this.XiangName,
 					"StatusCode": _this.selectId,
-					"StatusName": _this.ItemName,
+					"StatusName": _this.selectName,
 					"HuibaoNeirong": _this.content
 				}
 				_this.isLoading = true

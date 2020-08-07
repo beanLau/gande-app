@@ -24,7 +24,7 @@
 							v-model="item.checked" 
 							v-for="(item, index) in xiangList" :key="index" 
 							:name="item.DangzhibuName"
-						>{{item.DangzhibuName}}</u-checkbox>
+						><text class="checkbox-item">{{item.DangzhibuName}}</text></u-checkbox>
 					</u-checkbox-group>
 				</view>
 			</tui-list-cell>
@@ -321,7 +321,14 @@
 		text-align: right;
 	}
 	.checkbox-group{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
 		justify-content: flex-end;
 		padding-left: 20rpx;
+	}
+	.checkbox-item{
+		display: inline-block;
+		min-width: 200rpx;
 	}
 </style>

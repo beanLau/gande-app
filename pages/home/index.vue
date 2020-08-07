@@ -262,13 +262,22 @@
 				console.log(this.jibie)
 			}
 			//初始化当前年月
-			let currentMonth = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+			let currentYear = new Date().getFullYear() + '-'
+			let currentMonth = new Date().getMonth() + 1;
+			if(currentMonth < 10){
+				currentMonth = '0' + currentMonth
+			}
 			let date = new Date();
 			let prevMonth = date.setMonth(date.getMonth() - 1);
-			this.taskMonth = currentMonth;
-			this.workMonth = date.getFullYear() + '-' + (date.getMonth() + 1);
-			this.progressMonth = currentMonth;
-			this.buildMonth = currentMonth;
+			let prevYear = date.getFullYear() + '-';
+			prevMonth = new Date(prevMonth).getMonth() + 1;
+			if(prevMonth < 10){
+				prevMonth = '0' + prevMonth
+			}
+			this.taskMonth = currentYear + currentMonth;
+			this.workMonth = prevYear + prevMonth;
+			this.progressMonth = currentYear + currentMonth;
+			this.buildMonth = currentYear + currentMonth;
 			this.getSwiperData();
 			this.getTaskData();
 			this.getQuestionData();
@@ -351,12 +360,12 @@
 						"series": [{
 							"name": "已完成",
 							"data": complete,
-							"color": "#EE9FA5",
+							"color": "#4e6ef2",
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}, {
 							"name": "未完成",
 							"data": uncomplete,
-							"color": '#FAFAFA',
+							"color": '#c00',
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}]
 					});
@@ -411,12 +420,12 @@
 						"series": [{
 							"name": "已完成",
 							"data": complete,
-							"color": "#EE9FA5",
+							"color": "#4e6ef2",
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}, {
 							"name": "未完成",
 							"data": uncomplete,
-							"color": '#FAFAFA',
+							"color": '#c00',
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}]
 					});
@@ -464,12 +473,12 @@
 						"series": [{
 							"name": "已完成",
 							"data": complete,
-							"color": "#EE9FA5",
+							"color": "#4e6ef2",
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}, {
 							"name": "未完成",
 							"data": uncomplete,
-							"color": '#FAFAFA',
+							"color": '#c00',
 							format:(val)=>{return val.toFixed(0)+'%'}
 						}]
 					});

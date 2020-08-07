@@ -90,7 +90,7 @@
 					uni.setStorageSync('dataItem', res.dataItem); //字典项
 					console.log(authorizeMenu)
 					uni.setStorageSync('authorizeMenu', authorizeMenu); //权限信息
-					uni.navigateTo({
+					uni.reLaunch({
 						url: '../index/index'
 					})
 				})

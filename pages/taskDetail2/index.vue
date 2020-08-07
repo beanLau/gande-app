@@ -25,43 +25,28 @@
 			</view>
 			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
-		<!-- <view class="report-content" v-if="huibaoData.length > 0">
+		<view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
-			<block v-for="huibao in huibaoData">
+			<view class="huibao-item" v-for="huibao in huibaoData">
 				<view class="group">
 					<text class="group-label">汇报时间</text>
-					<text class="group-value">{{detailData.CreateDate}}</text>
+					<text class="group-value">{{huibao.CompDate}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">汇报人</text>
-					<text class="group-value">{{detailData.CreateUserName}}</text>
+					<text class="group-value">{{huibao.XiangName}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">完成状态</text>
-					<text class="group-value light-hight">{{detailData.StatusName}}</text>
+					<text class="group-value light-hight">{{huibao.StatusName}}</text>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">汇报内容</text>
-					<text class="group-value">{{detailData.Neirong}}</text>
+					<text class="group-value">{{huibao.HuibaoNeirong}}</text>
 				</view>
-				<view class="group">
-					<text class="group-label">汇报内容</text>
-					<view class="record-audios">
-						<view class="audio-item-wrap" v-for="(audio,index) in audios">
-							<view class="audio-item" :data-index="index" @click="playRecordAudio">
-								<image v-if="recordIndex == index" src="../../static/playing.gif" mode="" class="play-icon"></image>
-								<image v-else src="../../static/play-icon.png" mode="" class="play-icon"></image>
-								<text class="audio-len">{{audio.len}}</text>
-							</view>
-							<view class="delete-icon" :data-index="index" @click="deleteRecordAudio">
-								<tui-icon name="delete" :size="18" ></tui-icon>
-							</view>
-						</view>
-					</view>
-				</view>
-			</block>
-		</view> -->
+			</view>
+		</view>
 		<view class="towns-list">
 			<view class="towns-title">
 				完成情况
@@ -497,6 +482,9 @@
 	font-size: 38upx;
 	font-weight: bold;
 	margin-bottom: 45upx;
+}
+.huibao-item{
+	margin-bottom: 1px solid #ccc;
 }
 .group{
 	display: flex;
