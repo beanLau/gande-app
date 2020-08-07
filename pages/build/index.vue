@@ -222,7 +222,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://60.6.198.123:8003/' + src
+									src = 'http://110.166.84.163:8002/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -262,7 +262,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://60.6.198.123:8003/' + src
+									src = 'http://110.166.84.163:8002/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -304,7 +304,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://60.6.198.123:8003/' + src
+									src = 'http://110.166.84.163:8002/' + src
 								}
 							})
 							item.Imgs = srcs

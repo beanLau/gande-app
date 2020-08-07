@@ -364,7 +364,7 @@
 							let audios = []
 							audioList.map((audio,index)=>{
 								if(audio.indexOf('http') == -1){
-									let url = 'http://60.6.198.123:8003/' + audio
+									let url = 'http://110.166.84.163:8002/' + audio
 									audios[index] = {
 										src: url
 									}
