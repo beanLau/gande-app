@@ -97,6 +97,9 @@
 				}
 			}
 			console.log(userinfo)
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		mounted(){
 		},
@@ -141,20 +144,27 @@
 			},
 			getListData(){
 				let _this = this;
+				let queryJson = {
+					XiangCode: _this.userinfo.XiangCode || '',
+					CunCode: '',
+					LianHuYuanID: '',
+					beginTime: _this.beginTime,
+					endTime: _this.endTime,
+					Title: "",
+					JinjiCode: _this.degreeId,
+					TypeCode: _this.classifyId,
+					StatusCode: _this.statusId,
+					leixing: 'renwu', //wenti
+					jibie: _this.jibie
+				}
+				if(this.jibie == 3){
+					queryJson.CunCode = _this.userinfo.CunCode
+				}
+				if(this.jibie == 4){
+					queryJson.LianHuYuanID = _this.userinfo.UserId
+				}
 				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						CunCode: _this.userinfo.CunCode || '',
-						LianHuYuanID: _this.userinfo.LianHuYuanID || '',
-						beginTime: _this.beginTime,
-						endTime: _this.endTime,
-						Title: "",
-						JinjiCode: _this.degreeId,
-						TypeCode: _this.classifyId,
-						StatusCode: _this.statusId,
-						leixing: 'renwu', //wenti
-						jibie: _this.jibie
-					})),
+					"queryJson": decodeURIComponent(JSON.stringify(queryJson)),
 					"rows": _this.pageSize,
 					"page": _this.pageIndex,
 					"sidx": "CreateDate",

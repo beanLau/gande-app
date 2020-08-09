@@ -5,7 +5,7 @@
 		<view class="info-wrap" :class="{ 'info-wrap-show': hideQuick }">
 			<view class="info-top"  :class="{ 'info-top-border': hideQuick }" @click="toInfo">
 				<view class="top-left">
-					<image :src="img || '../../static/default-pic.png'" mode="" class="user-pic"></image>
+					<image :src="img" mode="" class="user-pic"></image>
 					<view class="user-info">
 						<text class="user-name">{{userinfo.RealName}}</text>
 						<!-- <text class="user-phone">{{userinfo.UserName}}</text> -->
@@ -133,7 +133,9 @@
 					keyValue: this.userinfo.UserId
 				}).then((res)=>{
 					if(res.HeadIcon){
-						res.HeadIcon = 'http://110.166.84.163:8002/' + res.HeadIcon
+						res.HeadIcon = 'http://110.166.84.163:8001/' + res.HeadIcon
+					}else{
+						res.HeadIcon = '../../static/default-pic.png'
 					}
 					_this.userinfo.RealName = res.RealName
 					_this.img = `${res.HeadIcon}?time=${new Date().getTime()}`

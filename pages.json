@@ -182,6 +182,10 @@
             "path" : "pages/newsdetail/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/meeting/index",
+            "style" : {}
+        }
     ],
 	"easycom": {
 		"autoscan": true,

@@ -7,7 +7,7 @@
 				<view class="tui-line-cell"> 
 					<view class="tui-title">头像</view>
 					<view class="form-right">
-						<image :src="img || '../../static/default-pic.png'" class="slot-btn" mode=""></image>
+						<image :src="img" class="slot-btn" mode=""></image>
 						<uni-icons type="arrowright" :size="18"></uni-icons>
 						<u-upload ref="upload" class="upload-wrap" :show-upload-list="false" :custom-btn="true" max-count="1" :action="action" :file-list="fileList"  :auto-upload="true" :header="header" @on-change="uploadChange">
 							<view slot="addBtn" class="custom-upload">
@@ -93,7 +93,7 @@
 				userinfo: {
 					HeadIcon: ""
 				},
-				action: 'http://110.166.84.163:8002/PersonCenter/UploadFile',
+				action: 'http://110.166.84.163:8001/PersonCenter/UploadFile',
 				fileList: [],
 				img: '',
 				sex: 1,
@@ -131,7 +131,7 @@
 					let data = JSON.parse(res.data)
 					if(data.type == 1){
 						data.resultdata = data.resultdata.replace(";","")
-						let img = 'http://110.166.84.163:8002/' + data.resultdata
+						let img = 'http://110.166.84.163:8001/' + data.resultdata
 						_this.img = `${img}?time=${new Date().getTime()}`
 						console.log(_this.img)
 						_this.$forceUpdate()
@@ -154,7 +154,7 @@
 					keyValue: this.UserId
 				}).then((res)=>{
 					if(res.HeadIcon){
-						res.HeadIcon = 'http://110.166.84.163:8002/' + res.HeadIcon
+						res.HeadIcon = 'http://110.166.84.163:8001/' + res.HeadIcon
 					}
 					_this.img = res.HeadIcon
 				})
@@ -167,7 +167,9 @@
 					console.log(res)
 					_this.userinfo = res || {}
 					if(_this.userinfo.HeadIcon){
-						_this.img = 'http://110.166.84.163:8002/' + _this.userinfo.HeadIcon
+						_this.img = 'http://110.166.84.163:8001/' + _this.userinfo.HeadIcon
+					}else{
+						_this.img = '../../static/default-pic.png'
 					}
 					console.log(_this.userinfo)
 				})

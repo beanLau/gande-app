@@ -219,7 +219,7 @@
 				}
 				if(_this.audios.length == 0){
 					_this.$refs.uToast.show({
-						title: '请进行录音汇报！',
+						title: '请录制下发语音！',
 					})
 					return
 				}

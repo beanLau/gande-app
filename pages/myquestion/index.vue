@@ -1,6 +1,7 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="我的问题"></uni-nav-bar>
+		<uni-nav-bar v-if="jibie == 4 && authorizeMenu.shangchuanxiada.wentifankui" status-bar right-text="问题反馈" @clickRight="toCreateQuestion" @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="我的问题"></uni-nav-bar>
+		<uni-nav-bar v-else status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" color="#fff" fixed background-color="#DE1727" title="我的问题"></uni-nav-bar>
 		
 		<view class="task-list">
 			<view class="towns-title">
@@ -23,7 +24,7 @@
 								<view class="bottom-left">
 									<tui-tag padding="8rpx" size="24rpx" :type="item.jinjiClass" v-if="item.jinjiname">
 										<!-- <tui-icon name="about" :size="10" color="#4B8AFC"></tui-icon> -->
-										<text>{{item.jinjiname}}</text>
+										<text>{{item.jinjiname || ''}}</text>
 									</tui-tag>
 									<tui-tag v-if="item.typename" margin="0 15upx" padding="8rpx" type="light-orange" size="24rpx">{{item.typename}}</tui-tag>
 									<view class="bottom-time">
@@ -74,7 +75,8 @@
 				pageSize: 5,
 				userinfo: {},
 				jibie: 0,
-				productList: []
+				productList: [],
+				authorizeMenu: {}
 			}
 		},
 		
@@ -97,6 +99,9 @@
 				}
 			}
 			console.log(userinfo)
+			let authorizeMenu = uni.getStorageSync("authorizeMenu");
+			console.log(authorizeMenu)
+			this.authorizeMenu = authorizeMenu
 		},
 		mounted(){
 		},
@@ -141,20 +146,27 @@
 			},
 			getListData(){
 				let _this = this;
+				let queryJson = {
+					XiangCode: _this.userinfo.XiangCode || '',
+					CunCode: '',
+					LianHuYuanID: '',
+					beginTime: _this.beginTime,
+					endTime: _this.endTime,
+					Title: "",
+					JinjiCode: _this.degreeId,
+					TypeCode: _this.classifyId,
+					StatusCode: _this.statusId,
+					leixing: 'wenti', //wenti
+					jibie: _this.jibie
+				}
+				if(this.jibie == 3){
+					queryJson.CunCode = _this.userinfo.CunCode
+				}
+				if(this.jibie == 4){
+					queryJson.LianHuYuanID = _this.userinfo.UserId
+				}
 				let resData = {
-					"queryJson": decodeURIComponent(JSON.stringify({
-						XiangCode: _this.userinfo.XiangCode || '',
-						CunCode: _this.userinfo.CunCode || '',
-						LianHuYuanID: _this.userinfo.LianHuYuanID || '',
-						beginTime: _this.beginTime,
-						endTime: _this.endTime,
-						Title: "",
-						JinjiCode: _this.degreeId,
-						TypeCode: _this.classifyId,
-						StatusCode: _this.statusId,
-						leixing: 'wenti', //wenti
-						jibie: _this.jibie
-					})),
+					"queryJson": decodeURIComponent(JSON.stringify(queryJson)),
 					"rows": _this.pageSize,
 					"page": _this.pageIndex,
 					"sidx": "CreateDate",
@@ -217,6 +229,11 @@
 			
 			showEndTime(){
 				this.$refs.endTime.show();
+			},
+			toCreateQuestion(){
+				uni.navigateTo({
+					url: '../createQuestion/index'
+				});
 			},
 			changeBeginTime(e){
 				this.beginTime = e.result;

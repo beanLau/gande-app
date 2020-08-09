@@ -17,7 +17,8 @@
 						<view class="task-desc" v-html="item.Renwu">
 						</view>
 						<view class="task-time">
-							{{item.RenwuQixianDate}}
+							<text>{{item.RenwuQixianDate}}</text>
+							<text class="item-status">{{item.StatusName}}</text>
 						</view>
 					</view>
 				</view>
@@ -31,7 +32,8 @@
 						<view class="task-desc" v-html="item.Huibao">
 						</view>
 						<view class="task-time">
-							{{item.RenwuQixianDate}}
+							<text>{{item.RenwuQixianDate}}</text>
+							<text class="item-status">{{item.StatusName}}</text>
 						</view>
 					</view>
 				</view>
@@ -225,10 +227,11 @@
 	.task-item{
 		display: flex;
 		align-items: center;
-		margin-bottom: 40rpx;
+		padding: 20rpx 0;
+		border-bottom: 1px solid #eee;
 	}
 	.task-item:last-of-type{
-		margin-bottom: 0;
+		border-bottom: none;
 	}
 	.task-pic{
 		width: 160rpx;
@@ -252,7 +255,14 @@
 		font-size: 24rpx;
 	}
 	.task-time{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		color: #aaa;
 		font-size: 24rpx;
+	}
+	.item-status{
+		color: #DE1727;
+		font-size: 24upx;
 	}
 </style>

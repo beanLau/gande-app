@@ -19,7 +19,8 @@
 					<view class="task-desc" v-html="item.Renwu">
 					</view>
 					<view class="task-time">
-						{{item.RenwuQixianDate}}
+						<text>{{item.RenwuQixianDate}}</text>
+						<text class="item-status">{{item.StatusName}}</text>
 					</view>
 				</view>
 			</view>
@@ -33,7 +34,8 @@
 					<view class="task-desc" v-html="item.Huibao">
 					</view>
 					<view class="task-time">
-						{{item.RenwuQixianDate}}
+						<text>{{item.RenwuQixianDate}}</text>
+						<text class="item-status">{{item.StatusName}}</text>
 					</view>
 				</view>
 			</view>
@@ -51,8 +53,8 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in zhibuList">
-			<view class="task-item">
+		<view class="task-list">
+			<view class="task-item" v-for="item in zhibuList" @click="toMeetDetail(item,'党支部')">
 				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
@@ -78,8 +80,8 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in dangyuanList">
-			<view class="task-item">
+		<view class="task-list">
+			<view class="task-item" v-for="item in dangyuanList" @click="toMeetDetail(item,'党员')">
 				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
@@ -105,8 +107,8 @@
 				<uni-icons type="arrowright" :size="16" color="#aaa"></uni-icons>
 			</view>
 		</view>
-		<view class="task-list" v-for="item in dangkeList">
-			<view class="task-item">
+		<view class="task-list">
+			<view class="task-item" v-for="item in dangkeList" @click="toMeetDetail(item,'党课')">
 				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
@@ -163,12 +165,23 @@
 			this.getDangkeList();
 		},
 		methods: {
+			refresh(){
+				this.getDangjianList();
+				this.getZhibuList();
+				this.getDangyuanList();
+				this.getDangkeList();
+			},
 			update(){
 				console.log('更新呢')
 				this.getDangjianList();
 				this.getZhibuList();
 				this.getDangyuanList();
 				this.getDangkeList();
+			},
+			toMeetDetail(item,name){
+				uni.navigateTo({
+					url: '../meeting/index?id='+item.ID + '&pageTitle=' + name
+				})
 			},
 			getDangjianList(){
 				let _this = this;
@@ -222,7 +235,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://110.166.84.163:8002/' + src
+									src = 'http://110.166.84.163:8001/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -262,7 +275,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://110.166.84.163:8002/' + src
+									src = 'http://110.166.84.163:8001/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -304,7 +317,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://110.166.84.163:8002/' + src
+									src = 'http://110.166.84.163:8001/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -394,10 +407,12 @@
 	.task-item{
 		display: flex;
 		align-items: center;
-		margin-bottom: 40rpx;
+		padding: 20rpx 0;
+		border-bottom: 1px solid #eee;
 	}
-	.task-item:last-of-type{
-		margin-bottom: 0;
+	.task-list .task-item:last-of-type{
+		border-bottom: 1px solid #eee;
+		border-bottom: none;
 	}
 	.task-pic{
 		width: 160rpx;
@@ -423,7 +438,14 @@
 		font-size: 24rpx;
 	}
 	.task-time{
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		color: #aaa;
 		font-size: 24rpx;
+	}
+	.item-status{
+		color: #DE1727;
+		font-size: 24upx;
 	}
 </style>

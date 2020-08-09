@@ -218,6 +218,12 @@
 					})
 					return
 				}
+				if(_this.audios.length == 0){
+					_this.$refs.uToast.show({
+						title: '请录制下发语音！',
+					})
+					return
+				}
 				// if(!_this.content){
 				// 	_this.$refs.uToast.show({
 				// 		title: '请输入下发内容',

@@ -99,6 +99,7 @@
 				userinfo = JSON.parse(userinfo)
 				this.userinfo = userinfo
 			}
+			console.log(this.userinfo)
 		},
 		methods: {
 			
@@ -229,7 +230,7 @@
 				let _this = this;
 				if(_this.audios.length == 0){
 					_this.$refs.uToast.show({
-						title: '请进行录音汇报！',
+						title: '请录制问题录音！',
 					})
 					return
 				}
@@ -243,8 +244,8 @@
 					"XiangName": _this.userinfo.XiangName,
 					"CunCode": _this.userinfo.CunCode,
 					"CunName": _this.userinfo.CunName,
-					"LianHuYuanID": _this.userinfo.LianHuYuanID,
-					"LianHuYuanName": _this.userinfo.LianHuYuanName,
+					"LianHuYuanID": _this.userinfo.UserId,
+					"LianHuYuanName": _this.userinfo.UserName,
 					"YuanShiRadioUrl": audioUrlList.join(','),
 					"StatusCode": "1",
 					"StatusName": "联户员已反馈"

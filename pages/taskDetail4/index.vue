@@ -26,7 +26,7 @@
 			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="report-content">
-			<view class="report-title">{{detailData.CunName}}语音记录</view>
+			<view class="report-title">{{detailData.CunName}}下发语音记录</view>
 			<view class="group">
 				<view class="record-audios">
 					<view class="audio-item-wrap" v-for="(audio,index) in audios">
@@ -349,7 +349,7 @@
 							let audioList = item.XiaFaRadioUrl.split(",");
 							audioList.map((audio,index)=>{
 								if(audio.indexOf('http') == -1){
-									let url = 'http://110.166.84.163:8002/' + audio
+									let url = 'http://110.166.84.163:8001/' + audio
 									audios.push({
 										src: url
 									})
@@ -367,7 +367,7 @@
 							HuibaoRadioUrl.map(radio=>{
 								let url = radio
 								if(url.indexOf('http') == -1){
-									radio = 'http://110.166.84.163:8002/' + url
+									radio = 'http://110.166.84.163:8001/' + url
 								}
 								audios.push({
 									src: url

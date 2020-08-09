@@ -300,6 +300,7 @@ export default {
 		this.endDate = date.getFullYear() + '-' + month
 		let dataItem = uni.getStorageSync('dataItem');
 		this.statusList = dataItem.renwuzhuangtai || [];
+		console.log(this.statusList)
 		this.classifyList = dataItem.renwufenlei || [];
 		this.degreeList = dataItem.jinjichengdu || [];
 		// this.getStatusData();
@@ -570,8 +571,8 @@ export default {
 		getListData(){
 			let _this = this;
 			let queryJson = {
-				XiangCode: _this.userinfo.XiangCode || '',
-				CunCode: _this.userinfo.CunCode || '',
+				XiangCode: '',
+				CunCode: '',
 				LianHuYuanID: '',
 				beginTime: _this.beginTime,
 				endTime: _this.endTime,
@@ -581,6 +582,12 @@ export default {
 				StatusCode: _this.statusId,
 				leixing: _this.typeId,
 				jibie: _this.jibie
+			}
+			if(this.jibie == 3){
+				queryJson.XiangCode = _this.userinfo.XiangCode
+			}
+			if(this.jibie == 3){
+				queryJson.CunCode = _this.userinfo.CunCode
 			}
 			if(_this.jibie == 4){
 				queryJson.LianHuYuanID = _this.userinfo.UserId;

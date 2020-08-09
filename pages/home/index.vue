@@ -12,7 +12,10 @@
 		</view>
 		<view class="qiun-columns" v-if="showTask">
 			<view class="group-wrap">
-				<view class="group-title">任务完成率</view>
+				<view class="title-wrap">
+					<image class="title-icon" src="../../static/title01.png" mode=""></image>
+					<view class="group-title">任务完成率</view>
+				</view>
 				<view class="select-month" @click="showTaskMonth()">
 					<text>{{taskMonth}}</text>
 					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
@@ -48,7 +51,10 @@
 		
 		<view class="qiun-columns" v-if="showWork">
 			<view class="group-wrap">
-				<view class="group-title">170工作解决机制</view>
+				<view class="title-wrap">
+					<image class="title-icon" src="../../static/title02.png" mode=""></image>
+					<view class="group-title">170工作解决机制</view>
+				</view>
 				<view class="select-month" @click="showWorkMonth()">
 					<text>{{workMonth}}</text>
 					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
@@ -91,7 +97,10 @@
 		</view>
 		<view class="qiun-columns" v-if="showHuiyi">
 			<view class="group-wrap">
-				<view class="group-title">党建任务完成进度</view>
+				<view class="title-wrap">
+					<image class="title-icon" src="../../static/title03.png" mode=""></image>
+					<view class="group-title">党建任务完成进度</view>
+				</view>
 				<view class="select-month" @click="showProgressMonth()">
 					<text>{{progressMonth}}</text>
 					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
@@ -124,7 +133,10 @@
 		</view>
 		<view class="qiun-columns" v-if="showBuild">
 			<view class="group-wrap">
-				<view class="group-title">党建任务完成率</view>
+				<view class="title-wrap">
+					<image class="title-icon" src="../../static/title04.png" mode=""></image>
+					<view class="group-title">党建任务完成率</view>
+				</view>
 				<view class="select-month" @click="showBuildMonth()">
 					<text>{{buildMonth}}</text>
 					<tui-icon name="turningdown" color="#ccc" :size="18"></tui-icon>
@@ -556,7 +568,7 @@
 					if(Array.isArray(res.rows)){
 						res.rows.map(item=>{
 							item.CoverImg = item.CoverImg.replace(';','')
-							item.CoverImg = 'http://110.166.84.163:8002/' + item.CoverImg
+							item.CoverImg = 'http://110.166.84.163:8001/' + item.CoverImg
 							console.log(item.CoverImg)
 						})
 					}
@@ -905,11 +917,20 @@
 		align-items: center;
 	}
 	.group-title{
-		padding-left: 22upx;
+		position: relative;
+		padding: 0 10upx;
 		font-size: 32upx;
 		line-height: 1;
 		color: #2E2E2E;
-		border-left: 8upx solid #DE1727;
+	}
+	.group-title::after{
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		content: "";
+		width: 100%;
+		height: 14rpx;
+		background: rgba(222,23,39,.2);;
 	}
 	.select-month{
 		line-height: 1;
@@ -936,5 +957,14 @@
 	}
 	.font-24{
 		font-size: 24upx;
+	}
+	.title-wrap{
+		display: flex;
+		align-items: center;
+	}
+	.title-icon{
+		width: 32rpx;
+		height: 32rpx;
+		margin-right: 10rpx;
 	}
 </style>

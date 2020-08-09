@@ -37,6 +37,7 @@
 				<view :class="PageCur=='my'?'text-red':'text-gray'">我的</view>
 			</view>
 		</view>
+		<u-toast ref="uToast" />
 	</view>
 </template>
 
@@ -64,6 +65,20 @@
 			let authorizeMenu = uni.getStorageSync("authorizeMenu");
 			console.log(authorizeMenu)
 			this.authorizeMenu = authorizeMenu
+			if(!authorizeMenu.dashujufenxi && !authorizeMenu.aizhinengdanganku && !authorizeMenu.shangchuanxiada && !authorizeMenu.dangjian && !authorizeMenu.wode){
+				uni.removeStorageSync("dataItem")
+				uni.removeStorageSync("authorizeMenu")
+				uni.removeStorageSync("userinfo")
+				uni.removeStorageSync("token")
+				this.$refs.uToast.show({
+					title: '暂无任何权限！',
+					callback: function(){
+						uni.reLaunch({
+							url: '../login/index'
+						})
+					}
+				})
+			}
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
 				this.userinfo = userinfo
@@ -106,10 +121,12 @@
 		onPullDownRefresh: function() {
 			if(this.PageCur == 'updown'){
 				this.$refs.updown.refresh()
+			}else if(this.PageCur == 'build'){
+				this.$refs.build.refresh()
 			}
 			setTimeout(()=>{
 				uni.stopPullDownRefresh();
-			},1500)
+			},1000)
 		}
 	}
 </script>

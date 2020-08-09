@@ -64,7 +64,7 @@
 		components: {uniNavBar},
 		data() {
 			return {
-				action: 'http://110.166.84.163:8002/PublicInfoManage/ResourceFile/UploadFolderFile',
+				action: 'http://110.166.84.163:8001/PublicInfoManage/ResourceFile/UploadFolderFile',
 				array: ['中国', '美国', '巴西', '日本'],
 				index: 0,
 				xiangList: [],
@@ -105,19 +105,30 @@
 		},
 		methods: {
 			uploadChange(res){
+				// try{
+				// 	let data = JSON.parse(res.data)
+				// 	if(data.type == 1){
+				// 		data.resultdata = data.resultdata.replace(";","")
+				// 		this.imgs.push(data.resultdata)
+				// 	}
+				// }catch(e){
+				// 	console.log(e)
+				// 	//TODO handle the exception
+				// }
+			},
+			uploadCb(data, index, lists){
 				try{
-					let data = JSON.parse(res.data)
 					if(data.type == 1){
 						data.resultdata = data.resultdata.replace(";","")
+						if(data.resultdata.indexOf('http') == -1){
+							data.resultdata = 'http://110.166.84.163:8001/' + data.resultdata
+						}
 						this.imgs.push(data.resultdata)
 					}
 				}catch(e){
 					console.log(e)
 					//TODO handle the exception
 				}
-			},
-			uploadCb(data, index, lists){
-				
 			},
 			removeCb(index){
 				this.imgs.splice(index, 1)
@@ -240,9 +251,10 @@
 						"Neirong": _this.content,
 						"Renyuan": _this.selectNames,
 						"Renshu": _this.selectNames.split(',').length,
-						Imgs: imgs
+						Imgs: _this.imgs.join(';')
 					}
 				}
+				console.log(reqData)
 				_this.isLoading = true
 				_this.tui.request("/Siji/AFP_Dangjian/SaveForm?keyValue=",'POST',reqData).then((res)=>{
 					console.log(res)

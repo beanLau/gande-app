@@ -17,12 +17,12 @@
 				<view class="begin-time" :class="{'has-value': beginTime != ''}" @click="showBeginTime">
 					{{beginTime ? beginTime : '选择开始时间'}}
 				</view>
-				<tui-datetime ref="beginTime" :type="3" :cancelColor="cancelColor" :color="color"
+				<tui-datetime ref="beginTime" :type="2" :cancelColor="cancelColor" :color="color"
 				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeBeginTime"></tui-datetime>
 				<view class="end-time" :class="{'has-value': endTime != ''}" @click="showEndTime">
 					{{endTime ? endTime : '选择截止时间'}}
 				</view>
-				<tui-datetime ref="endTime" :type="3" :cancelColor="cancelColor" :color="color"
+				<tui-datetime ref="endTime" :type="2" :cancelColor="cancelColor" :color="color"
 				 :setDateTime="setDateTime" :unitTop="unitTop" :radius="radius" @confirm="changeEndTime"></tui-datetime>
 			</view>
 			
@@ -35,7 +35,7 @@
 			<view class="towns-title">
 				全部会议
 			</view>
-			<view class="task-item" v-for="item in list" @click="detail">
+			<view class="task-item" v-for="item in list" @click="detail(item)">
 				<image :src="item.img" mode="" class="task-pic"></image>
 				<view class="task-right">
 					<view class="task-title">
@@ -149,7 +149,7 @@
 							srcs = srcs.split(";")
 							srcs.map(src=>{
 								if(src.indexOf('http') == -1){
-									src = 'http://110.166.84.163:8002/' + src
+									src = 'http://110.166.84.163:8001/' + src
 								}
 							})
 							item.Imgs = srcs
@@ -179,9 +179,9 @@
 			pageBack(){
 				uni.navigateBack()
 			},
-			detail(){
+			detail(item){
 				uni.navigateTo({
-					url: '../buildDetail/index'
+					url: '../meeting/index?id='+item.ID + '&pageTitle=党课'
 				})
 			},
 			keywordChange(e){
@@ -280,10 +280,12 @@
 	.task-item{
 		display: flex;
 		align-items: center;
-		margin-bottom: 40rpx;
+		padding: 20rpx 0;
+		border-bottom: 1px solid #eee;
 	}
-	.task-item:last-of-type{
-		margin-bottom: 0;
+	.task-list .task-item:last-of-type{
+		border-bottom: 1px solid #eee;
+		border-bottom: none;
 	}
 	.task-pic{
 		width: 160rpx;

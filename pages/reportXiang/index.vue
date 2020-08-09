@@ -54,7 +54,11 @@
 			this.XiangCode = opt.XiangCode
 			this.XiangName = opt.XiangName
 			let dataItem = uni.getStorageSync('dataItem');
-			this.statusList = dataItem.renwuzhuangtai || [];
+			if(Array.isArray(dataItem.renwuzhuangtai)){
+				this.statusList = dataItem.renwuzhuangtai.filter(item=>{
+					return item.ItemValue == 3 || item.ItemValue == 4
+ 				})
+			}
 		},
 		methods: {
 			bindPickerChange(e){

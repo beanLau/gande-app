@@ -28,6 +28,7 @@
 				<tui-button height="72rpx" :size="28" type="danger" shape="circle" @click="hideModel">确定</tui-button>
 			</view>
 		</tui-modal>
+		<u-toast ref="uToast" />
 	</view>
 </template>
 
@@ -157,7 +158,9 @@
 						// }
 						
 						if (res.errorcode == 0 && res.type == 1) {
-							this.tui.toast('登录成功');
+							_this.$refs.uToast.show({
+								title: '登录成功'
+							})
 							uni.setStorageSync('userinfo', JSON.stringify(res.resultdata));
 							uni.setStorageSync('token', res.resultdata.Token);
 							_this.getPower()
@@ -168,17 +171,18 @@
 							// },1000)
 							
 						} else {
-							this.tui.toast(res.message);
+							_this.$refs.uToast.show({
+								title: res.message
+							})
 						}
 					}).catch((res)=>{
 						console.log(res)
 					})
 					
 				} else {
-					uni.showToast({
-						title: checkRes,
-						icon: "none"
-					});
+					_this.$refs.uToast.show({
+						title: checkRes
+					})
 				}
 			}
 		}

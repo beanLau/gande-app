@@ -83,7 +83,7 @@ export default {
 				'folder': self.userinfo.UserId
 			}
 			uni.uploadFile({
-				url: 'http://110.166.84.163:8002/PublicInfoManage/ResourceFile/UploadFolderFile',
+				url: 'http://110.166.84.163:8001/PublicInfoManage/ResourceFile/UploadFolderFile',
 				filePath: res.tempFilePath,
 				name: 'File',
 				formData: formData,
@@ -96,7 +96,7 @@ export default {
 						if (uploadFileRes.statusCode === 200) {
 							data = JSON.parse(uploadFileRes.data)
 							console.log(data)
-							url = 'http://110.166.84.163:8002/' + data.resultdata
+							url = 'http://110.166.84.163:8001/' + data.resultdata
 							url = url.replace(';','')
 							self.$emit("sendData", {
 								src: url,

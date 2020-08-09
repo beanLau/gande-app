@@ -168,15 +168,18 @@
 				}
 				_this.isLoading = true
 				_this.tui.request("/Siji/AFP_WenTi/SaveForm",'POST',{
-					"XiangCode": _this.detailData.XiangCode,
-					"XiangName": _this.detailData.XiangName,
-					"CunCode": _this.detailData.CunCode,
-					"CunName": _this.detailData.CunName,
-					"LianHuYuanID": _this.detailData.LianHuYuanID,
-					"LianHuYuanName": _this.detailData.LianHuYuanName,
-					"YuanShiRadioUrl": _this.detailData.YuanShiRadioUrl,
-					"StatusCode": "2",
-					"StatusName": "村级已提交"
+					"keyValue": _this.detailData.ID,
+					// "XiangCode": _this.detailData.XiangCode,
+					// "XiangName": _this.detailData.XiangName,
+					// "CunCode": _this.detailData.CunCode,
+					// "CunName": _this.detailData.CunName,
+					// "LianHuYuanID": _this.detailData.LianHuYuanID,
+					// "LianHuYuanName": _this.detailData.LianHuYuanName,
+					// "YuanShiRadioUrl": _this.detailData.YuanShiRadioUrl,
+					entity: {
+						"StatusCode": "2",
+						"StatusName": "村级已提交"
+					}
 				}).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
@@ -223,7 +226,7 @@
 						YuanShiRadioUrl = YuanShiRadioUrl.split(';');
 						YuanShiRadioUrl.map(item=>{
 							if(item.indexOf('http') == -1){
-								item = 'http://110.166.84.163:8002/' + item
+								item = 'http://110.166.84.163:8001/' + item
 							}
 							audios.push({
 								src: item
