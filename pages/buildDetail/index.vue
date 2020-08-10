@@ -98,7 +98,7 @@
 					keyValue: _this.RenwuID
 				}).then((res)=>{
 					console.log(res)
-					if(_this.jibie == 3 && res.XiangCode == _this.userinfo.XiangCode && res.StatusCode == 1){
+					if(_this.jibie == 3 && res.XiangCode == _this.userinfo.XiangCode && res.StatusCode == 0){
 						_this.showReportBtn = true
 					}else{
 						_this.showReportBtn = false
