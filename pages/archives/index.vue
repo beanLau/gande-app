@@ -8,7 +8,7 @@
 				<tui-list-cell :hover="false">
 					<view class="tui-line-cell">
 						<view class="tui-title">选择乡镇</view>
-						<picker @change="bindXiangChange" :value="index" rangeKey="FullName" :range="xiangList" class="form-right">
+						<picker @change="bindXiangChange" :disabled="true" :value="index" rangeKey="FullName" :range="xiangList" class="form-right">
 							<view class="uni-input">{{xiangName || '请选择乡镇'}}</view>
 							<uni-icons type="arrowright" :size="18"></uni-icons>
 						</picker>
@@ -77,6 +77,8 @@
 			if(userinfo){
 				userinfo = JSON.parse(userinfo)
 				this.userinfo = userinfo
+				this.xiangName = userinfo.XiangName
+				this.xiangId = userinfo.XiangCode
 				if(userinfo.Nature == 3){ //县
 					this.listUrl = 'Siji/AFP_RenwuXian/GetPageListJson'
 					this.jibie = 1
@@ -93,6 +95,7 @@
 			}
 			console.log(userinfo)
 			this.getXiangList();
+			this.getCunList();
 		},
 		methods: {
 			changeKeyword(e){

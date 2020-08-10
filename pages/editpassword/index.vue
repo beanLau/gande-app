@@ -23,7 +23,7 @@
 			</tui-list-cell>
 			
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
@@ -66,6 +66,9 @@
 			}
 		},
 		methods: {
+			cancelCb(){
+				uni.navigateBack()
+			},
 			changeOld(e){
 				this.old = e.detail.value
 			},

@@ -1,7 +1,7 @@
 <template>
 	<view class="page-content">
 		<view class="navbar-wrap">
-			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="户档案详情"></uni-nav-bar>
+			<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="人员详情"></uni-nav-bar>
 		</view>
 		<view class="householder-wrap">
 			<view class="group-title">
@@ -35,7 +35,7 @@
 				</view>
 			</view>
 			<view class="group-title" style="margin-top: 40rpx;">
-				户信息
+				其他信息
 			</view>
 			<view class="report-content">
 				<view class="group">
@@ -114,27 +114,27 @@
 				<view class="group">
 					<text class="group-label">户口本</text>
 					<view class="group-value img-list">
-						<image :src="detailData.HukouImg" mode="" class="img-item"></image>
+						<image v-for="item in detailData.HukouImg" :src="item" mode="" class="img-item"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">残疾证</text>
 					<view class="group-value img-list">
-						<image :src="detailData.CanjiImg" mode="" class="img-item"></image>
+						<image v-for="item in detailData.CanjiImg" :src="item" mode="" class="img-item"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">低保证</text>
 					<view class="group-value img-list">
-						<image :src="detailData.DibaoImg" mode="" class="img-item"></image>
+						<image v-for="item in detailData.DibaoImg" :src="item" mode="" class="img-item"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">其他证件</text>
 					<view class="group-value img-list">
-						<image :src="detailData.QitaImg" mode="" class="img-item"></image>
+						<image v-for="item in detailData.QitaImg" :src="item" mode="" class="img-item"></image>
 					</view>
 				</view>
 			</view>
@@ -166,6 +166,7 @@
 				this.tui.request("Siji/AFP_HuRenkou/GetFormJson?keyValue=" + this.id,"get",{
 					keyValue: this.id
 				}).then((res)=>{
+					console.log(res)
 					if(res.IDCard){
 						res.IDCard = Decrypt(res.IDCard)
 					}
@@ -173,25 +174,65 @@
 						res.Tel = Decrypt(res.Tel)
 					}
 					if(res.HeadImg){
-						res.HeadImg = '' + res.HeadImg
+						let HeadImg = res.HeadImg.split(";")
+						HeadImg = HeadImg.map(item=>{
+							if(item){
+								return 'http://110.166.84.163:8001/' + item
+							}
+						})
+						res.HeadImg = HeadImg.filter(item=>{
+							return !!item
+						})
 					}
 					if(res.CardImg1){
-						res.CardImg1 = '' + res.CardImg1
+						res.CardImg1 = 'http://110.166.84.163:8001/' + res.CardImg1
 					}
 					if(res.CardImg2){
-						res.CardImg2 = '' + res.CardImg2
+						res.CardImg2 = 'http://110.166.84.163:8001/' + res.CardImg2
 					}
 					if(res.HukouImg){
-						res.HukouImg = '' + res.HukouImg
+						let HukouImg = res.HukouImg.split(";")
+						HukouImg = HukouImg.map(item=>{
+							if(item){
+								return 'http://110.166.84.163:8001/' + item
+							}
+						})
+						res.HukouImg = HukouImg.filter(item=>{
+							return !!item
+						})
 					}
 					if(res.CanjiImg){
-						res.CanjiImg = '' + res.CanjiImg
+						let CanjiImg = res.CanjiImg.split(";")
+						CanjiImg = CanjiImg.map(item=>{
+							if(item){
+								return 'http://110.166.84.163:8001/' + item
+							}
+						})
+						res.CanjiImg = CanjiImg.filter(item=>{
+							return !!item
+						})
 					}
 					if(res.DibaoImg){
-						res.DibaoImg = '' + res.DibaoImg
+						let DibaoImg = res.DibaoImg.split(";")
+						DibaoImg = DibaoImg.map(item=>{
+							if(item){
+								return 'http://110.166.84.163:8001/' + item
+							}
+						})
+						res.DibaoImg = DibaoImg.filter(item=>{
+							return !!item
+						})
 					}
 					if(res.QitaImg){
-						res.QitaImg = '' + res.QitaImg
+						let QitaImg = res.QitaImg.split(";")
+						QitaImg = QitaImg.map(item=>{
+							if(item){
+								return 'http://110.166.84.163:8001/' + item
+							}
+						})
+						res.QitaImg = QitaImg.filter(item=>{
+							return !!item
+						})
 					}
 					this.detailData = res || {}
 					console.log(res)

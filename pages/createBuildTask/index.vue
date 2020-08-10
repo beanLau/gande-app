@@ -38,7 +38,7 @@
 				<textarea placeholder-style="color:#999" placeholder="请输入任务内容" @input="changeContent" :value="content"/>
 			</view>
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cacelCb">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">提交</button>
 			</view>
 		</form>
@@ -83,6 +83,9 @@
 			this.getXiangList();
 		},
 		methods: {
+			cacelCb(){
+				uni.navigateBack()
+			},
 			changeQixian(e){
 				this.qixian = e.detail.value
 			},

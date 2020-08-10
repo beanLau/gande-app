@@ -45,7 +45,7 @@
 	export default {
 		data() {
 		return {
-				PageCur: 'home',
+				PageCur: '',
 				userinfo: {},
 				jibie: 0,
 				authorizeMenu: {}

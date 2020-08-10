@@ -8,7 +8,7 @@
 					<view class="tui-title">头像</view>
 					<view class="form-right">
 						<image :src="img" class="slot-btn" mode=""></image>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
+						
 						<u-upload ref="upload" class="upload-wrap" :show-upload-list="false" :custom-btn="true" max-count="1" :action="action" :file-list="fileList"  :auto-upload="true" :header="header" @on-change="uploadChange">
 							<view slot="addBtn" class="custom-upload">
 								
@@ -22,7 +22,7 @@
 					<view class="tui-title">名称</view>
 					<view class="right-wrap">
 						<input class="search-input" type="text" :value="userinfo.RealName" @input="nameChange"/>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
+						
 					</view>
 				</view>
 			</tui-list-cell>
@@ -44,7 +44,7 @@
 					<view class="tui-title">手机号</view>
 					<view class="right-wrap">
 						<input class="search-input" type="text" :value="userinfo.Mobile" @input="mobileChange"/>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
+						
 					</view>
 				</view>
 			</tui-list-cell>
@@ -53,12 +53,12 @@
 					<view class="tui-title">邮箱</view>
 					<view class="right-wrap">
 						<input class="search-input" type="text" :value="userinfo.Email" @input="emailChange"/>
-						<uni-icons type="arrowright" :size="18"></uni-icons>
+						
 					</view>
 				</view>
 			</tui-list-cell>
 			<view class="tui-btn-box flex">
-				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover">取消</button>
+				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
 				<button class="tui-button-primary submit-btn" hover-class="tui-button-gray_hover" formType="submit">保存</button>
 			</view>
 		</form>
@@ -112,6 +112,9 @@
 			this.getUserInfo();
 		},
 		methods: {
+			cancelCb(){
+				uni.navigateBack()
+			},
 			nameChange(e){
 				this.userinfo.RealName = e.target.value
 			},
