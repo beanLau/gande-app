@@ -3,21 +3,60 @@
 		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务下发"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
-			<tui-list-cell :hover="false">
+			<!-- <tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">下发人员</view>
 					
-					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
-						<u-checkbox 
-							active-color="#DE1727"
-							@change="checkboxChange" 
-							v-model="item.checked" 
-							v-for="(item, index) in statusList" :key="index" 
-							:name="item.RealName"
-						><text class="checkbox-item">{{item.RealName}}</text></u-checkbox>
-					</u-checkbox-group>
+					
+				</view>
+			</tui-list-cell> -->
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell" @click="showFilterDegree">
+					<view class="tui-title">下发人员</view>
+					<view class="right-wrap">
+						<text class="select-names">{{selectNames || '请选择下发人员'}}</text>
+						<tui-icon name="edit" :size="24" color="#2E2E2E"></tui-icon>
+					</view>
 				</view>
 			</tui-list-cell>
+			<!--下拉选择列表--紧急程度-->
+			<view class="tui-dropdownlist" :class="[degreeH > 0 ? 'tui-dropdownlist-show' : '']" :style="{ height: degreeH + 'rpx' }">
+				<view
+					class="tui-dropdownlist-item tui-icon-middle"
+					:class="[selectAll ? 'tui-bold' : '']"
+					@tap.stop="selectAllCb"
+				>
+					<text class="tui-ml tui-middle">全选</text>
+					<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="selectAll"></tui-icon>
+				</view>
+				<view
+					class="tui-dropdownlist-item tui-icon-middle"
+					:class="[item.checked ? 'tui-bold' : '']"
+					v-for="(item, index) in statusList"
+					:key="index"
+					@tap.stop="selectDegree"
+					:data-index="index"
+				>
+					<text class="tui-ml tui-middle">{{ item.RealName }}</text>
+					<tui-icon name="check" :size="16" color="#e41f19" :bold="true" v-if="item.checked"></tui-icon>
+				</view>
+			</view>
+			<view class="tui-dropdownlist-mask" :class="[degreeH > 0 ? 'tui-mask-show' : '']" @tap.stop="hideFilterDegree"></view>
+			<!--下拉选择列表--紧急程度-->
+			<!-- <u-popup v-model="show" mode="bottom" border-radius="14">
+				<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
+					<view style="width: 100%;margin-bottom: 20rpx;">
+						<u-button type="primary" size="medium" @click="selectAll">全选</u-button>
+					</view>
+					<u-checkbox 
+						active-color="#DE1727"
+						@change="checkboxChange" 
+						v-model="item.checked" 
+						v-for="(item, index) in statusList" :key="index" 
+						:name="item.RealName"
+					><text class="checkbox-item">{{item.RealName}}</text></u-checkbox>
+				</u-checkbox-group>
+			</u-popup> -->
 			<!-- <tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">下发内容</view>
@@ -75,7 +114,9 @@
 				selectNames: '',
 				selectIds: '',
 				recordIndex: -1,
-				innerAudioContext: null
+				innerAudioContext: null,
+				selectAll: false,
+				degreeH: 0
 			}
 		},
 		onLoad(opt) {
@@ -103,6 +144,47 @@
 			this.getCunList();
 		},
 		methods: {
+			selectAllCb(){
+				this.selectAll = !this.selectAll
+				let selectIds = [];
+				let selectNames = []
+				if(this.selectAll){
+					this.statusList.map((item,index)=>{
+						item.checked = true
+						selectIds.push(item.UserId)
+						selectNames.push(item.RealName)
+					})
+				}
+				this.selectIds = selectIds.join(',')
+				this.selectNames = selectNames.join(',')
+			},
+			selectDegree(e){
+				let selectIds = [];
+				let selectNames = []
+				let eindex = e.currentTarget.dataset.index;
+				this.statusList[eindex].checked = !this.statusList[eindex].checked
+				this.statusList.map((item,index)=>{
+					if(item.checked){
+						selectIds.push(item.UserId)
+						selectNames.push(item.RealName)
+					}
+				})
+				if(this.statusList.some(item=>{
+					return !item.checked
+				})){
+					this.selectAll = false
+				}else{
+					this.selectAll = true
+				}
+				this.selectIds = selectIds.join(',')
+				this.selectNames = selectNames.join(',')
+			},
+			showFilterDegree(){
+				this.degreeH = 500;
+			},
+			hideFilterDegree(){
+				this.degreeH = 0;
+			},
 			deleteRecordAudio(e){
 				let index = e.currentTarget.dataset.index;
 				let audios = this.audios;
@@ -182,8 +264,7 @@
 					XiangCode: _this.userinfo.XiangCode,
 					CunCode: _this.userinfo.CunCode
 				}).then((res)=>{
-					console.log(res)
-					this.statusList = res || []
+					_this.statusList = res || []
 				})
 			},
 			bindPickerChange(arr){
@@ -420,10 +501,87 @@
 		align-items: center;
 		justify-content: flex-end;
 		justify-content: flex-end;
-		padding-left: 20rpx;
+		padding: 40rpx 0;
 	}
 	.checkbox-item{
 		display: inline-block;
-		min-width: 200rpx;
+		min-width: 280rpx;
 	}
+	.right-wrap{
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		flex-grow: 1;
+		text-align: right;
+	}
+	.select-names{
+		max-width: 430rpx;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	
+	/*顶部下拉选择 综合*/
+	
+	.tui-dropdownlist {
+		width: 100%;
+		position: absolute;
+		background-color: #fff;
+		border-top-left-radius: 24rpx;
+		border-top-right-radius: 24rpx;
+		overflow: hidden;
+		box-sizing: border-box;
+		padding-top: 10rpx;
+		padding-bottom: 26rpx;
+		max-height: 600px;
+		left: 0;
+		bottom: 0;
+		visibility: hidden;
+		transition: all 0.2s ease-in-out;
+		overflow: auto;
+		z-index: 999;
+	}
+	
+	.tui-dropdownlist-show {
+		visibility: visible;
+	}
+	
+	.tui-dropdownlist-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.6);
+		z-index: 10;
+		transition: all 0.2s ease-in-out;
+		opacity: 0;
+		visibility: hidden;
+	}
+	
+	.tui-mask-show {
+		opacity: 1;
+		visibility: visible;
+	}
+	
+	.tui-dropdownlist-item {
+		color: #333;
+		height: 70rpx;
+		font-size: 28rpx;
+		padding: 0 40rpx;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	
+	/*顶部下拉选择 综合*/
+	.tui-bold {
+		font-weight: bold;
+	}
+	
+	.tui-active {
+		color: #e41f19;
+	}
+	
 </style>

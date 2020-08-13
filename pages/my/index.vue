@@ -144,7 +144,7 @@
 			checkUpdate(){
 				let _this = this;
 				this.tui.request('/Login/CheckVersion',"GET",{
-					version: '1.0.1'
+					version: '1.0.2'
 				}).then((res)=>{
 					console.log(res)
 					if(res.resultdata.status == 1){
