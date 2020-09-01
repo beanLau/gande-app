@@ -291,8 +291,9 @@
 			},
 			toReport(){
 				let detailData = this.detailData;
+				console.log(detailData.StartNode)
 				uni.navigateTo({
-					url: `../reportXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}`
+					url: `../reportXiang/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}&StartNode=${detailData.StartNode}`
 				})
 			},
 			toIssue(){
@@ -319,14 +320,20 @@
 						})){
 						_this.canReport = true
 					}
+					if(res.xiangRenWuData.StatusCode == 1){
+						_this.canReport = true
+					}
 					//当前用户
+					let StartNode = res.xiangRenWuData.StartNode
+					let StatusCode = res.xiangRenWuData.StatusCode
+					
 					if(_this.jibie == 2 && res.xiangRenWuData.XiangCode == _this.userinfo.XiangCode){
-						if(_this.canReport && res.xiangRenWuData.StatusCode != 4 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
+						if(_this.canReport && res.xiangRenWuData.StatusCode != 4 && StartNode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
 							_this.showReport = true;
 						}else{
 							_this.showReport = false;
 						}
-						if(res.xiangRenWuData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu){
+						if(res.xiangRenWuData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu && StartNode == 1){
 							_this.showIssue = true
 						}else{
 							_this.showIssue = false;
@@ -344,6 +351,7 @@
 						res.xiangRenWuData.jinjiClass = 'danger'
 					}
 					_this.detailData = res.xiangRenWuData;
+					console.log(_this.detailData)
 					_this.huibaoData = res.xiangHuiBaoData || [];
 					res.renWuCun.map(item=>{
 						if(!item.audioList){

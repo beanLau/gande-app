@@ -26,6 +26,12 @@
 	    ,{
             "path" : "pages/createTask/index"
         }
+	    ,{
+            "path" : "pages/createTask2/index"
+        }
+	    ,{
+            "path" : "pages/createTask3/index"
+        }
         ,{
             "path" : "pages/taskDetail/index"
         }

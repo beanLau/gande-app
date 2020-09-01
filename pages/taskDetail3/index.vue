@@ -25,7 +25,7 @@
 			</view>
 			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
-		<view class="report-content">
+		<view class="report-content" v-if="audios.length > 0">
 			<view class="report-title">{{detailData.XiangName}}下发语音记录</view>
 			<view class="group">
 				<view class="record-audios">
@@ -326,7 +326,7 @@
 			toReport(){
 				let detailData = this.detailData;
 				uni.navigateTo({
-					url: `../reportCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}&CunCode=${detailData.CunCode}&CunName=${detailData.CunName}`
+					url: `../reportCun/index?RenwuID=${detailData.RenwuID}&XiangCode=${detailData.XiangCode}&XiangName=${detailData.XiangName}&CunCode=${detailData.CunCode}&CunName=${detailData.CunName}&StartNode=${detailData.StartNode}`
 				})
 			},
 			toIssue(){
@@ -355,14 +355,19 @@
 							})){
 							_this.canReport = true
 						}
+						if(res.cunRenWuData.StatusCode == 1){
+							_this.canReport = true
+						}
+						let StartNode = res.cunRenWuData.StartNode
+						let StatusCode = res.cunRenWuData.StatusCode
 						//当前用户
 						if(_this.jibie == 3 && res.cunRenWuData.CunCode == _this.userinfo.CunCode){
-							if(_this.canReport && res.cunRenWuData.StatusCode != 4 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
+							if(_this.canReport && res.cunRenWuData.StatusCode != 4 && StartNode != 3 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.shangbaorenwu){
 								_this.showReport = true;
 							}else{
 								_this.showReport = false;
 							}
-							if(res.cunRenWuData.StatusCode == 1 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu){
+							if(res.cunRenWuData.StatusCode == 1 && StartNode != 3 && _this.authorizeMenu.shangchuanxiada && _this.authorizeMenu.shangchuanxiada.xiafarenwu){
 								_this.showIssue = true
 							}else{
 								_this.showIssue = false;

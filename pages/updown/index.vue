@@ -3,7 +3,7 @@
 		
 		<!--screen-->
 		<view class="tui-header-screen">
-			<uni-nav-bar v-if="jibie == 1 && authorizeMenu.shangchuanxiada.faburenwu" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
+			<uni-nav-bar v-if="(jibie == 1 || jibie == 2 || jibie == 3) && authorizeMenu.shangchuanxiada.faburenwu" status-bar right-text="发布任务" @clickRight="toCreateTask"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			<uni-nav-bar v-else-if="jibie == 4 && authorizeMenu.shangchuanxiada.wentifankui" status-bar right-text="问题反馈" @clickRight="toCreateQuestion"	color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			<uni-nav-bar v-else status-bar color="#fff" fixed background-color="#DE1727" title="上传下达"></uni-nav-bar>
 			
@@ -251,7 +251,11 @@ export default {
 			pullUpOn: true,
 			listUrl: '',
 			jibie: '',
-			authorizeMenu: {}
+			authorizeMenu: {
+				shangchuanxiada: {
+					
+				}
+			}
 		};
 	},
 	mounted: function(options) {
@@ -284,10 +288,10 @@ export default {
 				this.jibie = 4
 			}
 		}
-		console.log(userinfo)
 		console.log(this.jibie)
 		
 		let authorizeMenu = uni.getStorageSync("authorizeMenu");
+		console.log(authorizeMenu.shangchuanxiada.faburenwu)
 		console.log(authorizeMenu)
 		this.authorizeMenu = authorizeMenu
 		
@@ -559,9 +563,20 @@ export default {
 			}
 		},
 		toCreateTask(){
-			uni.navigateTo({
-				url: '../createTask/index'
-			});
+			let jibie = this.jibie
+			if(jibie == 1){
+				uni.navigateTo({
+					url: '../createTask/index'
+				});
+			}else if(jibie == 2){
+				uni.navigateTo({
+					url: '../createTask2/index'
+				});
+			}else{
+				uni.navigateTo({
+					url: '../createTask3/index'
+				});
+			}
 		},
 		toCreateQuestion(){
 			uni.navigateTo({

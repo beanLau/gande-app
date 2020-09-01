@@ -1,24 +1,58 @@
 <template>
 	<view class="container">
-		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="任务汇报"></uni-nav-bar>
+		<uni-nav-bar status-bar @clickLeft="pageBack" left-icon="back" left-text="返回" right-text="" color="#fff" fixed background-color="#DE1727" title="发布任务"></uni-nav-bar>
 		
 		<form @submit="formSubmit" @reset="formReset">
-			<!-- <tui-list-cell :hover="false">
+			<tui-list-cell :hover="false">
 				<view class="tui-line-cell">
-					<view class="tui-title">下发村庄</view>
-					
-					<u-checkbox-group @change="bindPickerChange">
-						<u-checkbox 
-							active-color="#DE1727"
-							@change="checkboxChange" 
-							v-model="item.checked" 
-							v-for="(item, index) in statusList" :key="index" 
-							:name="item.FullName"
-						>{{item.FullName}}</u-checkbox>
-					</u-checkbox-group>
+					<view class="tui-title">任务标题</view>
+					<input placeholder-class="tui-phcolor" @input="changeTitle" :value="title" class="tui-input form-right" name="title" placeholder="请输入任务标题" maxlength="50" type="text" />
 				</view>
 			</tui-list-cell>
 			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">任务期限（天）</view>
+					<input placeholder-class="tui-phcolor" type="number" min="0" @input="changeQixian" :value="qixian" class="tui-input form-right" name="title" placeholder="请输入任务期限天数"/>
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">紧急程度</view>
+					<picker @change="bindDegreeChange" :value="index" rangeKey="ItemName" :range="degreeList" class="form-right">
+						<view class="uni-input">{{degreeName || '请选择紧急程度'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker>
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">选择分类</view>
+					<picker @change="bindClassifyChange" :value="index" rangeKey="ItemName" :range="classifyList" class="form-right">
+						<view class="uni-input">{{classifyName || '请选择分类'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker>
+				</view>
+			</tui-list-cell>
+			<tui-list-cell :hover="false">
+				<view class="tui-line-cell">
+					<view class="tui-title">下发村庄</view>
+					<!-- <picker @change="bindPickerChange" mode="multiSelector" :value="index" rangeKey="ItemName" :range="statusList" class="form-right">
+						<view class="uni-input">{{selectNames || '请选择下发的村庄'}}</view>
+						<uni-icons type="arrowright" :size="18"></uni-icons>
+					</picker> -->
+					
+					<u-checkbox-group @change="bindPickerChange" class="checkbox-group">
+						<u-checkbox
+							width="200rpx"
+							active-color="#DE1727"
+							v-model="item.checked" 
+							v-for="(item, index) in xiangList" :key="index" 
+							:name="item.FullName"
+						><text class="checkbox-item">{{item.FullName}}</text></u-checkbox>
+					</u-checkbox-group>
+				</view>
+			</tui-list-cell>
+			<!-- <tui-list-cell :hover="false">
 				<view class="tui-line-cell">
 					<view class="tui-title">下发内容</view>
 				</view>
@@ -70,27 +104,99 @@
 				XiangName: '',
 				content: '',
 				statusList: [],
+				xiangList: [],
+				classifyList: [],
+				classifyId: '',
+				classifyName: '',
+				degreeList: [],
+				degreeId: '',
+				degreeName: '',
+				selectNames: '',
+				selectIds: '',
+				title: '',
+				content: "",
+				qixian: '',
 				curentItem: {},
 				isLoading: false,
 				selectNames: '',
 				selectIds: '',
 				recordIndex: -1,
-				innerAudioContext: null,
-				StartNode: ''
+				innerAudioContext: null
 			}
 		},
 		onLoad(opt) {
 			this.RenwuID = opt.RenwuID
 			this.XiangCode = opt.XiangCode
 			this.XiangName = opt.XiangName
-			this.CunCode = opt.CunCode
-			this.CunName = opt.CunName
-			this.StartNode = opt.StartNode
-			console.log(opt)
-			let self = this;
-			//this.getCunList();
+		},
+		mounted() {
+			let userinfo = uni.getStorageSync("userinfo")
+			if(userinfo){
+				userinfo = JSON.parse(userinfo)
+				this.userinfo = userinfo
+			}
+			let dataItem = uni.getStorageSync('dataItem');
+			this.classifyList = dataItem.renwufenlei || [];
+			this.degreeList = dataItem.jinjichengdu || [];
+			console.log(this.classifyList)
+			console.log(this.degreeList)
+			this.getCunList();
 		},
 		methods: {
+			cancelCb(){
+				uni.navigateBack()
+			},
+			changeQixian(e){
+				this.qixian = e.detail.value
+			},
+			changeTitle(e){
+				this.title = e.detail.value
+			},
+			changeContent(e){
+				this.content = e.detail.value
+			},
+			bindDegreeChange(e){
+				let index = e.target.value;
+				this.degreeId = this.degreeList[index].ItemValue
+				this.degreeName = this.degreeList[index].ItemName
+			},
+			bindClassifyChange(e){
+				let index = e.target.value;
+				this.classifyId = this.classifyList[index].ItemValue
+				this.classifyName = this.classifyList[index].ItemName
+			},
+			bindPickerChange(arr){
+				let xiangList = this.xiangList;
+				let selectArr;
+				let selectNames = [];
+				let selectIds = [];
+				if(arr.length == 0){
+					this.selectNames = '';
+					this.selectIds = '';
+					return
+				}
+				selectArr = xiangList.filter(item=>{
+					return arr.includes(item.FullName)
+				})
+				selectArr.map(item=>{
+					selectNames.push(item.FullName)
+					selectIds.push(item.OrganizeId)
+				})
+				selectNames = selectNames.join(",")
+				selectIds = selectIds.join(",")
+				this.selectNames = selectNames;
+				this.selectIds = selectIds;
+			},
+			getXiangList(){
+				let _this = this;
+				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
+					parentId: this.userinfo.XiangCode,
+					nature: 7
+				}).then((res)=>{
+					console.log(res)
+					this.xiangList = res || []
+				})
+			},
 			deleteRecordAudio(e){
 				let index = e.currentTarget.dataset.index;
 				let audios = this.audios;
@@ -166,15 +272,15 @@
 			getCunList(){
 				let _this = this;
 				this.tui.request('/BaseManage/Organize/GetOrgAreaList',"GET",{
-					parentId: _this.XiangCode,
+					parentId: _this.userinfo.XiangCode,
 					nature: 7
 				}).then((res)=>{
 					console.log(res)
-					this.statusList = res || []
+					this.xiangList = res || []
 				})
 			},
 			bindPickerChange(arr){
-				let statusList = this.statusList;
+				let xiangList = this.xiangList;
 				let selectArr;
 				let selectNames = [];
 				let selectIds = [];
@@ -183,7 +289,7 @@
 					this.selectIds = '';
 					return
 				}
-				selectArr = statusList.filter(item=>{
+				selectArr = xiangList.filter(item=>{
 					return arr.includes(item.FullName)
 				})
 				selectArr.map(item=>{
@@ -213,35 +319,69 @@
 					return
 				}
 				let _this = this;
-				if(_this.audios.length == 0){
-					_this.$refs.uToast.show({
-						title: '请进行录音汇报！',
-					})
-					return
-				}
 				let audioUrlList = []
 				_this.audios.map(item=>{
 					audioUrlList.push(item.src)
 				})
+				if(!_this.title){
+					_this.$refs.uToast.show({
+						title: '请输入任务标题',
+					})
+					return
+				}
+				if(!_this.qixian){
+					_this.$refs.uToast.show({
+						title: '请输入任务期限',
+					})
+					return
+				}
+				if(!_this.degreeId){
+					_this.$refs.uToast.show({
+						title: '请选择紧急程度',
+					})
+					return
+				}
+				if(!_this.classifyId){
+					_this.$refs.uToast.show({
+						title: '请选择分类',
+					})
+					return
+				}
+				if(!_this.selectIds){
+					_this.$refs.uToast.show({
+						title: '请选择执行村庄',
+					})
+					return
+				}
+				if(audioUrlList.length == 0){
+					_this.$refs.uToast.show({
+						title: '请录制任务语音！',
+					})
+					return
+				}
 				let reqData = {
-					entity: {
-						RenwuID: _this.RenwuID,
-						XiangCode: _this.XiangCode,
-						XiangName: _this.XiangName,
-						CunCode: _this.CunCode,
-						CunName: _this.CunName,
-						StartNode: _this.StartNode
+					"entity":{
+						XiangCode: _this.userinfo.XiangCode,
+						"Title": _this.title,
+						"JinjiCode": _this.degreeId,
+						"TypeCode": _this.classifyId,
+						"RenWuQiXian": parseInt(_this.qixian),
+						"Neirong": _this.content,
+						"RenWuDuiXiangName": _this.selectNames,
+						"JinjiName": _this.degreeName,
+						"TypeName": _this.classifyName,
+						"RenWuDuiXiangCode": _this.selectIds
 					},
-					audioUrlList: audioUrlList.join(',')
+					"audioUrlList": audioUrlList.join(',')
 				}
 				console.log(reqData)
 				_this.isLoading = true
-				_this.tui.request("/Siji/AFP_RenWuCunHuiBao/SaveForm",'POST',reqData).then((res)=>{
+				_this.tui.request("/Siji/AFP_RenwuXiang/SaveForm",'POST',reqData).then((res)=>{
 					console.log(res)
 					_this.isLoading = false;
 					if(res.type == 1){
 						_this.$refs.uToast.show({
-							title: '汇报成功',
+							title: '任务创建成功~',
 							back: true
 						})
 					}else{
@@ -400,5 +540,16 @@
 	.delete-icon{
 		margin-left: 30rpx;
 		margin-bottom: 30rpx;
+	}
+	.checkbox-group{
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		justify-content: flex-end;
+		padding-left: 20rpx;
+	}
+	.checkbox-item{
+		display: inline-block;
+		min-width: 200rpx;
 	}
 </style>

@@ -46,13 +46,15 @@
 				curentItem: {},
 				isLoading: false,
 				selectName: '',
-				selectId: ''
+				selectId: '',
+				StartNode: ''
 			}
 		},
 		onLoad(opt) {
 			this.RenwuID = opt.RenwuID
 			this.XiangCode = opt.XiangCode
 			this.XiangName = opt.XiangName
+			this.StartNode = opt.StartNode
 			let dataItem = uni.getStorageSync('dataItem');
 			if(Array.isArray(dataItem.renwuzhuangtai)){
 				this.statusList = dataItem.renwuzhuangtai.filter(item=>{
@@ -104,7 +106,8 @@
 					"XiangName": _this.XiangName,
 					"StatusCode": _this.selectId,
 					"StatusName": _this.selectName,
-					"HuibaoNeirong": _this.content
+					"HuibaoNeirong": _this.content,
+					StartNode: _this.StartNode
 				}
 				_this.isLoading = true
 				_this.tui.request("/Siji/AFP_RenWuXiangHuiBao/SaveForm",'POST',{
