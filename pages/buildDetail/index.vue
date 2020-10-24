@@ -55,7 +55,8 @@
 				detailData: {},
 				list: [],
 				id: '',
-				showReportBtn: false
+				showReportBtn: false,
+				ajaxCount: 0
 			}
 		},
 		
@@ -98,12 +99,9 @@
 					keyValue: _this.RenwuID
 				}).then((res)=>{
 					console.log(res)
-					if(_this.jibie == 3 && res.XiangCode == _this.userinfo.XiangCode && res.StatusCode == 0){
-						_this.showReportBtn = true
-					}else{
-						_this.showReportBtn = false
-					}
 					this.detailData = res || []
+					this.ajaxCount ++ 
+					this.ajaxDown();
 				})
 			},
 			getList(){
@@ -115,8 +113,26 @@
 				}
 				this.tui.request("/Siji/AFP_DangjianRenwuHuibao/GetListJson", "get",resData).then((res)=>{
 					this.list = res || []
-					console.log(res)
+					this.ajaxCount ++ 
+					this.ajaxDown();
 				})
+			},
+			ajaxDown(){
+				if(this.ajaxCount < 2){
+					return
+				}
+				let _this = this;
+				let StatusCode = 1;
+				this.list.map(item=>{
+					if(item.CunCode == _this.userinfo.CunCode){
+						StatusCode = item.StatusCode
+					}
+				})
+				if(_this.jibie == 3 && _this.detailData.XiangCode == _this.userinfo.XiangCode && StatusCode == 0){
+					_this.showReportBtn = true
+				}else{
+					_this.showReportBtn = false
+				}
 			},
 			pageBack(){
 				uni.navigateBack()

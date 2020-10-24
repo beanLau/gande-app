@@ -598,13 +598,16 @@ export default {
 				leixing: _this.typeId,
 				jibie: _this.jibie
 			}
-			if(this.jibie == 3){
+			if(this.jibie == 2){
 				queryJson.XiangCode = _this.userinfo.XiangCode
 			}
 			if(this.jibie == 3){
+				queryJson.XiangCode = _this.userinfo.XiangCode
 				queryJson.CunCode = _this.userinfo.CunCode
 			}
 			if(_this.jibie == 4){
+				queryJson.XiangCode = _this.userinfo.XiangCode
+				queryJson.CunCode = _this.userinfo.CunCode
 				queryJson.LianHuYuanID = _this.userinfo.UserId;
 			}
 			let resData = {

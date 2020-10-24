@@ -48,31 +48,31 @@
 				</view>
 				<view class="group">
 					<text class="group-label">孤儿及困境儿童</text>
-					<text class="group-value">{{detailData.Guer ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Guer}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">养老、高龄</text>
-					<text class="group-value">{{detailData.Gaoling ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Gaoling}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">参保</text>
-					<text class="group-value">{{detailData.Canbao ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Canbao}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">村干部</text>
-					<text class="group-value">{{detailData.Ganbu ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Ganbu}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">党员</text>
-					<text class="group-value">{{detailData.Dangyuan ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Dangyuan}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">公益性岗位</text>
-					<text class="group-value">{{detailData.Gongyigang ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Gongyigang}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">重点人员</text>
-					<text class="group-value">{{detailData.Zhongdian ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Zhongdian}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">四大疾病</text>
@@ -80,19 +80,19 @@
 				</view>
 				<view class="group">
 					<text class="group-label">僧侣</text>
-					<text class="group-value">{{detailData.Senglv ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.Senglv}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">管护员</text>
-					<text class="group-value">{{detailData.GuanhuyuanName ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.GuanhuyuanName || ''}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">雨露计划</text>
-					<text class="group-value">{{detailData.YuluJihua ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.YuluJihua}}</text>
 				</view>
 				<view class="group">
 					<text class="group-label">技能培训</text>
-					<text class="group-value">{{detailData.JinengPeixun ? '是':'否'}}</text>
+					<text class="group-value">{{detailData.JinengPeixun}}</text>
 				</view>
 			</view>
 			<view class="group-title" style="margin-top: 40rpx;">
@@ -102,39 +102,39 @@
 				<view class="group">
 					<text class="group-label">身份证正面</text>
 					<view class="group-value img-list">
-						<image :src="detailData.CardImg1" mode="" class="img-item"></image>
+						<image :src="detailData.CardImg1" mode="" class="img-item" @click="previewImg(detailData.CardImg1)"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">身份证反面</text>
 					<view class="group-value img-list">
-						<image :src="detailData.CardImg2" mode="" class="img-item"></image>
+						<image :src="detailData.CardImg2" mode="" class="img-item" @click="previewImg(detailData.CardImg2)"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">户口本</text>
 					<view class="group-value img-list">
-						<image v-for="item in detailData.HukouImg" :src="item" mode="" class="img-item"></image>
+						<image v-for="(item,index) in detailData.HukouImg" :src="item" mode="" class="img-item" @click="previewImg(detailData.HukouImg,index)"></image>
 					</view>
 				</view>
 				<view class="group">
 					<text class="group-label">残疾证</text>
 					<view class="group-value img-list">
-						<image v-for="item in detailData.CanjiImg" :src="item" mode="" class="img-item"></image>
+						<image v-for="(item,index) in detailData.CanjiImg" :src="item" mode="" class="img-item" @click="previewImg(detailData.CanjiImg,index)"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">低保证</text>
 					<view class="group-value img-list">
-						<image v-for="item in detailData.DibaoImg" :src="item" mode="" class="img-item"></image>
+						<image v-for="(item,index) in detailData.DibaoImg" :src="item" mode="" class="img-item" @click="previewImg(detailData.DibaoImg,index)"></image>
 					</view>
 				</view>
 				
 				<view class="group">
 					<text class="group-label">其他证件</text>
 					<view class="group-value img-list">
-						<image v-for="item in detailData.QitaImg" :src="item" mode="" class="img-item"></image>
+						<image v-for="(item,index) in detailData.QitaImg" :src="item" mode="" class="img-item" @click="previewImg(detailData.QitaImg,index)"></image>
 					</view>
 				</view>
 			</view>
@@ -160,6 +160,16 @@
 			this.getDetail();
 		},
 		methods: {
+			previewImg(imgs,index = 0){
+				if(!Array.isArray(imgs)){
+					imgs = [imgs]
+				}
+				uni.previewImage({
+					current: imgs[index],
+					urls: imgs
+				});
+				
+			},
 			getDetail(){
 				console.log(this.id)
 				let _this = this;
@@ -167,12 +177,12 @@
 					keyValue: this.id
 				}).then((res)=>{
 					console.log(res)
-					if(res.IDCard){
-						res.IDCard = Decrypt(res.IDCard)
-					}
-					if(res.Tel){
-						res.Tel = Decrypt(res.Tel)
-					}
+					// if(res.IDCard){
+					// 	res.IDCard = Decrypt(res.IDCard)
+					// }
+					// if(res.Tel){
+					// 	res.Tel = Decrypt(res.Tel)
+					// }
 					if(res.HeadImg){
 						let HeadImg = res.HeadImg.split(";")
 						HeadImg = HeadImg.map(item=>{
@@ -186,9 +196,11 @@
 					}
 					if(res.CardImg1){
 						res.CardImg1 = 'http://110.166.84.163:8001/' + res.CardImg1
+						res.CardImg1 = res.CardImg1.replace(';','')
 					}
 					if(res.CardImg2){
 						res.CardImg2 = 'http://110.166.84.163:8001/' + res.CardImg2
+						res.CardImg2 = res.CardImg2.replace(';','')
 					}
 					if(res.HukouImg){
 						let HukouImg = res.HukouImg.split(";")

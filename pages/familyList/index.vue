@@ -102,14 +102,14 @@
 						})
 						return
 					}
-					res.rows.map(item=>{
-						if(item.IDCard){
-							item.IDCard = Decrypt(item.IDCard)
-						}
-						if(item.Tel){
-							item.Tel = Decrypt(item.Tel)
-						}
-					})
+					// res.rows.map(item=>{
+					// 	if(item.IDCard){
+					// 		item.IDCard = Decrypt(item.IDCard)
+					// 	}
+					// 	if(item.Tel){
+					// 		item.Tel = Decrypt(item.Tel)
+					// 	}
+					// })
 					if(_this.pageIndex == 1){
 						_this.familyList = res.rows;
 					}else{
