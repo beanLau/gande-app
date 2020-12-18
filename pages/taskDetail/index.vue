@@ -23,10 +23,7 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			
-			<view class="item-desc">
-				{{detailData.Neirong}}
-			</view>
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="towns-list" v-if="xiangRenWu.length != 0">
 			<view class="towns-title">
@@ -37,9 +34,7 @@
 					<text class="towns-name">{{item.XiangName}}</text>
 					<text class="towns-status">{{item.StatusName}}</text>
 				</view>
-				<view class="towns-content">
-					具体工作内容：{{item.Neirong}}
-				</view>
+				<u-parse class="towns-content" :html="'具体工作内容：'+ item.Neirong"></u-parse>
 				<view class="towns-bottom">
 					<text class="towns-time">汇报时间 {{item.CompDate || ' 无'}}</text>
 					<text class="towns-btn">查看详情</text>

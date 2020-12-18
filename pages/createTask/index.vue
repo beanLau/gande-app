@@ -55,7 +55,7 @@
 				
 			</tui-list-cell>
 			<view class="textarea-wrap">
-				<textarea placeholder-style="color:#999" placeholder="请输入任务内容" @input="changeContent" :value="content"/>
+				<textarea maxlength="999999" placeholder-style="color:#999" placeholder="请输入任务内容" @input="changeContent" :value="content"/>
 			</view>
 			<view class="tui-btn-box flex">
 				<button class="tui-button-primary cancel-btn" hover-class="tui-button-hover" @click="cancelCb">取消</button>
@@ -153,7 +153,6 @@
 					parentId: this.userinfo.XianCode,
 					nature: 6
 				}).then((res)=>{
-					console.log(res)
 					this.xiangList = res || []
 				})
 			},
