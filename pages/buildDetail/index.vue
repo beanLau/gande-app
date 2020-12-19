@@ -17,7 +17,7 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			<u-parse :html="detailData.Renwu" class="item-desc"></u-parse>
+			<u-parse :html="formatTable(detailData.Renwu)" class="item-desc"></u-parse>
 			<!-- <rich-text :nodes="detailData.Renwu" class="item-desc"></rich-text> -->
 		</view>
 		<view class="towns-list">
@@ -88,6 +88,17 @@
 		mounted(){
 		},
 		methods: {
+			formatTable(content){
+				if(content){
+					content = content.replace(/<br[^>]*\/>/gi, '');
+					content = content.replace(/<td[^<>]*>/ig, '<td style="border:1px solid #ccc;padding:0px;height:auto;word-break:break-all;">');
+					content = content.replace(/<td[^<>]*>\s*?<p>/ig, '<td>');
+					content = content.replace(/<table[^>]*>/gi, '<table cellpadding="0" cellspacing="0" max-width="100%" border="1" style="font-size:12px;max-width:100%; text-align:left;text-indent: 0em;line-height:12px;"'); 
+					return content;
+				}else{
+					return null;
+				}
+			},
 			toReport(){
 				uni.navigateTo({
 					url: `../reportBuild/index?RenwuID=${this.RenwuID}&id=${this.id}`

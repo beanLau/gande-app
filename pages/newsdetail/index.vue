@@ -14,7 +14,7 @@
 					</view>
 				</view>
 			</view>
-			<u-parse class="item-desc" :html="detailData.NewsContent"></u-parse>
+			<u-parse class="item-desc" :html="formatTable(detailData.NewsContent)"></u-parse>
 		</view>
 		
 	</view>
@@ -41,6 +41,17 @@
 			this.getDetail();
 		},
 		methods: {
+			formatTable(content){
+				if(content){
+					content = content.replace(/<br[^>]*\/>/gi, '');
+					content = content.replace(/<td[^<>]*>/ig, '<td style="border:1px solid #ccc;padding:0px;height:auto;word-break:break-all;">');
+					content = content.replace(/<td[^<>]*>\s*?<p>/ig, '<td>');
+					content = content.replace(/<table[^>]*>/gi, '<table cellpadding="0" cellspacing="0" max-width="100%" border="1" style="font-size:12px;max-width:100%; text-align:left;text-indent: 0em;line-height:12px;"'); 
+					return content;
+				}else{
+					return null;
+				}
+			},
 			pageBack(){
 				uni.navigateBack()
 			},
