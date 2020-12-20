@@ -14,7 +14,7 @@
 					</view>
 				</view>
 			</view>
-			<u-parse class="item-desc" :html="formatTable(detailData.NewsContent)"></u-parse>
+			<u-parse class="item-desc" :html="detailData.NewsContent"></u-parse>
 		</view>
 		
 	</view>

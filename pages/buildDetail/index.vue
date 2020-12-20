@@ -17,7 +17,7 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			<u-parse :html="formatTable(detailData.Renwu)" class="item-desc"></u-parse>
+			<u-parse :html="detailData.Renwu" class="item-desc"></u-parse>
 			<!-- <rich-text :nodes="detailData.Renwu" class="item-desc"></rich-text> -->
 		</view>
 		<view class="towns-list">

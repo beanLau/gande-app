@@ -23,7 +23,7 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			<u-parse class="item-desc" :html="formatTable(detailData.Neirong)"></u-parse>
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="report-content" v-if="audios.length > 0">
 			<view class="report-title">{{detailData.XiangName}}下发语音记录</view>

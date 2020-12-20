@@ -23,7 +23,7 @@
 			<view class="group">
 				<text class="group-label">会议内容</text>
 			</view>
-			<u-parse class="item-desc" :html="formatTable(detailData.Neirong)"></u-parse>
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="solve-wrap">
 			<view class="solve-title">

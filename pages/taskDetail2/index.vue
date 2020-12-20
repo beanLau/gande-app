@@ -23,7 +23,7 @@
 					{{detailData.StatusName}}
 				</view>
 			</view>
-			<u-parse class="item-desc" :html="formatTable(detailData.Neirong)"></u-parse>
+			<u-parse class="item-desc" :html="detailData.Neirong"></u-parse>
 		</view>
 		<view class="report-content" v-if="huibaoData.length > 0">
 			<view class="report-title">{{detailData.XiangName}}任务汇报</view>
@@ -331,7 +331,7 @@
 						})){
 						_this.canReport = true
 					}
-					if(res.xiangRenWuData.StatusCode == 1){
+					if(res.xiangRenWuData.StatusCode == 1 || res.xiangRenWuData.StatusCode == 3){
 						_this.canReport = true
 					}
 					//当前用户
