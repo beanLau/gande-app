@@ -43,7 +43,7 @@
 				
 				<view class="group">
 					<text class="group-label">汇报内容</text>
-					<text class="group-value">{{huibao.HuibaoNeirong}}</text>
+					<u-parse class="group-value" :html="huibao.HuibaoNeirong"></u-parse>
 				</view>
 			</view>
 		</view>

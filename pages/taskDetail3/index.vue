@@ -57,7 +57,7 @@
 				
 				<view class="group">
 					<text class="group-label">汇报内容</text>
-					<text class="group-value">{{detailData.Neirong}}</text>
+					<u-parse class="group-value" :html="detailData.Neirong"></u-parse>
 				</view>
 				<view class="group">
 					<text class="group-label">汇报内容</text>

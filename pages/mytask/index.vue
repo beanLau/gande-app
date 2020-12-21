@@ -16,9 +16,7 @@
 								<tui-tag margin="0 15upx 0 0" padding="8rpx" :type="item.leixingType" size="24rpx">{{item.leixingName}}</tui-tag>
 								<view>{{item.title}}</view>
 							</view>
-							<view class="item-desc">
-								具体工作内容：{{item.neirong}}
-							</view>
+							<u-parse class="item-desc" :html="'具体工作内容：'+detailData.Neirong"></u-parse>
 							<view class="bottom-wrap">
 								<view class="bottom-left">
 									<tui-tag padding="8rpx" size="24rpx" :type="item.jinjiClass" v-if="item.jinjiname">
